@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register — KNOWLEDGEBASE</title>
+
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/pages/auth.css">
+</head>
+<body>
+
+    <div class="auth-page">
+
+        <!-- LEFT PANEL -->
+        <div class="auth-left">
+            <div class="auth-brand">
+                <h1 class="auth-brand-name">KNOWLEDGE<span>BASE</span></h1>
+                <p class="auth-tagline">Certify what you know.</p>
+
+                <div class="auth-features">
+                    <div class="auth-feature-item">
+                        <div class="auth-feature-icon">📝</div>
+                        <span>Take structured certification exams</span>
+                    </div>
+                    <div class="auth-feature-item">
+                        <div class="auth-feature-icon">✅</div>
+                        <span>Validate your skills officially</span>
+                    </div>
+                    <div class="auth-feature-item">
+                        <div class="auth-feature-icon">🏆</div>
+                        <span>Earn verifiable certificates</span>
+                    </div>
+                    <div class="auth-feature-item">
+                        <div class="auth-feature-icon">🔍</div>
+                        <span>Share and verify credentials</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="auth-right">
+            <div class="auth-form-wrapper">
+
+                <div class="auth-form-header">
+                    <h2 class="auth-form-title">Create your account</h2>
+                    <p class="auth-form-subtitle">Join thousands validating their skills on KNOWLEDGEBASE</p>
+                </div>
+
+                <form class="auth-form" id="registerForm">
+
+                    <div class="auth-form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="firstName">First Name <span style="color: var(--color-error)">*</span></label>
+                            <input 
+                                type="text" 
+                                id="firstName" 
+                                name="firstName"
+                                class="form-input" 
+                                placeholder="John"
+                                autocomplete="given-name"
+                            >
+                            <span class="form-error hidden" id="firstNameError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="surname">Surname <span style="color: var(--color-error)">*</span></label>
+                            <input 
+                                type="text" 
+                                id="surname" 
+                                name="surname"
+                                class="form-input" 
+                                placeholder="Doe"
+                                autocomplete="family-name"
+                            >
+                            <span class="form-error hidden" id="surnameError"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="otherName">Other Name <span style="color: var(--color-text-muted); font-weight: 400;">(optional)</span></label>
+                        <input 
+                            type="text" 
+                            id="otherName" 
+                            name="otherName"
+                            class="form-input" 
+                            placeholder="Middle name"
+                            autocomplete="additional-name"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address <span style="color: var(--color-error)">*</span></label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email"
+                            class="form-input" 
+                            placeholder="john@example.com"
+                            autocomplete="email"
+                        >
+                        <span class="form-error hidden" id="emailError"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password <span style="color: var(--color-error)">*</span></label>
+                        <div class="password-wrapper">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password"
+                                class="form-input" 
+                                placeholder="Minimum 6 characters"
+                                autocomplete="new-password"
+                            >
+                            <button type="button" class="password-toggle" id="togglePassword">👁</button>
+                        </div>
+                        <span class="form-error hidden" id="passwordError"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="confirmPassword">Confirm Password <span style="color: var(--color-error)">*</span></label>
+                        <div class="password-wrapper">
+                            <input 
+                                type="password" 
+                                id="confirmPassword" 
+                                name="confirmPassword"
+                                class="form-input" 
+                                placeholder="Repeat your password"
+                                autocomplete="new-password"
+                            >
+                            <button type="button" class="password-toggle" id="toggleConfirmPassword">👁</button>
+                        </div>
+                        <span class="form-error hidden" id="confirmPasswordError"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-full btn-lg" id="registerBtn">
+                        Create Account
+                    </button>
+
+                </form>
+
+                <div class="auth-form-footer mt-6">
+                    Already have an account? <a href="./login.html">Log in</a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/pages/register.js"></script>
+
+</body>
+</html>
