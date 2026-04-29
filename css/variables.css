@@ -1,1 +1,89 @@
-n
+:root {
+    /* ── BRAND COLOURS ── */
+    --color-primary: #2563EB;
+    --color-primary-hover: #1D4ED8;
+    --color-accent: #F59E0B;
+    --color-accent-hover: #D97706;
+
+    /* ── LIGHT MODE (default) ── */
+    --color-bg: #F8F9FB;
+    --color-surface: #FFFFFF;
+    --color-surface-2: #F1F4F9;
+    --color-border: #E2E8F0;
+    --color-text-primary: #0F172A;
+    --color-text-secondary: #475569;
+    --color-text-muted: #94A3B8;
+
+    /* ── SEMANTIC COLOURS ── */
+    --color-success: #10B981;
+    --color-error: #EF4444;
+    --color-warning: #F59E0B;
+    --color-info: #2563EB;
+
+    /* ── TYPOGRAPHY ── */
+    --font-heading: 'Plus Jakarta Sans', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+
+    /* ── SPACING ── */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --space-20: 5rem;
+
+    /* ── BORDER RADIUS ── */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 9999px;
+
+    /* ── SHADOWS ── */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04);
+
+    /* ── TRANSITIONS ── */
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+    --transition-slow: 350ms ease;
+
+    /* ── LAYOUT ── */
+    --max-width: 1200px;
+    --navbar-height: 70px;
+}
+
+/* ── DARK MODE ── */
+[data-theme="dark"] {
+    --color-bg: #0F172A;
+    --color-surface: #1E3A5F;
+    --color-surface-2: #162032;
+    --color-border: #1E3A5F;
+    --color-text-primary: #F8F9FB;
+    --color-text-secondary: #94A3B8;
+    --color-text-muted: #475569;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+}
