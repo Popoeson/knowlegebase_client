@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile — KNOWLEDGEBASE</title>
+
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/pages/dashboard.css">
+    <link rel="stylesheet" href="../css/pages/profile.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span class="sidebar-brand-name">KNOWLEDGE<span>BASE</span></span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Main</p>
+                <a href="./dashboard.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🏠</span>
+                    Dashboard
+                </a>
+                <a href="./courses.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📚</span>
+                    Courses
+                </a>
+            </div>
+
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">My Activity</p>
+                <a href="./exam-history.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📝</span>
+                    Exam History
+                </a>
+                <a href="./certificates.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🏆</span>
+                    My Certificates
+                </a>
+                <a href="./transactions.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">💳</span>
+                    Transactions
+                </a>
+            </div>
+
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Account</p>
+                <a href="./profile.html" class="sidebar-nav-item active">
+                    <span class="sidebar-nav-icon">👤</span>
+                    Profile
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar" id="sidebarAvatar"></div>
+                <div class="sidebar-user-info">
+                    <p class="sidebar-user-name" id="sidebarName"></p>
+                    <p class="sidebar-user-role">Student</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- OVERLAY -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <!-- TOP BAR -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <h1 class="topbar-title">Profile</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle">🌙</button>
+                <div class="topbar-avatar" id="topbarAvatar"></div>
+            </div>
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <main class="page-content">
+
+            <div class="profile-layout">
+
+                <!-- LEFT: PHOTO + BASIC INFO -->
+                <div class="profile-sidebar-card card">
+
+                    <div class="profile-photo-wrapper">
+                        <div class="profile-photo" id="profilePhoto"></div>
+                        <label class="profile-photo-edit" for="photoInput" title="Change photo">✏️</label>
+                        <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp" class="hidden">
+                    </div>
+
+                    <div class="profile-basic-info">
+                        <h2 class="profile-name" id="profileName"></h2>
+                        <p class="profile-email" id="profileEmail"></p>
+                        <span class="badge badge-info mt-2" id="profileRole"></span>
+                    </div>
+
+                    <button class="btn btn-ghost w-full mt-6" id="logoutBtn">
+                        🚪 Log Out
+                    </button>
+
+                </div>
+
+                <!-- RIGHT: EDIT FORMS -->
+                <div class="profile-main">
+
+                    <!-- PERSONAL INFO -->
+                    <div class="card mb-6">
+                        <h3 class="profile-section-title">Personal Information</h3>
+                        <p class="profile-section-subtitle">Your name is set at registration and cannot be changed here.</p>
+
+                        <div class="profile-info-grid">
+                            <div class="profile-info-item">
+                                <span class="profile-info-label">First Name</span>
+                                <span class="profile-info-value" id="infoFirstName"></span>
+                            </div>
+                            <div class="profile-info-item">
+                                <span class="profile-info-label">Surname</span>
+                                <span class="profile-info-value" id="infoSurname"></span>
+                            </div>
+                            <div class="profile-info-item">
+                                <span class="profile-info-label">Other Name</span>
+                                <span class="profile-info-value" id="infoOtherName">—</span>
+                            </div>
+                            <div class="profile-info-item">
+                                <span class="profile-info-label">Email</span>
+                                <span class="profile-info-value" id="infoEmail"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EDIT PROFILE -->
+                    <div class="card mb-6">
+                        <h3 class="profile-section-title">Edit Profile</h3>
+
+                        <form class="auth-form" id="editProfileForm">
+                            <div class="form-group">
+                                <label class="form-label" for="phone">Phone Number</label>
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    class="form-input"
+                                    placeholder="+234 800 000 0000"
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="bio">Bio</label>
+                                <textarea
+                                    id="bio"
+                                    class="form-input profile-textarea"
+                                    placeholder="Tell us a little about yourself..."
+                                    rows="3"
+                                ></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" id="saveProfileBtn">
+                                Save Changes
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- CHANGE PASSWORD -->
+                    <div class="card">
+                        <h3 class="profile-section-title">Change Password</h3>
+
+                        <form class="auth-form" id="changePasswordForm">
+                            <div class="form-group">
+                                <label class="form-label" for="currentPassword">Current Password</label>
+                                <div class="password-wrapper">
+                                    <input
+                                        type="password"
+                                        id="currentPassword"
+                                        class="form-input"
+                                        placeholder="Enter current password"
+                                    >
+                                    <button type="button" class="password-toggle" id="toggleCurrent">👁</button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="newPassword">New Password</label>
+                                <div class="password-wrapper">
+                                    <input
+                                        type="password"
+                                        id="newPassword"
+                                        class="form-input"
+                                        placeholder="Minimum 6 characters"
+                                    >
+                                    <button type="button" class="password-toggle" id="toggleNew">👁</button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="confirmNewPassword">Confirm New Password</label>
+                                <div class="password-wrapper">
+                                    <input
+                                        type="password"
+                                        id="confirmNewPassword"
+                                        class="form-input"
+                                        placeholder="Repeat new password"
+                                    >
+                                    <button type="button" class="password-toggle" id="toggleConfirmNew">👁</button>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" id="changePasswordBtn">
+                                Change Password
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/pages/profile.js"></script>
+
+</body>
+</html>
