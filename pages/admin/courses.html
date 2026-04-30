@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Courses — KNOWLEDGEBASE</title>
+
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/reset.css">
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="../../css/pages/dashboard.css">
+    <link rel="stylesheet" href="../../css/pages/courses.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span class="sidebar-brand-name">KNOWLEDGE<span>BASE</span></span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Admin Panel</p>
+                <a href="./dashboard.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="./users.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">👥</span>
+                    Users
+                </a>
+                <a href="./courses.html" class="sidebar-nav-item active">
+                    <span class="sidebar-nav-icon">📚</span>
+                    Courses
+                </a>
+                <a href="./questions.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🧠</span>
+                    Questions
+                </a>
+                <a href="./certificates.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🏆</span>
+                    Certificates
+                </a>
+                <a href="./transactions.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">💳</span>
+                    Transactions
+                </a>
+            </div>
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Account</p>
+                <a href="./profile.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">👤</span>
+                    Profile
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar" id="sidebarAvatar"></div>
+                <div class="sidebar-user-info">
+                    <p class="sidebar-user-name" id="sidebarName"></p>
+                    <p class="sidebar-user-role">Administrator</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- OVERLAY -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <h1 class="topbar-title">Manage Courses</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle">🌙</button>
+                <div class="topbar-avatar" id="topbarAvatar"></div>
+            </div>
+        </header>
+
+        <main class="page-content">
+
+            <!-- CATEGORIES SECTION -->
+            <div class="section-header mb-4">
+                <h2 class="section-title">Categories</h2>
+                <button class="btn btn-outline btn-sm" id="addCategoryBtn">+ Add Category</button>
+            </div>
+
+            <div class="card mb-8">
+                <div class="admin-table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Category Name</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriesTable">
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- COURSES SECTION -->
+            <div class="section-header mb-4">
+                <h2 class="section-title">All Courses</h2>
+                <a href="./add-course.html" class="btn btn-primary btn-sm">+ Add Course</a>
+            </div>
+
+            <div class="card">
+                <div class="admin-table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Pass Mark</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coursesTable">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- ADD/EDIT CATEGORY MODAL -->
+<div class="modal-overlay hidden" id="categoryModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="categoryModalTitle">Add Category</h3>
+            <button class="modal-close" id="closeCategoryModal">✕</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="categoryName">Category Name</label>
+            <input type="text" id="categoryName" class="form-input" placeholder="e.g. Digital Skills">
+            <span class="form-error hidden" id="categoryNameError"></span>
+        </div>
+        <input type="hidden" id="categoryId">
+        <div class="modal-footer">
+            <button class="btn btn-ghost" id="cancelCategoryBtn">Cancel</button>
+            <button class="btn btn-primary" id="saveCategoryBtn">Save Category</button>
+        </div>
+    </div>
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-overlay hidden" id="deleteModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Confirm Delete</h3>
+            <button class="modal-close" id="closeDeleteModal">✕</button>
+        </div>
+        <p style="color: var(--color-text-secondary); margin-bottom: var(--space-4);">
+            Are you sure you want to delete <strong id="deleteItemName"></strong>? This action cannot be undone.
+        </p>
+        <input type="hidden" id="deleteItemId">
+        <input type="hidden" id="deleteItemType">
+        <div class="modal-footer">
+            <button class="btn btn-ghost" id="cancelDeleteBtn">Cancel</button>
+            <button class="btn btn-accent" id="confirmDeleteBtn">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script src="../../js/config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/utils.js"></script>
+<script src="../../js/pages/admin/courses-manage.js"></script>
+
+</body>
+</html>
