@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Course — KNOWLEDGEBASE</title>
+
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/reset.css">
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="../../css/pages/dashboard.css">
+    <link rel="stylesheet" href="../../css/pages/courses.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span class="sidebar-brand-name">KNOWLEDGE<span>BASE</span></span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Admin Panel</p>
+                <a href="./dashboard.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="./users.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">👥</span>
+                    Users
+                </a>
+                <a href="./courses.html" class="sidebar-nav-item active">
+                    <span class="sidebar-nav-icon">📚</span>
+                    Courses
+                </a>
+                <a href="./questions.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🧠</span>
+                    Questions
+                </a>
+                <a href="./certificates.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🏆</span>
+                    Certificates
+                </a>
+                <a href="./transactions.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">💳</span>
+                    Transactions
+                </a>
+            </div>
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Account</p>
+                <a href="./profile.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">👤</span>
+                    Profile
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar" id="sidebarAvatar"></div>
+                <div class="sidebar-user-info">
+                    <p class="sidebar-user-name" id="sidebarName"></p>
+                    <p class="sidebar-user-role">Administrator</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- OVERLAY -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <h1 class="topbar-title" id="pageTitle">Add Course</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle">🌙</button>
+                <div class="topbar-avatar" id="topbarAvatar"></div>
+            </div>
+        </header>
+
+        <main class="page-content">
+
+            <div style="margin-bottom: var(--space-6);">
+                <a href="./courses.html" class="btn btn-ghost btn-sm">← Back to Courses</a>
+            </div>
+
+            <div style="max-width: 780px;">
+                <form id="courseForm">
+
+                    <!-- BASIC INFO -->
+                    <div class="card mb-6">
+                        <h3 class="profile-section-title">Basic Information</h3>
+
+                        <div class="auth-form" style="margin-top: var(--space-4);">
+
+                            <div class="form-group">
+                                <label class="form-label" for="title">Course Title <span style="color:var(--color-error)">*</span></label>
+                                <input type="text" id="title" class="form-input" placeholder="e.g. Microsoft Excel Fundamentals">
+                                <span class="form-error hidden" id="titleError"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="category">Category <span style="color:var(--color-error)">*</span></label>
+                                <select id="category" class="filter-select w-full">
+                                    <option value="">Select a category</option>
+                                </select>
+                                <span class="form-error hidden" id="categoryError"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="description">Description <span style="color:var(--color-error)">*</span></label>
+                                <textarea
+                                    id="description"
+                                    class="form-input profile-textarea"
+                                    placeholder="Describe what this certification covers..."
+                                    rows="4"
+                                ></textarea>
+                                <span class="form-error hidden" id="descriptionError"></span>
+                            </div>
+
+                            <div class="auth-form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="difficulty">Difficulty</label>
+                                    <select id="difficulty" class="filter-select w-full">
+                                        <option value="Beginner">Beginner</option>
+                                        <option value="Intermediate">Intermediate</option>
+                                        <option value="Advanced">Advanced</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="duration">Exam Duration (minutes) <span style="color:var(--color-error)">*</span></label>
+                                    <input type="number" id="duration" class="form-input" placeholder="e.g. 30" min="1">
+                                    <span class="form-error hidden" id="durationError"></span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- TOPICS -->
+                    <div class="card mb-6">
+                        <h3 class="profile-section-title">Topics Covered</h3>
+                        <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-4);">
+                            Add topics that users will be tested on. Press Enter or click Add.
+                        </p>
+
+                        <div class="topics-input-wrapper">
+                            <div class="topics-tags" id="topicsTags"></div>
+                            <div class="topics-add-row">
+                                <input
+                                    type="text"
+                                    id="topicInput"
+                                    class="form-input"
+                                    placeholder="e.g. Data entry & formatting"
+                                >
+                                <button type="button" class="btn btn-outline btn-sm" id="addTopicBtn">Add</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EXAM SETTINGS -->
+                    <div class="card mb-6">
+                        <h3 class="profile-section-title">Exam Settings</h3>
+
+                        <div class="auth-form" style="margin-top: var(--space-4);">
+
+                            <div class="auth-form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="certificationQuestions">Cert. Questions Shown <span style="color:var(--color-error)">*</span></label>
+                                    <input type="number" id="certificationQuestions" class="form-input" placeholder="e.g. 30" min="1">
+                                    <span class="form-error hidden" id="certQError"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="practiceQuestions">Practice Questions Shown <span style="color:var(--color-error)">*</span></label>
+                                    <input type="number" id="practiceQuestions" class="form-input" placeholder="e.g. 20" min="1">
+                                    <span class="form-error hidden" id="practiceQError"></span>
+                                </div>
+                            </div>
+
+                            <div class="auth-form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="timeLimit">Time Limit (minutes) <span style="color:var(--color-error)">*</span></label>
+                                    <input type="number" id="timeLimit" class="form-input" placeholder="e.g. 30" min="1">
+                                    <span class="form-error hidden" id="timeLimitError"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="passMark">Pass Mark (%) <span style="color:var(--color-error)">*</span></label>
+                                    <input type="number" id="passMark" class="form-input" placeholder="e.g. 60" min="1" max="100">
+                                    <span class="form-error hidden" id="passMarkError"></span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- PRICING -->
+                    <div class="card mb-6">
+                        <h3 class="profile-section-title">Pricing</h3>
+
+                        <div class="auth-form" style="margin-top: var(--space-4);">
+                            <div class="form-group">
+                                <label class="form-label" for="price">Price (USD $) <span style="color:var(--color-error)">*</span></label>
+                                <input type="number" id="price" class="form-input" placeholder="e.g. 7" min="1">
+                                <span class="form-error hidden" id="priceError"></span>
+                                <p style="font-size: var(--text-xs); color: var(--color-text-muted); margin-top: var(--space-1);">
+                                    Enter price in USD. Naira equivalent will be shown to users at current exchange rate.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- THUMBNAIL -->
+                    <div class="card mb-8">
+                        <h3 class="profile-section-title">Course Thumbnail (Optional)</h3>
+                        <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-4);">
+                            Upload a cover image for this course.
+                        </p>
+                        <input type="file" id="thumbnail" accept="image/jpeg,image/png,image/webp" class="form-input">
+                        <div id="thumbnailPreview" style="margin-top: var(--space-4);"></div>
+                    </div>
+
+                    <!-- SUBMIT -->
+                    <div style="display: flex; gap: var(--space-4);">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                            Save Course
+                        </button>
+                        <a href="./courses.html" class="btn btn-ghost btn-lg">Cancel</a>
+                    </div>
+
+                </form>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script src="../../js/config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/utils.js"></script>
+<script src="../../js/pages/admin/add-course.js"></script>
+
+</body>
+</html>
