@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Questions — KNOWLEDGEBASE</title>
+
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/reset.css">
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="../../css/pages/dashboard.css">
+    <link rel="stylesheet" href="../../css/pages/courses.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span class="sidebar-brand-name">KNOWLEDGE<span>BASE</span></span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Admin Panel</p>
+                <a href="./dashboard.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="./users.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">👥</span>
+                    Users
+                </a>
+                <a href="./courses.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📚</span>
+                    Courses
+                </a>
+                <a href="./questions.html" class="sidebar-nav-item active">
+                    <span class="sidebar-nav-icon">🧠</span>
+                    Questions
+                </a>
+                <a href="./certificates.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🏆</span>
+                    Certificates
+                </a>
+                <a href="./transactions.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">💳</span>
+                    Transactions
+                </a>
+            </div>
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Account</p>
+                <a href="./profile.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">👤</span>
+                    Profile
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar" id="sidebarAvatar"></div>
+                <div class="sidebar-user-info">
+                    <p class="sidebar-user-name" id="sidebarName"></p>
+                    <p class="sidebar-user-role">Administrator</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- OVERLAY -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <h1 class="topbar-title">Manage Questions</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle">🌙</button>
+                <div class="topbar-avatar" id="topbarAvatar"></div>
+            </div>
+        </header>
+
+        <main class="page-content">
+
+            <!-- FILTER BAR -->
+            <div class="courses-filter-bar mb-6">
+                <select class="filter-select" id="courseFilter">
+                    <option value="">All Courses</option>
+                </select>
+                <select class="filter-select" id="typeFilter">
+                    <option value="">All Types</option>
+                    <option value="practice">Practice</option>
+                    <option value="certification">Certification</option>
+                </select>
+                <button class="btn btn-primary btn-sm" id="addQuestionBtn">
+                    + Add Question
+                </button>
+            </div>
+
+            <!-- BULK UPLOAD SECTION -->
+            <div class="card mb-6">
+                <div class="flex-between mb-4">
+                    <h3 class="profile-section-title" style="margin:0;">Bulk Upload Questions</h3>
+                    <button class="btn btn-outline btn-sm" id="downloadTemplateBtn">
+                        ⬇ Download Template
+                    </button>
+                </div>
+
+                <div class="auth-form-row mb-4">
+                    <div class="form-group">
+                        <label class="form-label" for="bulkCourse">Course <span style="color:var(--color-error)">*</span></label>
+                        <select id="bulkCourse" class="filter-select w-full">
+                            <option value="">Select course</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="bulkType">Question Type <span style="color:var(--color-error)">*</span></label>
+                        <select id="bulkType" class="filter-select w-full">
+                            <option value="">Select type</option>
+                            <option value="practice">Practice</option>
+                            <option value="certification">Certification</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="upload-zone" id="uploadZone">
+                    <div class="upload-zone-icon">📂</div>
+                    <p class="upload-zone-text">Click to upload or drag and drop your file here</p>
+                    <p class="upload-zone-subtext">Accepts .xlsx or .csv files</p>
+                    <input type="file" id="bulkFile" accept=".xlsx,.csv" class="hidden">
+                </div>
+
+                <div id="uploadResult" class="hidden"></div>
+
+                <div style="margin-top: var(--space-4);">
+                    <button class="btn btn-primary" id="uploadBtn">
+                        Upload Questions
+                    </button>
+                </div>
+            </div>
+
+            <!-- QUESTIONS TABLE -->
+            <div class="section-header mb-4">
+                <h2 class="section-title">Questions <span id="questionsCount" class="text-muted" style="font-size: var(--text-sm); font-weight: 400;"></span></h2>
+            </div>
+
+            <div class="card">
+                <div class="admin-table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Question</th>
+                                <th>Course</th>
+                                <th>Type</th>
+                                <th>Answer</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="questionsTable">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- ADD/EDIT QUESTION MODAL -->
+<div class="modal-overlay hidden" id="questionModal">
+    <div class="modal" style="max-width: 640px;">
+        <div class="modal-header">
+            <h3 class="modal-title" id="questionModalTitle">Add Question</h3>
+            <button class="modal-close" id="closeQuestionModal">✕</button>
+        </div>
+
+        <div class="auth-form">
+
+            <div class="form-group">
+                <label class="form-label" for="qCourse">Course <span style="color:var(--color-error)">*</span></label>
+                <select id="qCourse" class="filter-select w-full">
+                    <option value="">Select course</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="qType">Question Type <span style="color:var(--color-error)">*</span></label>
+                <select id="qType" class="filter-select w-full">
+                    <option value="">Select type</option>
+                    <option value="practice">Practice</option>
+                    <option value="certification">Certification</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="qQuestion">Question <span style="color:var(--color-error)">*</span></label>
+                <textarea id="qQuestion" class="form-input profile-textarea" placeholder="Enter your question here..." rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="qOptionA">Option A <span style="color:var(--color-error)">*</span></label>
+                <input type="text" id="qOptionA" class="form-input" placeholder="Option A">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="qOptionB">Option B <span style="color:var(--color-error)">*</span></label>
+                <input type="text" id="qOptionB" class="form-input" placeholder="Option B">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="qOptionC">Option C <span style="color:var(--color-error)">*</span></label>
+                <input type="text" id="qOptionC" class="form-input" placeholder="Option C">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="qOptionD">Option D <span style="color:var(--color-error)">*</span></label>
+                <input type="text" id="qOptionD" class="form-input" placeholder="Option D">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="qCorrectAnswer">Correct Answer <span style="color:var(--color-error)">*</span></label>
+                <select id="qCorrectAnswer" class="filter-select w-full">
+                    <option value="">Select correct answer</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="qExplanation">Explanation (Optional)</label>
+                <textarea id="qExplanation" class="form-input profile-textarea" placeholder="Explain why the answer is correct..." rows="2"></textarea>
+            </div>
+
+        </div>
+
+        <input type="hidden" id="questionId">
+
+        <div class="modal-footer">
+            <button class="btn btn-ghost" id="cancelQuestionBtn">Cancel</button>
+            <button class="btn btn-primary" id="saveQuestionBtn">Save Question</button>
+        </div>
+    </div>
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-overlay hidden" id="deleteModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Delete Question</h3>
+            <button class="modal-close" id="closeDeleteModal">✕</button>
+        </div>
+        <p style="color: var(--color-text-secondary); margin-bottom: var(--space-4);">
+            Are you sure you want to delete this question? This action cannot be undone.
+        </p>
+        <input type="hidden" id="deleteQuestionId">
+        <div class="modal-footer">
+            <button class="btn btn-ghost" id="cancelDeleteBtn">Cancel</button>
+            <button class="btn btn-accent" id="confirmDeleteBtn">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script src="../../js/config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/utils.js"></script>
+<script src="../../js/pages/admin/questions.js"></script>
+
+</body>
+</html>
