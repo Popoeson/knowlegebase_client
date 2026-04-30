@@ -3,7 +3,7 @@ Utils.initTheme();
 const init = async () => {
 
     if (!Auth.isLoggedIn() || !Auth.isAdmin()) {
-        window.location.href = "../../pages/login.html";
+        window.location.href = "../login.html";
         return;
     }
 
