@@ -7,6 +7,17 @@ const init = async () => {
         return;
     }
 
+// ── ESCAPE HTML ──
+const escapeHTML = (str) => {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+};
+
     // ── GET URL PARAMS ──
     const params = new URLSearchParams(window.location.search);
     const courseId = params.get("id");
