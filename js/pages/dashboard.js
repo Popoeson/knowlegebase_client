@@ -62,10 +62,20 @@ const init = async () => {
     };
 
     // ── LOAD DASHBOARD DATA ──
+    const loadDashboard = async () => {
     try {
-        const response = await api.get("/user/profile");
-        const user = response.user;
+        // Load profile and stats and courses in parallel
+        const [profileResponse, statsResponse, coursesResponse] = await Promise.all([
+            api.get("/user/profile"),
+            api.get("/user/stats"),
+            api.get("/courses")
+        ]);
 
+        const user = profileResponse.user;
+        const stats = statsResponse.stats;
+        const courses = coursesResponse.courses;
+
+        // Update session
         const token = Auth.getToken();
         Auth.setSession(token, {
             id: user._id,
@@ -76,16 +86,49 @@ const init = async () => {
             profilePhoto: user.profilePhoto
         });
 
+        // Populate user info
         populateUser(user);
+
+        // Populate stats
+        document.getElementById("statExams").textContent = stats.totalExams;
+        document.getElementById("statCerts").textContent = stats.totalCertificates;
+        document.getElementById("statPassed").textContent = stats.passedExams;
+        document.getElementById("statCourses").textContent = stats.totalCourses;
+
+        // Populate courses
+        const coursesGrid = document.getElementById("coursesGrid");
+        if (courses.length === 0) {
+            coursesGrid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📚</div>
+                    <h3 class="empty-state-title">No courses yet</h3>
+                    <p class="empty-state-text">Courses will appear here once they are added.</p>
+                </div>`;
+        } else {
+            // Show max 3 courses on dashboard
+            const preview = courses.slice(0, 3);
+            coursesGrid.innerHTML = preview.map(course => `
+                <div class="course-card"
+                    onclick="window.location.href='./course-detail.html?id=${course._id}'">
+                    <p class="course-card-category">${course.category?.name || "General"}</p>
+                    <div class="course-card-icon">📘</div>
+                    <h3 class="course-card-title">${course.title}</h3>
+                    <p class="course-card-desc">${Utils.truncate(course.description, 80)}</p>
+                    <div class="course-card-meta">
+                        <span class="badge badge-info">${course.difficulty}</span>
+                        <span class="course-card-price">$${course.price}</span>
+                    </div>
+                </div>
+            `).join("");
+        }
 
     } catch (error) {
         if (error.message.includes("authorized") || error.message.includes("token")) {
             Auth.logout();
             return;
         }
-        Utils.toast("Failed to load profile data", "error");
+        Utils.toast("Failed to load dashboard data", "error");
     }
-
 };
 
 init();
