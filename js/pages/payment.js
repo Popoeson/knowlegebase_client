@@ -224,73 +224,68 @@ const init = async () => {
 
     // ── PAY NOW BUTTON ──
     document.getElementById("payNowBtn").addEventListener("click", async () => {
-        const payBtn = document.getElementById("payNowBtn");
-        payBtn.disabled = true;
-        payBtn.textContent = "Initializing payment...";
+    const payBtn = document.getElementById("payNowBtn");
+    payBtn.disabled = true;
+    payBtn.textContent = "Initializing payment...";
 
-        try {
-            // Initialize payment on backend
-            const response = await api.post("/payment/initialize", {
-                courseId,
-                amountNGN: priceNGN
-            });
+    try {
+        const response = await api.post("/payment/initialize", {
+            courseId,
+            amountNGN: priceNGN
+        });
 
-            const { reference, accessCode } = response;
+        const { reference } = response;
 
-            // Open Paystack popup
-            const handler = PaystackPop.setup({
-                key: CONFIG.PAYSTACK_PUBLIC_KEY,
-                email: user.email,
-                amount: priceNGN * 100,
-                ref: reference,
-                access_code: accessCode,
-                metadata: {
-                    custom_fields: [
-                        {
-                            display_name: "Course",
-                            variable_name: "course",
-                            value: course.title
-                        },
-                        {
-                            display_name: "Student Name",
-                            variable_name: "student_name",
-                            value: user.fullName
-                        }
-                    ]
-                },
-                callback: async (response) => {
-                    // Verify payment on backend
-                    Utils.showLoader();
-                    try {
-                        await api.get(`/payment/verify/${response.reference}`);
+        // ── PAYSTACK HANDLER ──
+        const handler = PaystackPop.setup({
+            key: CONFIG.PAYSTACK_PUBLIC_KEY,
+            email: user.email,
+            amount: priceNGN * 100,
+            ref: reference,
+            currency: "NGN",
+            metadata: {
+                custom_fields: [
+                    {
+                        display_name: "Course",
+                        variable_name: "course",
+                        value: course.title
+                    },
+                    {
+                        display_name: "Student Name",
+                        variable_name: "student_name",
+                        value: user.fullName
+                    }
+                ]
+            },
+            callback: function(paystackResponse) {
+                // Verify payment — cannot use async here so we use promise chain
+                Utils.showLoader();
+                api.get(`/payment/verify/${paystackResponse.reference}`)
+                    .then(() => {
                         Utils.toast("Payment successful! Starting your exam...", "success");
-
                         setTimeout(() => {
                             window.location.href = `./exam.html?id=${courseId}&type=certification`;
                         }, 1500);
-
-                    } catch (error) {
-                        Utils.toast("Payment verification failed. Please contact support.", "error");
-                    } finally {
+                    })
+                    .catch(() => {
                         Utils.hideLoader();
-                    }
-                },
-                onClose: () => {
-                    payBtn.disabled = false;
-                    payBtn.textContent = `💳 Pay ₦${priceNGNFormatted} Now`;
-                    Utils.toast("Payment cancelled", "warning");
-                }
-            });
+                        Utils.toast("Payment verification failed. Please contact support.", "error");
+                    });
+            },
+            onClose: function() {
+                payBtn.disabled = false;
+                payBtn.textContent = `💳 Pay ₦${priceNGNFormatted} Now`;
+                Utils.toast("Payment cancelled", "warning");
+            }
+        });
 
-            handler.openIframe();
+        handler.openIframe();
 
-        } catch (error) {
-            Utils.toast(error.message, "error");
-            payBtn.disabled = false;
-            payBtn.textContent = `💳 Pay ₦${priceNGNFormatted} Now`;
-        }
-    });
-
-};
+    } catch (error) {
+        Utils.toast(error.message, "error");
+        payBtn.disabled = false;
+        payBtn.textContent = `💳 Pay ₦${priceNGNFormatted} Now`;
+    }
+});
 
 init();
