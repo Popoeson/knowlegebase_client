@@ -48,38 +48,49 @@ const init = async () => {
     };
 
     // ── RENDER REVIEW QUESTIONS ──
-    const renderReview = (review) => {
-        if (!review || review.length === 0) return "";
+    
+const escapeHTML = (str) => {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+};
 
-        return review.map((q, index) => `
-            <div class="review-item ${q.isCorrect ? "correct" : "incorrect"}">
-                <p class="review-question-text">
-                    ${index + 1}. ${q.questionText}
-                </p>
+const renderReview = (review) => {
+    if (!review || review.length === 0) return "";
 
-                <div class="review-options">
-                    ${["A", "B", "C", "D"].map(letter => {
-                        let className = "review-option";
-                        if (letter === q.correctAnswer) className += " correct-answer";
-                        else if (letter === q.userAnswer && !q.isCorrect) className += " wrong-answer";
+    return review.map((q, index) => `
+        <div class="review-item ${q.isCorrect ? "correct" : "incorrect"}">
+            <p class="review-question-text">
+                ${index + 1}. ${escapeHTML(q.questionText)}
+            </p>
 
-                        return `
-                            <div class="${className}">
-                                <strong>${letter}.</strong>
-                                ${q[`option${letter}`]}
-                                ${letter === q.correctAnswer ? " ✅" : ""}
-                                ${letter === q.userAnswer && !q.isCorrect ? " ❌" : ""}
-                            </div>`;
-                    }).join("")}
-                </div>
+            <div class="review-options">
+                ${["A", "B", "C", "D"].map(letter => {
+                    let className = "review-option";
+                    if (letter === q.correctAnswer) className += " correct-answer";
+                    else if (letter === q.userAnswer && !q.isCorrect) className += " wrong-answer";
 
-                ${q.explanation ? `
-                    <p class="review-explanation">
-                        💡 ${q.explanation}
-                    </p>` : ""}
+                    return `
+                        <div class="${className}">
+                            <strong>${letter}.</strong>
+                            ${escapeHTML(q[`option${letter}`])}
+                            ${letter === q.correctAnswer ? " ✅" : ""}
+                            ${letter === q.userAnswer && !q.isCorrect ? " ❌" : ""}
+                        </div>`;
+                }).join("")}
             </div>
-        `).join("");
-    };
+
+            ${q.explanation ? `
+                <p class="review-explanation">
+                    💡 ${escapeHTML(q.explanation)}
+                </p>` : ""}
+        </div>
+    `).join("");
+};
 
     // ── RENDER RESULT ──
     const passed = result.passed;
