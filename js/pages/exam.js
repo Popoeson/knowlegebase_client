@@ -157,57 +157,76 @@ const escapeHTML = (str) => {
 
     // ── RENDER QUESTION ──
     const renderQuestion = () => {
-        const q = questions[currentIndex];
-        const answered = answers[q._id];
-        const total = questions.length;
-        const answeredCount = Object.keys(answers).length;
+    const q = questions[currentIndex];
+    const answered = answers[q._id];
+    const total = questions.length;
+    const answeredCount = Object.keys(answers).length;
 
-        // Update progress
-        progressFill.style.width = `${((currentIndex + 1) / total) * 100}%`;
+    // Update progress
+    progressFill.style.width = `${((currentIndex + 1) / total) * 100}%`;
 
-        // Update question grid
-        const dots = document.querySelectorAll(".question-dot");
-        dots.forEach((dot, i) => {
-            dot.className = "question-dot";
-            if (answers[questions[i]._id]) dot.classList.add("answered");
-            if (i === currentIndex) dot.classList.add("current");
+    // Update question grid dots
+    const dots = document.querySelectorAll(".question-dot");
+    dots.forEach((dot, i) => {
+        dot.className = "question-dot";
+        if (answers[questions[i]._id]) dot.classList.add("answered");
+        if (i === currentIndex) dot.classList.add("current");
+    });
+
+    // Render question panel
+    document.getElementById("questionPanel").innerHTML = `
+        <div class="question-header">
+            <span class="question-number">Question ${currentIndex + 1} of ${total}</span>
+            <span class="question-badge">${answeredCount} of ${total} answered</span>
+        </div>
+
+        <p class="question-text">${escapeHTML(q.question)}</p>
+
+        <div class="options-list">
+            ${["A", "B", "C", "D"].map(letter => `
+                <div
+                    class="option-item ${answered === letter ? "selected" : ""}"
+                    data-question="${q._id}"
+                    data-letter="${letter}"
+                >
+                    <div class="option-letter">${letter}</div>
+                    <div class="option-text">${escapeHTML(q[`option${letter}`])}</div>
+                </div>
+            `).join("")}
+        </div>
+
+        <div class="question-nav">
+            <button
+                class="btn btn-ghost"
+                id="prevBtn"
+                ${currentIndex === 0 ? "disabled" : ""}
+            >← Previous</button>
+
+            ${currentIndex < total - 1
+                ? `<button class="btn btn-primary" id="nextBtn">Next →</button>`
+                : `<button class="btn btn-accent" id="submitNavBtn">Submit Exam</button>`
+            }
+        </div>
+    `;
+
+    // Attach option click events after rendering
+    document.querySelectorAll(".option-item").forEach(item => {
+        item.addEventListener("click", () => {
+            const questionId = item.getAttribute("data-question");
+            const letter = item.getAttribute("data-letter");
+            selectAnswer(questionId, letter);
         });
+    });
 
-        // Render question panel
-        document.getElementById("questionPanel").innerHTML = `
-            <div class="question-header">
-                <span class="question-number">Question ${currentIndex + 1} of ${total}</span>
-                <span class="question-badge">${answeredCount} of ${total} answered</span>
-            </div>
+    // Attach nav button events after rendering
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const submitNavBtn = document.getElementById("submitNavBtn");
 
-            <p class="question-text">${q.question}</p>
-
-            <div class="options-list">
-                ${["A", "B", "C", "D"].map(letter => `
-                    <div
-                        class="option-item ${answered === letter ? "selected" : ""}"
-                        onclick="selectAnswer('${q._id}', '${letter}')"
-                    >
-                        <div class="option-letter">${letter}</div>
-                        <div class="option-text">${q[`option${letter}`]}</div>
-                    </div>
-                `).join("")}
-            </div>
-
-            <div class="question-nav">
-                <button
-                    class="btn btn-ghost"
-                    onclick="navigate(-1)"
-                    ${currentIndex === 0 ? "disabled" : ""}
-                >← Previous</button>
-
-                ${currentIndex < total - 1
-                    ? `<button class="btn btn-primary" onclick="navigate(1)">Next →</button>`
-                    : `<button class="btn btn-accent" onclick="showSubmitConfirm()">Submit Exam</button>`
-                }
-            </div>
-        `;
-    };
+    if (prevBtn) prevBtn.addEventListener("click", () => navigate(-1));
+    if (nextBtn) nextBtn.addEventListener("click", () => navigate(1));
+    if (submitNavBtn) submitNavBtn.addEventListener("click", () => showSubmitConfirm());
+};
 
     // ── SELECT ANSWER ──
     window.selectAnswer = async (questionId, answer) => {
