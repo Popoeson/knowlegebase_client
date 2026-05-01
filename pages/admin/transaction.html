@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions — KNOWLEDGEBASE Admin</title>
+
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/reset.css">
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="../../css/pages/dashboard.css">
+    <link rel="stylesheet" href="../../css/pages/payment.css">
+    <link rel="stylesheet" href="../../css/pages/courses.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span class="sidebar-brand-name">KNOWLEDGE<span>BASE</span></span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Admin Panel</p>
+                <a href="./dashboard.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="./users.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">👥</span>
+                    Users
+                </a>
+                <a href="./courses.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📚</span>
+                    Courses
+                </a>
+                <a href="./questions.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🧠</span>
+                    Questions
+                </a>
+                <a href="./certificates.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🏆</span>
+                    Certificates
+                </a>
+                <a href="./transactions.html" class="sidebar-nav-item active">
+                    <span class="sidebar-nav-icon">💳</span>
+                    Transactions
+                </a>
+            </div>
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Account</p>
+                <a href="./profile.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">👤</span>
+                    Profile
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar" id="sidebarAvatar"></div>
+                <div class="sidebar-user-info">
+                    <p class="sidebar-user-name" id="sidebarName"></p>
+                    <p class="sidebar-user-role">Administrator</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- OVERLAY -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <h1 class="topbar-title">All Transactions</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle">🌙</button>
+                <div class="topbar-avatar" id="topbarAvatar"></div>
+            </div>
+        </header>
+
+        <main class="page-content">
+
+            <!-- STATS -->
+            <div class="transaction-stats">
+                <div class="transaction-stat-card">
+                    <span class="transaction-stat-label">Total Revenue</span>
+                    <span class="transaction-stat-value" id="statRevenue">—</span>
+                </div>
+                <div class="transaction-stat-card">
+                    <span class="transaction-stat-label">Total Transactions</span>
+                    <span class="transaction-stat-value" id="statTotal">—</span>
+                </div>
+                <div class="transaction-stat-card">
+                    <span class="transaction-stat-label">Successful</span>
+                    <span class="transaction-stat-value" id="statSuccessful">—</span>
+                </div>
+                <div class="transaction-stat-card">
+                    <span class="transaction-stat-label">Failed</span>
+                    <span class="transaction-stat-value" id="statFailed">—</span>
+                </div>
+            </div>
+
+            <!-- FILTERS -->
+            <div class="transaction-filters">
+                <div class="filter-search">
+                    <span class="filter-search-icon">🔍</span>
+                    <input
+                        type="text"
+                        class="form-input"
+                        id="searchInput"
+                        placeholder="Search by user, course or reference..."
+                    >
+                </div>
+                <select class="filter-select" id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="success">Success</option>
+                    <option value="pending">Pending</option>
+                    <option value="failed">Failed</option>
+                </select>
+            </div>
+
+            <!-- TABLE -->
+            <div class="section-header mb-4">
+                <h2 class="section-title">
+                    Transactions
+                    <span id="transactionsCount" class="text-muted"
+                        style="font-size: var(--text-sm); font-weight: 400;"></span>
+                </h2>
+            </div>
+
+            <div class="card">
+                <div class="admin-table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>User</th>
+                                <th>Course</th>
+                                <th>Reference</th>
+                                <th>Amount</th>
+                                <th>Channel</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTable">
+                            <tr>
+                                <td colspan="8" class="text-center text-muted">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script src="../../js/config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/utils.js"></script>
+<script src="../../js/pages/admin/transactions.js"></script>
+
+</body>
+</html>
