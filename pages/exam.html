@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam — KNOWLEDGEBASE</title>
+
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/pages/exam.css">
+</head>
+<body>
+
+<div class="exam-page">
+
+    <!-- EXAM TOPBAR -->
+    <header class="exam-topbar">
+        <div class="exam-topbar-left">
+            <span class="exam-brand">KNOWLEDGE<span>BASE</span></span>
+            <span class="exam-course-title" id="examCourseTitle"></span>
+        </div>
+        <div class="exam-topbar-right">
+            <div class="exam-timer" id="examTimer">00:00</div>
+            <span class="badge badge-info" id="examTypeBadge"></span>
+        </div>
+    </header>
+
+    <!-- PROGRESS BAR -->
+    <div class="exam-progress-bar">
+        <div class="exam-progress-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+
+    <!-- EXAM BODY -->
+    <div class="exam-body" id="examBody">
+        <div class="flex-center" style="grid-column: 1/-1; padding: var(--space-20);">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- TAB SWITCH WARNING OVERLAY -->
+<div class="exam-warning-overlay hidden" id="warningOverlay">
+    <div class="exam-warning-card">
+        <div class="exam-warning-icon">⚠️</div>
+        <h2 class="exam-warning-title">Warning!</h2>
+        <p class="exam-warning-text">
+            You have left the exam tab. This is your <strong>only warning</strong>.
+            If you switch tabs or minimize again, your exam will be automatically submitted.
+        </p>
+        <button class="btn btn-primary btn-lg w-full" id="returnToExamBtn">
+            Return to Exam
+        </button>
+    </div>
+</div>
+
+<!-- SUBMIT CONFIRM OVERLAY -->
+<div class="exam-warning-overlay hidden" id="submitOverlay">
+    <div class="exam-warning-card" style="border-color: var(--color-primary);">
+        <div class="exam-warning-icon">📝</div>
+        <h2 class="exam-warning-title" style="color: var(--color-primary);">Submit Exam?</h2>
+        <p class="exam-warning-text" id="submitOverlayText">
+            Are you sure you want to submit your exam?
+        </p>
+        <div style="display: flex; gap: var(--space-3);">
+            <button class="btn btn-ghost btn-lg w-full" id="cancelSubmitBtn">
+                Continue Exam
+            </button>
+            <button class="btn btn-primary btn-lg w-full" id="confirmSubmitBtn">
+                Submit Now
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/pages/exam.js"></script>
+
+</body>
+</html>
