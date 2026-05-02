@@ -100,7 +100,7 @@ const init = async () => {
             year: "numeric"
         });
 
-        const verifyUrl = `https://knowledgebase.vercel.app/pages/verify.html?id=${certificate.certificateId}`;
+        const verifyUrl = `https://knowledgebase-client.vercel.app/pages/verify.html?id=${certificate.certificateId}`;
 
         // ── RENDER CERTIFICATE ──
         certificateContent.innerHTML = `
