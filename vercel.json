@@ -1,0 +1,19 @@
+{
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/$1"
+        }
+    ],
+    "headers": [
+        {
+            "source": "/pages/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "no-cache"
+                }
+            ]
+        }
+    ]
+}
