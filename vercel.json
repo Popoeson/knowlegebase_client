@@ -2,13 +2,6 @@
   "cleanUrls": false,
   "trailingSlash": false,
 
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/$1"
-    }
-  ],
-
   "headers": [
     {
       "source": "/pages/(.*)",
@@ -18,13 +11,6 @@
           "value": "no-cache"
         }
       ]
-    }
-  ],
-
-  "errorHandling": [
-    {
-      "statusCode": 404,
-      "destination": "/pages/404.html"
     }
   ]
 }
