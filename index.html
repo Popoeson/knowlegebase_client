@@ -4,25 +4,465 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KNOWLEDGEBASE — Certify What You Know</title>
+    <meta name="description" content="Take structured certification exams, validate your skills, and earn verifiable certificates. KNOWLEDGEBASE is the trusted platform for beginner certifications.">
 
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/pages/landing.css">
 </head>
 <body>
 
-    <main>
-        <h1>KNOWLEDGEBASE</h1>
-        <p>Slice 1 complete. Frontend shell is live.</p>
-    </main>
+<!-- ══════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════ -->
+<nav class="navbar" id="navbar">
+    <div class="navbar-container">
+        <a href="./index.html" class="navbar-brand">
+            KNOWLEDGE<span>BASE</span>
+        </a>
 
-    <script src="js/config.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/utils.js"></script>
-    <script>
-        Utils.initTheme();
-    </script>
+        <div class="navbar-nav">
+            <a href="./index.html" class="navbar-link active">Home</a>
+            <a href="./pages/courses-public.html" class="navbar-link">Courses</a>
+            <a href="./pages/about.html" class="navbar-link">About</a>
+            <a href="./pages/verify.html" class="navbar-link">Verify Certificate</a>
+        </div>
 
-</body>
-</html>
+        <div class="navbar-actions">
+            <button class="navbar-theme-toggle" id="themeToggle">🌙</button>
+            <a href="./pages/login.html" class="btn btn-ghost btn-sm">Log In</a>
+            <a href="./pages/register.html" class="btn btn-primary btn-sm">Get Certified</a>
+            <button class="navbar-hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="navbar-mobile-menu" id="mobileMenu">
+    <a href="./index.html" class="navbar-mobile-link">🏠 Home</a>
+    <a href="./pages/courses-public.html" class="navbar-mobile-link">📚 Courses</a>
+    <a href="./pages/about.html" class="navbar-mobile-link">ℹ️ About</a>
+    <a href="./pages/verify.html" class="navbar-mobile-link">🔍 Verify Certificate</a>
+    <div class="navbar-mobile-divider"></div>
+    <a href="./pages/login.html" class="navbar-mobile-link">🔐 Log In</a>
+    <a href="./pages/register.html" class="navbar-mobile-link">🚀 Get Certified</a>
+</div>
+
+<div class="public-page">
+
+<!-- ══════════════════════════════════════
+     HERO
+══════════════════════════════════════ -->
+<section class="hero">
+    <div class="hero-container">
+
+        <!-- LEFT -->
+        <div class="hero-left">
+            <div class="hero-badge">
+                🏆 Trusted Certification Platform
+            </div>
+
+            <h1 class="hero-title">
+                Prove What You<br>
+                <span class="hero-title-highlight">Actually Know</span>
+            </h1>
+
+            <p class="hero-subtitle">
+                You have the skills. Now get the proof. KNOWLEDGEBASE helps you
+                validate your knowledge through structured exams and earn
+                verifiable certificates that employers can trust.
+            </p>
+
+            <div class="hero-actions">
+                <a href="./pages/register.html" class="btn-hero-primary">
+                    🚀 Start for Free
+                </a>
+                <a href="./pages/courses-public.html" class="btn-hero-secondary">
+                    📚 Browse Courses
+                </a>
+            </div>
+
+            <div class="hero-trust">
+                <div class="hero-trust-avatars">
+                    <div class="hero-trust-avatar">AO</div>
+                    <div class="hero-trust-avatar">BK</div>
+                    <div class="hero-trust-avatar">CM</div>
+                    <div class="hero-trust-avatar">DJ</div>
+                </div>
+                <span>Join hundreds of certified professionals</span>
+            </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="hero-visual">
+            <div class="hero-cert-preview">
+                <div class="hero-cert-brand">KNOWLEDGEBASE</div>
+                <div class="hero-cert-title">Certificate of Achievement</div>
+                <div style="font-size: 0.75rem; color: #999; margin-bottom: 8px;">
+                    This certifies that
+                </div>
+                <div class="hero-cert-name">Your Full Name</div>
+                <div class="hero-cert-course">
+                    has successfully passed<br>
+                    <strong style="color: #1B3A6B;">Web Development Fundamentals</strong>
+                </div>
+                <div style="margin: 12px 0; height: 1px;
+                    background: linear-gradient(90deg, transparent, #C9A84C, transparent);">
+                </div>
+                <div class="hero-cert-id">KB-2026-A3F9K</div>
+            </div>
+
+            <div class="hero-stats-cards">
+                <div class="hero-stat-card">
+                    <div class="hero-stat-value" id="heroStatCourses">—</div>
+                    <div class="hero-stat-label">Active Courses</div>
+                </div>
+                <div class="hero-stat-card">
+                    <div class="hero-stat-value" id="heroStatCerts">—</div>
+                    <div class="hero-stat-label">Certificates Issued</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     HOW IT WORKS
+══════════════════════════════════════ -->
+<section class="section">
+    <div class="section-container">
+
+        <div class="section-header-center">
+            <div class="section-tag">✦ Simple Process</div>
+            <h2 class="section-title-main">How It Works</h2>
+            <p class="section-subtitle-main">
+                From zero to certified in four simple steps.
+                No classroom required.
+            </p>
+        </div>
+
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3 class="step-title">Browse Courses</h3>
+                <p class="step-desc">
+                    Explore our growing library of beginner certification courses
+                    across tech, business, digital skills and more.
+                </p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3 class="step-title">Practice for Free</h3>
+                <p class="step-desc">
+                    Take unlimited practice tests at no cost. Get familiar
+                    with the exam format and identify your weak areas.
+                </p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3 class="step-title">Take the Exam</h3>
+                <p class="step-desc">
+                    Pay a small fee and take the timed certification exam.
+                    Questions are randomized to ensure fair assessment.
+                </p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <h3 class="step-title">Earn Your Certificate</h3>
+                <p class="step-desc">
+                    Pass the exam and instantly receive a verifiable certificate
+                    with a unique ID. Download, share, and showcase it.
+                </p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     FEATURED COURSES
+══════════════════════════════════════ -->
+<section class="section courses-section" style="background-color: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);">
+    <div class="section-container">
+
+        <div class="section-header-center">
+            <div class="section-tag">📚 Featured</div>
+            <h2 class="section-title-main">Available Certifications</h2>
+            <p class="section-subtitle-main">
+                Start with any course, practice for free, and get certified
+                when you are ready.
+            </p>
+        </div>
+
+        <div class="courses-grid" id="featuredCourses">
+            <div class="empty-state" style="grid-column: 1/-1;">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: var(--space-10);">
+            <a href="./pages/courses-public.html" class="btn btn-outline btn-lg">
+                View All Courses →
+            </a>
+        </div>
+
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     WHY KNOWLEDGEBASE
+══════════════════════════════════════ -->
+<section class="section why-section">
+    <div class="section-container">
+        <div class="why-grid">
+
+            <!-- LEFT: FEATURES -->
+            <div>
+                <div class="section-tag">✦ Why Us</div>
+                <h2 class="section-title-main" style="margin-bottom: var(--space-4);">
+                    Credentials That<br>Actually Mean Something
+                </h2>
+                <p class="section-subtitle-main" style="margin-bottom: var(--space-10);">
+                    We built KNOWLEDGEBASE because self-taught learners deserve
+                    a way to prove their skills without spending thousands on
+                    traditional certifications.
+                </p>
+
+                <div class="why-features">
+                    <div class="why-feature">
+                        <div class="why-feature-icon why-feature-icon-blue">🔍</div>
+                        <div class="why-feature-content">
+                            <h4 class="why-feature-title">Instant Public Verification</h4>
+                            <p class="why-feature-desc">
+                                Every certificate has a unique ID verifiable by anyone,
+                                anywhere, at any time. Employers can confirm authenticity
+                                in seconds.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="why-feature">
+                        <div class="why-feature-icon why-feature-icon-gold">💰</div>
+                        <div class="why-feature-content">
+                            <h4 class="why-feature-title">Affordable Certification</h4>
+                            <p class="why-feature-desc">
+                                Practice tests are completely free. Certification exams
+                                start at just $7 — a fraction of traditional certification costs.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="why-feature">
+                        <div class="why-feature-icon why-feature-icon-green">🎯</div>
+                        <div class="why-feature-content">
+                            <h4 class="why-feature-title">Built for Beginners</h4>
+                            <p class="why-feature-desc">
+                                No prerequisites. No prior experience required. Every course
+                                is designed for people starting their learning journey.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="why-feature">
+                        <div class="why-feature-icon why-feature-icon-purple">📄</div>
+                        <div class="why-feature-content">
+                            <h4 class="why-feature-title">Professional PDF Certificate</h4>
+                            <p class="why-feature-desc">
+                                Download a beautifully designed PDF certificate.
+                                Add it to your CV, LinkedIn profile, or portfolio with confidence.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: VERIFY DEMO -->
+            <div class="why-visual">
+                <div class="why-verify-card">
+                    <p class="why-verify-title">🔍 Certificate Verification</p>
+
+                    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                        <input
+                            type="text"
+                            value="KB-2026-A3F9K"
+                            readonly
+                            style="flex: 1; padding: 10px 14px; border: 1.5px solid #C9A84C;
+                                border-radius: 8px; background: white;
+                                font-family: monospace; font-size: 14px;
+                                color: #1B3A6B; font-weight: bold;"
+                        >
+                        <button style="padding: 10px 20px; background: #1B3A6B;
+                            color: white; border: none; border-radius: 8px;
+                            font-weight: bold; cursor: pointer; font-size: 13px;">
+                            Verify
+                        </button>
+                    </div>
+
+                    <div class="why-verify-result">
+                        <div class="why-verify-icon">✅</div>
+                        <div>
+                            <p class="why-verify-name">Adebayo Okafor</p>
+                            <p class="why-verify-course">
+                                Microsoft Excel Fundamentals
+                            </p>
+                            <p class="why-verify-status">
+                                ✦ Valid Certificate — Issued May 1, 2026
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="border-color: rgba(37,99,235,0.2);">
+                    <div style="display: flex; align-items: center;
+                        gap: 12px; margin-bottom: 16px;">
+                        <div style="width: 44px; height: 44px; border-radius: 50%;
+                            background: linear-gradient(135deg, #2563EB, #C9A84C);
+                            display: flex; align-items: center; justify-content: center;
+                            font-weight: bold; color: white; font-size: 16px;">
+                            🎓
+                        </div>
+                        <div>
+                            <p style="font-weight: 700; font-size: 14px;
+                                color: var(--color-text-primary);">
+                                Free Practice Tests
+                            </p>
+                            <p style="font-size: 12px; color: var(--color-text-muted);">
+                                No account required to start
+                            </p>
+                        </div>
+                    </div>
+                    <p style="font-size: 13px; color: var(--color-text-secondary);
+                        line-height: 1.6;">
+                        Not sure if you are ready? Take a free practice test first.
+                        Get familiar with the format before committing to the exam.
+                    </p>
+                    <a href="./pages/courses-public.html"
+                        style="display: inline-block; margin-top: 12px;
+                        font-size: 13px; color: var(--color-primary);
+                        font-weight: 600; text-decoration: none;">
+                        Start practicing for free →
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     TESTIMONIALS
+══════════════════════════════════════ -->
+<section class="testimonials-section">
+    <div class="section-container">
+
+        <div class="section-header-center" style="margin-bottom: var(--space-12);">
+            <div class="section-tag" style="background: rgba(201,168,76,0.15);
+                color: #F0D080; border: 1px solid rgba(201,168,76,0.3);">
+                ✦ Success Stories
+            </div>
+            <h2 class="section-title-main" style="color: #FFFFFF;">
+                What Our Students Say
+            </h2>
+            <p class="section-subtitle-main" style="color: rgba(255,255,255,0.6);">
+                Real people. Real results. Real careers.
+            </p>
+        </div>
+
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">
+                    "I was self-taught for two years but had nothing to show
+                    for it. KNOWLEDGEBASE gave me a certificate I could
+                    actually put on my CV. Got my first tech job two months later."
+                </p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">AO</div>
+                    <div>
+                        <p class="testimonial-name">Adebayo Okafor</p>
+                        <p class="testimonial-role">Frontend Developer, Lagos</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">
+                    "The practice tests helped me identify exactly where I was
+                    weak. By the time I took the real exam I was fully prepared.
+                    The certificate verification feature is brilliant."
+                </p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">BK</div>
+                    <div>
+                        <p class="testimonial-name">Blessing Kamara</p>
+                        <p class="testimonial-role">Data Analyst, Accra</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">
+                    "At $7 per exam this is the most affordable certification
+                    I have ever seen. The certificate looks completely professional
+                    and my employer verified it without any issues."
+                </p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">CM</div>
+                    <div>
+                        <p class="testimonial-name">Chiamaka Madu</p>
+                        <p class="testimonial-role">Digital Marketer, Abuja</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     CTA SECTION
+══════════════════════════════════════ -->
+<section class="cta-section">
+    <div class="section-container">
+        <h2 class="cta-title">
+            Your Skills Deserve Recognition
+        </h2>
+        <p class="cta-subtitle">
+            Stop letting your hard-earned knowledge go unnoticed.
+            Get certified today and show the world what you know.
+        </p>
+        <div class="cta-actions">
+            <a href="./pages/register.html" class="btn-hero-primary">
+                🚀 Create Free Account
+            </a>
+            <a href="./pages/courses-public.html" class="btn-hero-secondary">
+                📚 Browse Courses
+            </a>
+        </div>
+        <p class="cta-note">
+            Free practice tests • No credit card required • Instant certificate delivery
+        </p>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     FOOTER
+══════════════════════════════════════ -->
+<footer class="footer">
+    <div class="footer-container">
+
+        <div class="footer-top">
+
+            <div>
+                <span class="footer-brand-name">KNOWLEDGE<span>BASE</span></span>
+                <p class="footer-brand-desc">
+      
