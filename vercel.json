@@ -1,19 +1,30 @@
 {
-    "rewrites": [
+  "cleanUrls": false,
+  "trailingSlash": false,
+
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/$1"
+    }
+  ],
+
+  "headers": [
+    {
+      "source": "/pages/(.*)",
+      "headers": [
         {
-            "source": "/(.*)",
-            "destination": "/$1"
+          "key": "Cache-Control",
+          "value": "no-cache"
         }
-    ],
-    "headers": [
-        {
-            "source": "/pages/(.*)",
-            "headers": [
-                {
-                    "key": "Cache-Control",
-                    "value": "no-cache"
-                }
-            ]
-        }
-    ]
+      ]
+    }
+  ],
+
+  "errorHandling": [
+    {
+      "statusCode": 404,
+      "destination": "/pages/404.html"
+    }
+  ]
 }
