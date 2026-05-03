@@ -5,30 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page Not Found — KNOWLEDGEBASE</title>
 
-    <link rel="stylesheet" href="css/variables.css">
-    <link rel="stylesheet" href="css/reset.css">
-    <link rel="stylesheet" href="css/global.css">
-    <link rel="stylesheet" href="css/navbar.css">
-    <link rel="stylesheet" href="css/footer.css">
-    <link rel="stylesheet" href="css/pages/landing.css">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/footer.css">
+    <link rel="stylesheet" href="../css/pages/landing.css">
 </head>
 <body>
 
+<!-- NAVBAR -->
 <nav class="navbar" id="navbar">
     <div class="navbar-container">
-        <a href="./index.html" class="navbar-brand">
+        <a href="../index.html" class="navbar-brand">
             KNOWLEDGE<span>BASE</span>
         </a>
         <div class="navbar-nav">
-            <a href="./index.html" class="navbar-link">Home</a>
-            <a href="./pages/courses-public.html" class="navbar-link">Courses</a>
-            <a href="./pages/about.html" class="navbar-link">About</a>
-            <a href="./pages/verify.html" class="navbar-link">Verify Certificate</a>
+            <a href="../index.html" class="navbar-link">Home</a>
+            <a href="./courses-public.html" class="navbar-link">Courses</a>
+            <a href="./about.html" class="navbar-link">About</a>
+            <a href="./verify.html" class="navbar-link">Verify Certificate</a>
         </div>
         <div class="navbar-actions">
             <button class="navbar-theme-toggle" id="themeToggle">🌙</button>
-            <a href="./pages/login.html" class="btn btn-ghost btn-sm">Log In</a>
-            <a href="./pages/register.html" class="btn btn-primary btn-sm">
+            <a href="./login.html" class="btn btn-ghost btn-sm">Log In</a>
+            <a href="./register.html" class="btn btn-primary btn-sm">
                 Get Certified
             </a>
             <button class="navbar-hamburger" id="hamburger">
@@ -41,13 +42,13 @@
 </nav>
 
 <div class="navbar-mobile-menu" id="mobileMenu">
-    <a href="./index.html" class="navbar-mobile-link">🏠 Home</a>
-    <a href="./pages/courses-public.html" class="navbar-mobile-link">📚 Courses</a>
-    <a href="./pages/about.html" class="navbar-mobile-link">ℹ️ About</a>
-    <a href="./pages/verify.html" class="navbar-mobile-link">🔍 Verify Certificate</a>
+    <a href="../index.html" class="navbar-mobile-link">🏠 Home</a>
+    <a href="./courses-public.html" class="navbar-mobile-link">📚 Courses</a>
+    <a href="./about.html" class="navbar-mobile-link">ℹ️ About</a>
+    <a href="./verify.html" class="navbar-mobile-link">🔍 Verify Certificate</a>
     <div class="navbar-mobile-divider"></div>
-    <a href="./pages/login.html" class="navbar-mobile-link">🔐 Log In</a>
-    <a href="./pages/register.html" class="navbar-mobile-link">🚀 Get Certified</a>
+    <a href="./login.html" class="navbar-mobile-link">🔐 Log In</a>
+    <a href="./register.html" class="navbar-mobile-link">🚀 Get Certified</a>
 </div>
 
 <div class="public-page">
@@ -68,32 +69,32 @@
         <div style="display: flex; gap: var(--space-4);
             flex-wrap: wrap; justify-content: center;
             margin-bottom: var(--space-8);">
-            <a href="./index.html" class="btn btn-primary btn-lg">
+            <a href="../index.html" class="btn btn-primary btn-lg">
                 🏠 Go to Home
             </a>
-            <a href="./pages/courses-public.html" class="btn btn-outline btn-lg">
+            <a href="./courses-public.html" class="btn btn-outline btn-lg">
                 📚 Browse Courses
             </a>
         </div>
 
         <div style="display: flex; gap: var(--space-6); flex-wrap: wrap;
             justify-content: center;">
-            <a href="./pages/login.html"
+            <a href="./login.html"
                 style="font-size: var(--text-sm); color: var(--color-primary);
                 text-decoration: none; font-weight: var(--font-medium);">
                 Log In →
             </a>
-            <a href="./pages/register.html"
+            <a href="./register.html"
                 style="font-size: var(--text-sm); color: var(--color-primary);
                 text-decoration: none; font-weight: var(--font-medium);">
                 Register →
             </a>
-            <a href="./pages/verify.html"
+            <a href="./verify.html"
                 style="font-size: var(--text-sm); color: var(--color-primary);
                 text-decoration: none; font-weight: var(--font-medium);">
                 Verify Certificate →
             </a>
-            <a href="./pages/about.html"
+            <a href="./about.html"
                 style="font-size: var(--text-sm); color: var(--color-primary);
                 text-decoration: none; font-weight: var(--font-medium);">
                 About Us →
@@ -102,13 +103,98 @@
 
     </div>
 
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div>
+                    <span class="footer-brand-name">
+                        KNOWLEDGE<span>BASE</span>
+                    </span>
+                    <p class="footer-brand-desc">
+                        The trusted platform for beginner certifications.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" class="footer-social-link">𝕏</a>
+                        <a href="#" class="footer-social-link">in</a>
+                        <a href="#" class="footer-social-link">📷</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-col-title">Platform</h4>
+                    <div class="footer-links">
+                        <a href="./courses-public.html" class="footer-link">
+                            Browse Courses
+                        </a>
+                        <a href="./verify.html" class="footer-link">
+                            Verify Certificate
+                        </a>
+                        <a href="./register.html" class="footer-link">
+                            Get Certified
+                        </a>
+                        <a href="./login.html" class="footer-link">
+                            Log In
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-col-title">Company</h4>
+                    <div class="footer-links">
+                        <a href="./about.html" class="footer-link">
+                            About Us
+                        </a>
+                        <a href="./privacy-policy.html" class="footer-link">
+                            Privacy Policy
+                        </a>
+                        <a href="./terms-of-use.html" class="footer-link">
+                            Terms of Use
+                        </a>
+                        <a href="./data-compliance.html" class="footer-link">
+                            Data & Compliance
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-col-title">Support</h4>
+                    <div class="footer-links">
+                        <a href="mailto:support@knowledgebase.com"
+                            class="footer-link">
+                            Contact Us
+                        </a>
+                        <a href="./verify.html" class="footer-link">
+                            Verify Certificate
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-divider"></div>
+            <div class="footer-bottom">
+                <p class="footer-copyright" id="footerYear"></p>
+                <div class="footer-bottom-links">
+                    <a href="./privacy-policy.html" class="footer-bottom-link">
+                        Privacy
+                    </a>
+                    <a href="./terms-of-use.html" class="footer-bottom-link">
+                        Terms
+                    </a>
+                    <a href="./data-compliance.html" class="footer-bottom-link">
+                        GDPR & CCPA
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
 </div>
 
-<script src="js/config.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/utils.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/utils.js"></script>
 <script>
     Utils.initTheme();
+
+    document.getElementById("footerYear").textContent =
+        `© ${new Date().getFullYear()} KNOWLEDGEBASE. All rights reserved.`;
 
     const themeToggle = document.getElementById("themeToggle");
     const updateThemeIcon = () => {
