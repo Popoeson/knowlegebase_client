@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses — KNOWLEDGEBASE</title>
+    <meta name="description" content="Browse all available certification courses on KNOWLEDGEBASE. Practice for free, get certified affordably.">
+
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/footer.css">
+    <link rel="stylesheet" href="../css/pages/landing.css">
+    <link rel="stylesheet" href="../css/pages/courses.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+    <div class="navbar-container">
+        <a href="../index.html" class="navbar-brand">
+            KNOWLEDGE<span>BASE</span>
+        </a>
+        <div class="navbar-nav">
+            <a href="../index.html" class="navbar-link">Home</a>
+            <a href="./courses-public.html" class="navbar-link active">Courses</a>
+            <a href="./about.html" class="navbar-link">About</a>
+            <a href="./verify.html" class="navbar-link">Verify Certificate</a>
+        </div>
+        <div class="navbar-actions">
+            <button class="navbar-theme-toggle" id="themeToggle">🌙</button>
+            <a href="./login.html" class="btn btn-ghost btn-sm">Log In</a>
+            <a href="./register.html" class="btn btn-primary btn-sm">Get Certified</a>
+            <button class="navbar-hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div class="navbar-mobile-menu" id="mobileMenu">
+    <a href="../index.html" class="navbar-mobile-link">🏠 Home</a>
+    <a href="./courses-public.html" class="navbar-mobile-link">📚 Courses</a>
+    <a href="./about.html" class="navbar-mobile-link">ℹ️ About</a>
+    <a href="./verify.html" class="navbar-mobile-link">🔍 Verify Certificate</a>
+    <div class="navbar-mobile-divider"></div>
+    <a href="./login.html" class="navbar-mobile-link">🔐 Log In</a>
+    <a href="./register.html" class="navbar-mobile-link">🚀 Get Certified</a>
+</div>
+
+<div class="public-page">
+
+    <!-- PAGE HERO -->
+    <section style="background: linear-gradient(135deg, #0F172A 0%, #1B3A6B 100%);
+        padding: var(--space-16) 0;">
+        <div class="section-container" style="text-align: center;">
+            <div class="section-tag" style="background: rgba(201,168,76,0.15);
+                color: #F0D080; border: 1px solid rgba(201,168,76,0.3);
+                margin: 0 auto var(--space-4);">
+                📚 All Certifications
+            </div>
+            <h1 style="font-size: var(--text-4xl); font-weight: var(--font-bold);
+                color: #FFFFFF; margin-bottom: var(--space-4);">
+                Browse Our Courses
+            </h1>
+            <p style="font-size: var(--text-lg); color: rgba(255,255,255,0.7);
+                max-width: 500px; margin: 0 auto; line-height: 1.7;">
+                Practice for free. Get certified when you are ready.
+                All courses are beginner-friendly.
+            </p>
+        </div>
+    </section>
+
+    <!-- COURSES BODY -->
+    <section class="section">
+        <div class="section-container">
+
+            <!-- FILTER BAR -->
+            <div class="courses-filter-bar">
+                <div class="filter-search">
+                    <span class="filter-search-icon">🔍</span>
+                    <input
+                        type="text"
+                        class="form-input"
+                        id="searchInput"
+                        placeholder="Search courses..."
+                    >
+                </div>
+                <select class="filter-select" id="categoryFilter">
+                    <option value="">All Categories</option>
+                </select>
+            </div>
+
+            <p class="courses-count" id="coursesCount"></p>
+
+            <!-- COURSES GRID -->
+            <div class="courses-grid" id="coursesGrid">
+                <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="section-container">
+            <h2 class="cta-title">Ready to Get Certified?</h2>
+            <p class="cta-subtitle">
+                Create a free account and start practicing today.
+                Pay only when you are ready to get certified.
+            </p>
+            <div class="cta-actions">
+                <a href="./register.html" class="btn-hero-primary">
+                    🚀 Create Free Account
+                </a>
+            </div>
+            <p class="cta-note">
+                Free practice tests • No credit card required
+            </p>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div>
+                    <span class="footer-brand-name">KNOWLEDGE<span>BASE</span></span>
+                    <p class="footer-brand-desc">
+                        The trusted platform for beginner certifications.
+                        Validate your skills, earn verifiable certificates,
+                        and advance your career.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" class="footer-social-link">𝕏</a>
+                        <a href="#" class="footer-social-link">in</a>
+                        <a href="#" class="footer-social-link">📷</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-col-title">Platform</h4>
+                    <div class="footer-links">
+                        <a href="./courses-public.html" class="footer-link">Browse Courses</a>
+                        <a href="./verify.html" class="footer-link">Verify Certificate</a>
+                        <a href="./register.html" class="footer-link">Get Certified</a>
+                        <a href="./login.html" class="footer-link">Log In</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-col-title">Company</h4>
+                    <div class="footer-links">
+                        <a href="./about.html" class="footer-link">About Us</a>
+                        <a href="./privacy-policy.html" class="footer-link">Privacy Policy</a>
+                        <a href="./terms-of-use.html" class="footer-link">Terms of Use</a>
+                        <a href="./data-compliance.html" class="footer-link">Data & Compliance</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-col-title">Support</h4>
+                    <div class="footer-links">
+                        <a href="mailto:support@knowledgebase.com" class="footer-link">
+                            Contact Us
+                        </a>
+                        <a href="./verify.html" class="footer-link">
+                            Certificate Verification
+                        </a>
+                        <a href="./courses-public.html" class="footer-link">All Courses</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-divider"></div>
+            <div class="footer-bottom">
+                <p class="footer-copyright" id="footerYear"></p>
+                <div class="footer-bottom-links">
+                    <a href="./privacy-policy.html" class="footer-bottom-link">Privacy</a>
+                    <a href="./terms-of-use.html" class="footer-bottom-link">Terms</a>
+                    <a href="./data-compliance.html" class="footer-bottom-link">GDPR & CCPA</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/pages/courses-public.js"></script>
+
+</body>
+</html>
