@@ -120,7 +120,11 @@ const init = async () => {
                 </td>
                 <td>
                     <p style="font-weight: var(--font-semibold);">
-                        ${cert.user?.fullName || "—"}
+
+            ${cert.user
+    ? `${cert.user.firstName || ""} ${cert.user.otherName || ""} ${cert.user.surname || ""}`.trim()
+    : "—"}
+                       
                     </p>
                     <p style="font-size: var(--text-xs); color: var(--color-text-muted);">
                         ${cert.user?.email || ""}
