@@ -25,6 +25,17 @@ const init = async () => {
     const bulkFile = document.getElementById("bulkFile");
     const uploadResult = document.getElementById("uploadResult");
 
+    // AI element references
+    const generateBtn = document.getElementById("generateBtn");
+    const approveBtn = document.getElementById("approveBtn");
+    const rejectBtn = document.getElementById("rejectBtn");
+    const reviewPanel = document.getElementById("reviewPanel");
+    const aiQuestionsList = document.getElementById("aiQuestionsList");
+    const reviewStatus = document.getElementById("reviewStatus");
+    const duplicateNotice = document.getElementById("duplicateNotice");
+    const duplicateNoticeText = document.getElementById("duplicateNoticeText");
+    const selectAllCheckbox = document.getElementById("selectAllCheckbox");
+
     // ── SIDEBAR TOGGLE ──
     hamburger.addEventListener("click", () => {
         sidebar.classList.toggle("open");
@@ -72,13 +83,14 @@ const init = async () => {
     const openModal = (modal) => modal.classList.remove("hidden");
     const closeModal = (modal) => modal.classList.add("hidden");
 
-    // ── LOAD COURSES INTO SELECTS ──
+    // ── LOAD COURSES INTO ALL SELECTS ──
     const loadCourses = async () => {
         try {
             const response = await api.get("/admin/courses");
             const courses = response.courses;
 
-            const selects = ["courseFilter", "bulkCourse", "qCourse"];
+            // Populate all course selects including the new AI one
+            const selects = ["courseFilter", "bulkCourse", "qCourse", "aiCourse"];
             selects.forEach(selectId => {
                 const select = document.getElementById(selectId);
                 const firstOption = select.options[0];
@@ -186,7 +198,7 @@ const init = async () => {
     document.getElementById("closeQuestionModal").addEventListener("click", () => closeModal(questionModal));
     document.getElementById("cancelQuestionBtn").addEventListener("click", () => closeModal(questionModal));
 
-    // ── EDIT QUESTION (GLOBAL) ──
+    // ── EDIT QUESTION ──
     window.editQuestion = async (id) => {
         try {
             const response = await api.get(`/admin/questions?courseId=&type=`);
@@ -395,6 +407,255 @@ const init = async () => {
             uploadBtn.textContent = "Upload Questions";
         }
     });
+
+
+        // ════════════════════════════════════════
+    // ── AI QUESTION GENERATION ──
+    // ════════════════════════════════════════
+
+    let pendingQuestions = [];
+
+    // ── RENDER QUESTION CARDS ──
+    const renderQuestionCards = (questions) => {
+        aiQuestionsList.innerHTML = questions.map((q, index) => `
+            <div class="card mb-4" style="border: 1px solid var(--color-border);">
+
+                <div style="display: flex; align-items: flex-start; gap: var(--space-3);">
+                    <input
+                        type="checkbox"
+                        class="question-checkbox"
+                        data-index="${index}"
+                        checked
+                        style="margin-top: 3px; flex-shrink: 0; width: 16px; height: 16px; cursor: pointer;"
+                    >
+                    <div style="flex: 1;">
+
+                        <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3);">
+                            <span style="
+                                font-size: var(--text-xs);
+                                font-weight: 600;
+                                padding: 2px 8px;
+                                border-radius: var(--radius-full);
+                                background: var(--color-primary-soft, #ede9fe);
+                                color: var(--color-primary);
+                            ">Q${index + 1}</span>
+                            <span style="
+                                font-size: var(--text-xs);
+                                padding: 2px 8px;
+                                border-radius: var(--radius-full);
+                                background: var(--color-bg-muted, #f1f5f9);
+                                color: var(--color-text-muted);
+                            ">${document.getElementById("aiDifficulty").value}</span>
+                        </div>
+
+                        <p style="font-weight: 500; margin-bottom: var(--space-3); font-size: var(--text-sm); line-height: 1.5;">
+                            ${q.question}
+                        </p>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); margin-bottom: var(--space-3);">
+                            ${["A", "B", "C", "D"].map(letter => `
+                                <div style="
+                                    padding: var(--space-2) var(--space-3);
+                                    border-radius: var(--radius-md);
+                                    font-size: var(--text-sm);
+                                    border: 1px solid ${q.correctAnswer === letter
+                                        ? "var(--color-success, #22c55e)"
+                                        : "var(--color-border)"};
+                                    background: ${q.correctAnswer === letter
+                                        ? "var(--color-success-soft, #f0fdf4)"
+                                        : "transparent"};
+                                    color: ${q.correctAnswer === letter
+                                        ? "var(--color-success-dark, #15803d)"
+                                        : "var(--color-text)"};
+                                    font-weight: ${q.correctAnswer === letter ? "600" : "400"};
+                                ">
+                                    <strong>${letter}.</strong> ${q["option" + letter]}
+                                </div>
+                            `).join("")}
+                        </div>
+
+                        ${q.explanation ? `
+                            <div style="
+                                padding: var(--space-2) var(--space-3);
+                                background: var(--color-bg-muted, #f8fafc);
+                                border-radius: var(--radius-md);
+                                font-size: var(--text-xs);
+                                color: var(--color-text-muted);
+                                border-left: 3px solid var(--color-primary);
+                                line-height: 1.5;
+                            ">
+                                💡 ${q.explanation}
+                            </div>
+                        ` : ""}
+
+                    </div>
+                </div>
+
+            </div>
+        `).join("");
+
+        // Sync select-all when individual checkboxes change
+        aiQuestionsList.querySelectorAll(".question-checkbox").forEach(cb => {
+            cb.addEventListener("change", syncSelectAll);
+        });
+    };
+
+    // ── SELECT ALL SYNC ──
+    const syncSelectAll = () => {
+        const all = aiQuestionsList.querySelectorAll(".question-checkbox");
+        const checked = aiQuestionsList.querySelectorAll(".question-checkbox:checked");
+        selectAllCheckbox.checked = all.length === checked.length;
+        selectAllCheckbox.indeterminate = checked.length > 0 && checked.length < all.length;
+    };
+
+    selectAllCheckbox.addEventListener("change", () => {
+        aiQuestionsList.querySelectorAll(".question-checkbox").forEach(cb => {
+            cb.checked = selectAllCheckbox.checked;
+        });
+    });
+
+    // ── RESET AI PANEL ──
+    const resetAIPanel = () => {
+        reviewPanel.classList.add("hidden");
+        duplicateNotice.classList.add("hidden");
+        aiQuestionsList.innerHTML = "";
+        reviewStatus.textContent = "";
+        pendingQuestions = [];
+        document.getElementById("aiTopic").value = "";
+        document.getElementById("aiCount").value = "10";
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = false;
+    };
+
+    // ── GENERATE ──
+    generateBtn.addEventListener("click", async () => {
+        const courseId = document.getElementById("aiCourse").value;
+        const topicName = document.getElementById("aiTopic").value.trim();
+        const difficulty = document.getElementById("aiDifficulty").value;
+        const type = document.getElementById("aiType").value;
+        const count = document.getElementById("aiCount").value;
+
+        // Validate
+        const aiCourseError = document.getElementById("aiCourseError");
+        const aiTopicError = document.getElementById("aiTopicError");
+        const aiCountError = document.getElementById("aiCountError");
+
+        aiCourseError.classList.add("hidden");
+        aiTopicError.classList.add("hidden");
+        aiCountError.classList.add("hidden");
+
+        let valid = true;
+
+        if (!courseId) {
+            aiCourseError.textContent = "Please select a course";
+            aiCourseError.classList.remove("hidden");
+            valid = false;
+        }
+        if (!topicName) {
+            aiTopicError.textContent = "Topic name is required";
+            aiTopicError.classList.remove("hidden");
+            valid = false;
+        }
+        if (!count || Number(count) < 1 || Number(count) > 50) {
+            aiCountError.textContent = "Enter a number between 1 and 50";
+            aiCountError.classList.remove("hidden");
+            valid = false;
+        }
+        if (!valid) return;
+
+        // Reset state before new generation
+        reviewPanel.classList.add("hidden");
+        duplicateNotice.classList.add("hidden");
+        reviewStatus.textContent = "";
+        pendingQuestions = [];
+
+        generateBtn.disabled = true;
+        generateBtn.textContent = "✨ Generating...";
+
+        try {
+            const data = await api.post("/admin/questions/ai-generate", {
+                courseId,
+                topicName,
+                difficulty,
+                count: Number(count),
+                type
+            });
+
+            pendingQuestions = data.questions;
+
+            if (data.duplicatesRemoved > 0) {
+                duplicateNoticeText.textContent =
+                    `${data.duplicatesRemoved} question${data.duplicatesRemoved > 1 ? "s were" : " was"} identical to existing questions and removed automatically.`;
+                duplicateNotice.classList.remove("hidden");
+            }
+
+            renderQuestionCards(pendingQuestions);
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+            reviewPanel.classList.remove("hidden");
+            reviewStatus.textContent = `${pendingQuestions.length} question${pendingQuestions.length !== 1 ? "s" : ""} generated. Review and select which to save.`;
+            reviewPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+
+        } catch (error) {
+            Utils.toast(error.message || "Generation failed. Please try again.", "error");
+        } finally {
+            generateBtn.disabled = false;
+            generateBtn.textContent = "✨ Generate Questions";
+        }
+    });
+
+    // ── APPROVE — SAVE SELECTED ──
+    approveBtn.addEventListener("click", async () => {
+        const checked = aiQuestionsList.querySelectorAll(".question-checkbox:checked");
+
+        if (checked.length === 0) {
+            Utils.toast("Select at least one question to save.", "warning");
+            return;
+        }
+
+        const selected = Array.from(checked).map(cb => {
+            return pendingQuestions[Number(cb.dataset.index)];
+        });
+
+        const courseId = document.getElementById("aiCourse").value;
+        const difficulty = document.getElementById("aiDifficulty").value;
+        const type = document.getElementById("aiType").value;
+
+        approveBtn.disabled = true;
+        approveBtn.textContent = "Saving...";
+
+        try {
+            const data = await api.post("/admin/questions/ai-save", {
+                courseId,
+                questions: selected,
+                difficulty,
+                type
+            });
+
+            Utils.toast(data.message, "success");
+            resetAIPanel();
+            await loadQuestions();
+
+        } catch (error) {
+            Utils.toast(error.message || "Failed to save questions.", "error");
+        } finally {
+            approveBtn.disabled = false;
+            approveBtn.textContent = "✅ Save Selected Questions";
+        }
+    });
+
+    // ── REJECT — DISCARD ALL ──
+    rejectBtn.addEventListener("click", async () => {
+        try {
+            await api.post("/admin/questions/ai-reject", {});
+        } catch (_) {
+            // Best-effort — nothing was saved so failure is harmless
+        }
+
+        resetAIPanel();
+        Utils.toast("Questions discarded.", "info");
+    });
+
 
     // ── INIT ──
     await loadCourses();
