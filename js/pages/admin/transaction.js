@@ -115,7 +115,9 @@ const init = async () => {
                 <td>${index + 1}</td>
                 <td>
                     <p style="font-weight: var(--font-semibold);">
-                        ${payment.user?.fullName || "—"}
+                        ${payment.user
+    ? `${payment.user.firstName || ""} ${payment.user.otherName || ""} ${payment.user.surname || ""}`.trim()
+    : "—"}
                     </p>
                     <p style="font-size: var(--text-xs); color: var(--color-text-muted);">
                         ${payment.user?.email || ""}
