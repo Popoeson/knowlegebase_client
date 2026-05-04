@@ -23,6 +23,19 @@ const init = async () => {
     const thumbnailInput = document.getElementById("thumbnail");
     const thumbnailPreview = document.getElementById("thumbnailPreview");
 
+    // AI panel elements
+    const aiPanel = document.getElementById("aiPanel");
+    const skipAiRow = document.getElementById("skipAiRow");
+    const generateBtn = document.getElementById("generateBtn");
+    const approveBtn = document.getElementById("approveBtn");
+    const rejectBtn = document.getElementById("rejectBtn");
+    const reviewPanel = document.getElementById("reviewPanel");
+    const questionsList = document.getElementById("questionsList");
+    const reviewStatus = document.getElementById("reviewStatus");
+    const duplicateNotice = document.getElementById("duplicateNotice");
+    const duplicateNoticeText = document.getElementById("duplicateNoticeText");
+    const selectAllCheckbox = document.getElementById("selectAllCheckbox");
+
     // ── SIDEBAR TOGGLE ──
     hamburger.addEventListener("click", () => {
         sidebar.classList.toggle("open");
@@ -68,8 +81,8 @@ const init = async () => {
 
     // ── CHECK IF EDIT MODE ──
     const params = new URLSearchParams(window.location.search);
-    const courseId = params.get("id");
-    const isEditMode = !!courseId;
+    const urlCourseId = params.get("id");
+    const isEditMode = !!urlCourseId;
 
     if (isEditMode) {
         pageTitle.textContent = "Edit Course";
@@ -146,7 +159,7 @@ const init = async () => {
     // ── LOAD COURSE FOR EDIT ──
     const loadCourse = async () => {
         try {
-            const response = await api.get(`/courses/${courseId}`);
+            const response = await api.get(`/courses/${urlCourseId}`);
             const { course } = response;
 
             document.getElementById("title").value = course.title;
@@ -244,6 +257,9 @@ const init = async () => {
     };
 
     // ── FORM SUBMIT ──
+    // savedCourseId is set after a successful save and used by the AI panel
+    let savedCourseId = urlCourseId || null;
+
     courseForm.addEventListener("submit", async (e) => {
         e.preventDefault();
 
@@ -271,7 +287,7 @@ const init = async () => {
 
             const token = Auth.getToken();
             const url = isEditMode
-                ? `${CONFIG.API_BASE_URL}/admin/courses/${courseId}`
+                ? `${CONFIG.API_BASE_URL}/admin/courses/${urlCourseId}`
                 : `${CONFIG.API_BASE_URL}/admin/courses`;
             const method = isEditMode ? "PUT" : "POST";
 
@@ -284,11 +300,19 @@ const init = async () => {
             const data = await response.json();
             if (!response.ok) throw new Error(data.message);
 
+            // Store the course ID for the AI panel
+            savedCourseId = data.course._id;
+
             Utils.toast(data.message, "success");
 
-            setTimeout(() => {
-                window.location.href = "./courses.html";
-            }, 1500);
+            // Reveal AI panel instead of redirecting immediately
+            submitBtn.textContent = isEditMode ? "Update Course" : "Save Course";
+            submitBtn.disabled = false;
+            courseForm.style.opacity = "0.5";
+            courseForm.style.pointerEvents = "none";
+            aiPanel.style.display = "block";
+            skipAiRow.style.display = "block";
+            aiPanel.scrollIntoView({ behavior: "smooth", block: "start" });
 
         } catch (error) {
             Utils.toast(error.message, "error");
@@ -297,9 +321,253 @@ const init = async () => {
         }
     });
 
+
+    // ════════════════════════════════════════
+    // ── AI QUESTION GENERATION ──
+    // ════════════════════════════════════════
+
+    // Holds the questions returned by Gemini before admin approves
+    let pendingQuestions = [];
+
+    // ── RENDER QUESTION CARDS ──
+    const renderQuestionCards = (questions) => {
+        questionsList.innerHTML = questions.map((q, index) => `
+            <div class="card mb-4" id="qCard-${index}" style="border: 1px solid var(--color-border);">
+
+                <div style="display: flex; align-items: flex-start; gap: var(--space-3);">
+                    <input
+                        type="checkbox"
+                        class="question-checkbox"
+                        data-index="${index}"
+                        checked
+                        style="margin-top: 3px; flex-shrink: 0; width: 16px; height: 16px; cursor: pointer;"
+                    >
+                    <div style="flex: 1;">
+
+                        <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3);">
+                            <span style="
+                                font-size: var(--text-xs);
+                                font-weight: 600;
+                                padding: 2px 8px;
+                                border-radius: var(--radius-full);
+                                background: var(--color-primary-soft, #ede9fe);
+                                color: var(--color-primary);
+                            ">Q${index + 1}</span>
+                        </div>
+
+                        <p style="font-weight: 500; margin-bottom: var(--space-3); font-size: var(--text-sm);">
+                            ${q.question}
+                        </p>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); margin-bottom: var(--space-3);">
+                            ${["A", "B", "C", "D"].map(letter => `
+                                <div style="
+                                    padding: var(--space-2) var(--space-3);
+                                    border-radius: var(--radius-md);
+                                    font-size: var(--text-sm);
+                                    border: 1px solid ${q.correctAnswer === letter
+                                        ? "var(--color-success, #22c55e)"
+                                        : "var(--color-border)"};
+                                    background: ${q.correctAnswer === letter
+                                        ? "var(--color-success-soft, #f0fdf4)"
+                                        : "transparent"};
+                                    color: ${q.correctAnswer === letter
+                                        ? "var(--color-success-dark, #15803d)"
+                                        : "var(--color-text)"};
+                                    font-weight: ${q.correctAnswer === letter ? "600" : "400"};
+                                ">
+                                    <strong>${letter}.</strong> ${q["option" + letter]}
+                                </div>
+                            `).join("")}
+                        </div>
+
+                        ${q.explanation ? `
+                            <div style="
+                                padding: var(--space-2) var(--space-3);
+                                background: var(--color-bg-muted, #f8fafc);
+                                border-radius: var(--radius-md);
+                                font-size: var(--text-xs);
+                                color: var(--color-text-muted);
+                                border-left: 3px solid var(--color-primary);
+                            ">
+                                💡 ${q.explanation}
+                            </div>
+                        ` : ""}
+
+                    </div>
+                </div>
+            </div>
+        `).join("");
+
+        // Update select-all state when individual checkboxes change
+        questionsList.querySelectorAll(".question-checkbox").forEach(cb => {
+            cb.addEventListener("change", syncSelectAll);
+        });
+    };
+
+    // ── SELECT ALL TOGGLE ──
+    const syncSelectAll = () => {
+        const all = questionsList.querySelectorAll(".question-checkbox");
+        const checked = questionsList.querySelectorAll(".question-checkbox:checked");
+        selectAllCheckbox.checked = all.length === checked.length;
+        selectAllCheckbox.indeterminate = checked.length > 0 && checked.length < all.length;
+    };
+
+    selectAllCheckbox.addEventListener("change", () => {
+        questionsList.querySelectorAll(".question-checkbox").forEach(cb => {
+            cb.checked = selectAllCheckbox.checked;
+        });
+    });
+
+    // ── GENERATE QUESTIONS ──
+    generateBtn.addEventListener("click", async () => {
+        const topicName = document.getElementById("aiTopic").value.trim();
+        const difficulty = document.getElementById("aiDifficulty").value;
+        const type = document.getElementById("aiType").value;
+        const count = document.getElementById("aiCount").value;
+
+        // Validate AI form
+        const aiTopicError = document.getElementById("aiTopicError");
+        const aiCountError = document.getElementById("aiCountError");
+        aiTopicError.classList.add("hidden");
+        aiCountError.classList.add("hidden");
+
+        let aiValid = true;
+        if (!topicName) {
+            aiTopicError.textContent = "Topic name is required";
+            aiTopicError.classList.remove("hidden");
+            aiValid = false;
+        }
+        if (!count || Number(count) < 1 || Number(count) > 50) {
+            aiCountError.textContent = "Enter a number between 1 and 50";
+            aiCountError.classList.remove("hidden");
+            aiValid = false;
+        }
+        if (!aiValid) return;
+
+        // Reset review panel
+        reviewPanel.classList.add("hidden");
+        duplicateNotice.classList.add("hidden");
+        reviewStatus.textContent = "";
+        pendingQuestions = [];
+
+        generateBtn.disabled = true;
+        generateBtn.textContent = "✨ Generating...";
+
+        try {
+            const data = await api.post("/admin/questions/ai-generate", {
+                courseId: savedCourseId,
+                topicName,
+                difficulty,
+                count: Number(count),
+                type
+            });
+
+            pendingQuestions = data.questions;
+
+                   // Show duplicate notice if any were removed
+            if (data.duplicatesRemoved > 0) {
+                duplicateNoticeText.textContent =
+                    `${data.duplicatesRemoved} question${data.duplicatesRemoved > 1 ? "s were" : " was"} identical to existing questions and removed automatically.`;
+                duplicateNotice.classList.remove("hidden");
+            }
+
+            renderQuestionCards(pendingQuestions);
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+            reviewPanel.classList.remove("hidden");
+            reviewStatus.textContent = `${pendingQuestions.length} question${pendingQuestions.length !== 1 ? "s" : ""} generated. Review and select which to save.`;
+            reviewPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+
+        } catch (error) {
+            Utils.toast(error.message || "Generation failed. Please try again.", "error");
+        } finally {
+            generateBtn.disabled = false;
+            generateBtn.textContent = "✨ Generate Questions";
+        }
+    });
+
+
+    // ── APPROVE — SAVE SELECTED QUESTIONS ──
+    approveBtn.addEventListener("click", async () => {
+        const checked = questionsList.querySelectorAll(".question-checkbox:checked");
+
+        if (checked.length === 0) {
+            Utils.toast("Select at least one question to save.", "warning");
+            return;
+        }
+
+        // Collect only selected questions by their index
+        const selected = Array.from(checked).map(cb => {
+            return pendingQuestions[Number(cb.dataset.index)];
+        });
+
+        approveBtn.disabled = true;
+        approveBtn.textContent = "Saving...";
+
+        try {
+            const difficulty = document.getElementById("aiDifficulty").value;
+            const type = document.getElementById("aiType").value;
+
+            const data = await api.post("/admin/questions/ai-save", {
+                courseId: savedCourseId,
+                questions: selected,
+                difficulty,
+                type
+            });
+
+            Utils.toast(data.message, "success");
+
+            // Clear the review panel and reset for next generation
+            reviewPanel.classList.add("hidden");
+            duplicateNotice.classList.add("hidden");
+            questionsList.innerHTML = "";
+            pendingQuestions = [];
+            reviewStatus.textContent = "";
+            document.getElementById("aiTopic").value = "";
+            document.getElementById("aiCount").value = "10";
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+
+        } catch (error) {
+            Utils.toast(error.message || "Failed to save questions.", "error");
+        } finally {
+            approveBtn.disabled = false;
+            approveBtn.textContent = "✅ Save Selected Questions";
+        }
+    });
+
+
+    // ── REJECT — DISCARD ALL ──
+    rejectBtn.addEventListener("click", async () => {
+        try {
+            await api.post("/admin/questions/ai-reject", {});
+        } catch (_) {
+            // Rejection is best-effort — no user-facing error needed
+        }
+
+        reviewPanel.classList.add("hidden");
+        duplicateNotice.classList.add("hidden");
+        questionsList.innerHTML = "";
+        pendingQuestions = [];
+        reviewStatus.textContent = "";
+        document.getElementById("aiTopic").value = "";
+        document.getElementById("aiCount").value = "10";
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = false;
+
+        Utils.toast("Questions discarded.", "info");
+    });
+
+
     // ── INIT ──
     await loadCategories();
-    if (isEditMode) await loadCourse();
+    if (isEditMode) {
+        await loadCourse();
+        // In edit mode, AI panel is available immediately since the course exists
+        aiPanel.style.display = "block";
+        skipAiRow.style.display = "block";
+    }
 
 };
 
