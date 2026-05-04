@@ -149,9 +149,137 @@
                 </div>
             </div>
 
+
+            <!-- ── AI QUESTION GENERATION SECTION ── -->
+            <div class="card mb-6" id="aiSection">
+
+                <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-2);">
+                    <span style="font-size: 1.5rem;">🤖</span>
+                    <h3 class="profile-section-title" style="margin: 0;">Generate Questions with AI</h3>
+                </div>
+                <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-6);">
+                    Use Gemini AI to generate questions for any course. Review and approve each question before it is saved to the question bank.
+                </p>
+
+                <!-- AI INPUTS -->
+                <div class="auth-form">
+
+                    <div class="form-group">
+                        <label class="form-label" for="aiCourse">Course <span style="color:var(--color-error)">*</span></label>
+                        <select id="aiCourse" class="filter-select w-full">
+                            <option value="">Select course</option>
+                        </select>
+                        <span class="form-error hidden" id="aiCourseError"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="aiTopic">Topic Name <span style="color:var(--color-error)">*</span></label>
+                        <input
+                            type="text"
+                            id="aiTopic"
+                            class="form-input"
+                            placeholder="e.g. Pivot Tables, VLOOKUP, Subnetting"
+                        >
+                        <span class="form-error hidden" id="aiTopicError"></span>
+                    </div>
+
+                    <div class="auth-form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="aiDifficulty">Difficulty</label>
+                            <select id="aiDifficulty" class="filter-select w-full">
+                                <option value="Beginner">Beginner</option>
+                                <option value="Intermediate">Intermediate</option>
+                                <option value="Advanced">Advanced</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="aiType">Question Type</label>
+                            <select id="aiType" class="filter-select w-full">
+                                <option value="practice">Practice</option>
+                                <option value="certification">Certification</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="aiCount">Number of Questions <span style="color:var(--color-error)">*</span></label>
+                        <input
+                            type="number"
+                            id="aiCount"
+                            class="form-input"
+                            placeholder="e.g. 10"
+                            min="1"
+                            max="50"
+                            value="10"
+                        >
+                        <p style="font-size: var(--text-xs); color: var(--color-text-muted); margin-top: var(--space-1);">
+                            Maximum 50 questions per generation.
+                        </p>
+                        <span class="form-error hidden" id="aiCountError"></span>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" id="generateBtn">
+                        ✨ Generate Questions
+                    </button>
+
+                </div>
+
+                <!-- DUPLICATE NOTICE -->
+                <div id="duplicateNotice" class="hidden" style="
+                    margin-top: var(--space-5);
+                    padding: var(--space-3) var(--space-4);
+                    background: var(--color-warning-soft, #fff8e1);
+                    border-left: 3px solid var(--color-warning, #f59e0b);
+                    border-radius: var(--radius-md);
+                    font-size: var(--text-sm);
+                    color: var(--color-text);
+                ">
+                    <strong>⚠️ Duplicates removed:</strong> <span id="duplicateNoticeText"></span>
+                </div>
+
+                <!-- REVIEW PANEL -->
+                <div id="reviewPanel" class="hidden" style="margin-top: var(--space-6);">
+
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4);">
+                        <h4 style="font-size: var(--text-base); font-weight: 600;">
+                            Review Generated Questions
+                        </h4>
+                        <label style="font-size: var(--text-sm); color: var(--color-text-muted); cursor: pointer; display: flex; align-items: center; gap: var(--space-2);">
+                            <input type="checkbox" id="selectAllCheckbox">
+                            Select all
+                        </label>
+                    </div>
+
+                    <!-- Question cards injected here -->
+                    <div id="aiQuestionsList"></div>
+
+                    <!-- ACTIONS -->
+                    <div style="display: flex; gap: var(--space-3); margin-top: var(--space-6);">
+                        <button type="button" class="btn btn-primary" id="approveBtn">
+                            ✅ Save Selected Questions
+                        </button>
+                        <button type="button" class="btn btn-ghost" id="rejectBtn">
+                            ✕ Discard All
+                        </button>
+                    </div>
+
+                    <p id="reviewStatus" style="
+                        margin-top: var(--space-3);
+                        font-size: var(--text-sm);
+                        color: var(--color-text-muted);
+                    "></p>
+
+                </div>
+
+            </div>
+
+
             <!-- QUESTIONS TABLE -->
             <div class="section-header mb-4">
-                <h2 class="section-title">Questions <span id="questionsCount" class="text-muted" style="font-size: var(--text-sm); font-weight: 400;"></span></h2>
+                <h2 class="section-title">
+                    Questions
+                    <span id="questionsCount" class="text-muted" style="font-size: var(--text-sm); font-weight: 400;"></span>
+                </h2>
             </div>
 
             <div class="card">
@@ -179,6 +307,7 @@
         </main>
     </div>
 </div>
+
 
 <!-- ADD/EDIT QUESTION MODAL -->
 <div class="modal-overlay hidden" id="questionModal">
@@ -257,6 +386,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- DELETE CONFIRM MODAL -->
 <div class="modal-overlay hidden" id="deleteModal">
