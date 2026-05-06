@@ -101,7 +101,6 @@ const init = async () => {
             return;
         }
 
-        
         coursesGrid.innerHTML = courses.map(course => `
     <div class="course-card" onclick="window.location.href='./course-detail.html?id=${course._id}'">
         <p class="course-card-category">${course.category?.name || "General"}</p>
@@ -148,8 +147,13 @@ const init = async () => {
     // ── LOAD CATEGORIES ──
     const loadCategories = async () => {
         try {
-            const response = await api.get("/courses/categories");
-            const categories = response.categories;
+            let categories = Store.get("categories:all");
+
+            if (!categories) {
+                const response = await api.get("/courses/categories");
+                categories = response.categories;
+                Store.set("categories:all", categories, 30); // 30 minutes
+            }
 
             categories.forEach(cat => {
                 const option = document.createElement("option");
@@ -157,6 +161,7 @@ const init = async () => {
                 option.textContent = cat.name;
                 categoryFilter.appendChild(option);
             });
+
         } catch (error) {
             console.error("Failed to load categories");
         }
@@ -165,9 +170,17 @@ const init = async () => {
     // ── LOAD COURSES ──
     const loadCourses = async () => {
         try {
-            const response = await api.get("/courses");
-            allCourses = response.courses;
+            let courses = Store.get("courses:all");
+
+            if (!courses) {
+                const response = await api.get("/courses");
+                courses = response.courses;
+                Store.set("courses:all", courses, 10); // 10 minutes
+            }
+
+            allCourses = courses;
             renderCourses(allCourses);
+
         } catch (error) {
             coursesGrid.innerHTML = `
                 <div class="empty-state">
