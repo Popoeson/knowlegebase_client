@@ -91,51 +91,57 @@ const renderCourses = (courses) => {
         return;
     }
 
-    coursesGrid.innerHTML = courses.map(course => `
-        <div class="course-card">
-            <p class="course-card-category">
-                ${course.category?.name || "General"}
-            </p>
-            <div class="course-card-icon">📘</div>
-            <h3 class="course-card-title">${course.title}</h3>
-            <p class="course-card-desc">
-                ${Utils.truncate(course.description, 100)}
-            </p>
-            <div class="course-card-stats">
-                <span class="course-card-stat">⏱ ${course.duration} mins</span>
-                <span class="course-card-stat">
-                    📝 ${course.certificationQuestions} questions
-                </span>
-                <span class="course-card-stat">
-                    🎯 ${course.passMark}% pass mark
-                </span>
-            </div>
-            <div class="course-card-meta" style="margin-bottom: var(--space-4);">
-                <span class="badge badge-info">${course.difficulty}</span>
-                <span class="course-card-price">${formatPrice(course.price)}</span>
-            </div>
-            <div style="display: flex; gap: var(--space-2);">
-                <a
-                    href="${Auth.isLoggedIn()
-                        ? `./exam.html?id=${course._id}&type=practice`
-                        : `./register.html`}"
-                    class="btn btn-ghost btn-sm"
-                    style="flex: 1; text-align: center;"
-                >
-                    Practice Free
-                </a>
-                <a
-                    href="${Auth.isLoggedIn()
-                        ? `./payment.html?id=${course._id}`
-                        : `./register.html`}"
-                    class="btn btn-primary btn-sm"
-                    style="flex: 1; text-align: center;"
-                >
-                    Get Certified
-                </a>
-            </div>
+    
+coursesGrid.innerHTML = courses.map(course => `
+    <div class="course-card">
+        <p class="course-card-category">
+            ${course.category?.name || "General"}
+        </p>
+        ${course.thumbnail
+            ? `<img src="${course.thumbnail}" alt="${course.title}"
+                style="width: 100%; height: 140px; object-fit: cover;
+                border-radius: var(--radius-md); margin-bottom: var(--space-3);">`
+            : `<div class="course-card-icon">📘</div>`
+        }
+        <h3 class="course-card-title">${course.title}</h3>
+        <p class="course-card-desc">
+            ${Utils.truncate(course.description, 100)}
+        </p>
+        <div class="course-card-stats">
+            <span class="course-card-stat">⏱ ${course.duration} mins</span>
+            <span class="course-card-stat">
+                📝 ${course.certificationQuestions} questions
+            </span>
+            <span class="course-card-stat">
+                🎯 ${course.passMark}% pass mark
+            </span>
         </div>
-    `).join("");
+        <div class="course-card-meta" style="margin-bottom: var(--space-4);">
+            <span class="badge badge-info">${course.difficulty}</span>
+            <span class="course-card-price">${formatPrice(course.price)}</span>
+        </div>
+        <div style="display: flex; gap: var(--space-2);">
+            <a
+                href="${Auth.isLoggedIn()
+                    ? `./exam.html?id=${course._id}&type=practice`
+                    : `./register.html`}"
+                class="btn btn-ghost btn-sm"
+                style="flex: 1; text-align: center;"
+            >
+                Practice Free
+            </a>
+            <a
+                href="${Auth.isLoggedIn()
+                    ? `./payment.html?id=${course._id}`
+                    : `./register.html`}"
+                class="btn btn-primary btn-sm"
+                style="flex: 1; text-align: center;"
+            >
+                Get Certified
+            </a>
+        </div>
+    </div>
+`).join("");
 };
 
 // ── FILTER ──
