@@ -64,17 +64,32 @@ const init = async () => {
     // ── LOAD DASHBOARD ──
     const loadDashboard = async () => {
         try {
-            const [profileResponse, statsResponse, coursesResponse] = await Promise.all([
-                api.get("/user/profile"),
-                api.get("/user/stats"),
-                api.get("/courses")
-            ]);
 
-            const user = profileResponse.user;
-            const stats = statsResponse.stats;
-            const courses = coursesResponse.courses;
+            // ── PROFILE — store first, fallback to API ──
+            let user = Store.get("user:profile");
+            if (!user) {
+                const profileResponse = await api.get("/user/profile");
+                user = profileResponse.user;
+                Store.set("user:profile", user, 0); // no expiry — invalidated on profile edit
+            }
 
-            // Update session with latest data
+            // ── STATS — store first, fallback to API ──
+            let stats = Store.get("user:stats");
+            if (!stats) {
+                const statsResponse = await api.get("/user/stats");
+                stats = statsResponse.stats;
+                Store.set("user:stats", stats, 5); // 5 minutes
+            }
+
+            // ── COURSES — store first, fallback to API ──
+            let courses = Store.get("courses:all");
+            if (!courses) {
+                const coursesResponse = await api.get("/courses");
+                courses = coursesResponse.courses;
+                Store.set("courses:all", courses, 10); // 10 minutes
+            }
+
+            // Update session with latest profile data
             Auth.setSession(Auth.getToken(), {
                 id: user._id,
                 fullName: user.fullName,
