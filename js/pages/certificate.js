@@ -73,13 +73,17 @@ const init = async () => {
 
     try {
         if (certId) {
-            // Load existing certificate by ID
+            // Load existing certificate by ID — no store needed, rarely revisited
             const response = await api.get(`/certificates/${certId}`);
             certificate = response.certificate;
         } else if (attemptId) {
-            // Generate new certificate
+            // Generate new certificate — always hits API, this is a write operation
             const response = await api.post("/certificates/generate", { attemptId });
             certificate = response.certificate;
+
+            // Certificate generated means a new cert exists — invalidate stats
+            // so dashboard reflects the updated certificate count
+            Store.invalidate("user:stats");
         } else {
             certificateContent.innerHTML = `
                 <div class="empty-state">
