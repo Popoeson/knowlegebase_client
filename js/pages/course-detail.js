@@ -87,10 +87,18 @@ const init = async () => {
         return `~₦${ngn}`;
     };
 
-    // ── LOAD COURSE ──
+    // ── LOAD COURSE — store first, fallback to API ──
     try {
-        const response = await api.get(`/courses/${courseId}`);
-        const { course, questionCounts } = response;
+        const cacheKey = `course:${courseId}`;
+        let courseData = Store.get(cacheKey);
+
+        if (!courseData) {
+            const response = await api.get(`/courses/${courseId}`);
+            courseData = response; // contains { course, questionCounts }
+            Store.set(cacheKey, courseData, 10); // 10 minutes
+        }
+
+        const { course, questionCounts } = courseData;
 
         // Update page title
         document.title = `${course.title} — KNOWLEDGEBASE`;
