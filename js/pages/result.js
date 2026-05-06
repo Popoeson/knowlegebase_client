@@ -39,6 +39,9 @@ const init = async () => {
         }
     }
 
+    // ── INVALIDATE STATS — exam just completed, stats are now stale ──
+    Store.invalidate("user:stats");
+
     // ── FORMAT TIME ──
     const formatTimeTaken = (seconds) => {
         if (!seconds) return "—";
@@ -48,49 +51,48 @@ const init = async () => {
     };
 
     // ── RENDER REVIEW QUESTIONS ──
-    
-const escapeHTML = (str) => {
-    if (!str) return "";
-    return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-};
+    const escapeHTML = (str) => {
+        if (!str) return "";
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    };
 
-const renderReview = (review) => {
-    if (!review || review.length === 0) return "";
+    const renderReview = (review) => {
+        if (!review || review.length === 0) return "";
 
-    return review.map((q, index) => `
-        <div class="review-item ${q.isCorrect ? "correct" : "incorrect"}">
-            <p class="review-question-text">
-                ${index + 1}. ${escapeHTML(q.questionText)}
-            </p>
+        return review.map((q, index) => `
+            <div class="review-item ${q.isCorrect ? "correct" : "incorrect"}">
+                <p class="review-question-text">
+                    ${index + 1}. ${escapeHTML(q.questionText)}
+                </p>
 
-            <div class="review-options">
-                ${["A", "B", "C", "D"].map(letter => {
-                    let className = "review-option";
-                    if (letter === q.correctAnswer) className += " correct-answer";
-                    else if (letter === q.userAnswer && !q.isCorrect) className += " wrong-answer";
+                <div class="review-options">
+                    ${["A", "B", "C", "D"].map(letter => {
+                        let className = "review-option";
+                        if (letter === q.correctAnswer) className += " correct-answer";
+                        else if (letter === q.userAnswer && !q.isCorrect) className += " wrong-answer";
 
-                    return `
-                        <div class="${className}">
-                            <strong>${letter}.</strong>
-                            ${escapeHTML(q[`option${letter}`])}
-                            ${letter === q.correctAnswer ? " ✅" : ""}
-                            ${letter === q.userAnswer && !q.isCorrect ? " ❌" : ""}
-                        </div>`;
-                }).join("")}
+                        return `
+                            <div class="${className}">
+                                <strong>${letter}.</strong>
+                                ${escapeHTML(q[`option${letter}`])}
+                                ${letter === q.correctAnswer ? " ✅" : ""}
+                                ${letter === q.userAnswer && !q.isCorrect ? " ❌" : ""}
+                            </div>`;
+                    }).join("")}
+                </div>
+
+                ${q.explanation ? `
+                    <p class="review-explanation">
+                        💡 ${escapeHTML(q.explanation)}
+                    </p>` : ""}
             </div>
-
-            ${q.explanation ? `
-                <p class="review-explanation">
-                    💡 ${escapeHTML(q.explanation)}
-                </p>` : ""}
-        </div>
-    `).join("");
-};
+        `).join("");
+    };
 
     // ── RENDER RESULT ──
     const passed = result.passed;
