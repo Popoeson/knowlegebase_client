@@ -16,11 +16,16 @@ const Store = (() => {
     // Retrieve data — returns null if missing or expired
     function get(key) {
         const entry = _cache[key];
-        if (!entry) return null;
-        if (entry.expiresAt && Date.now() > entry.expiresAt) {
-            delete _cache[key];
+        if (!entry) {
+            console.log(`[Store MISS] ${key}`);
             return null;
         }
+        if (entry.expiresAt && Date.now() > entry.expiresAt) {
+            delete _cache[key];
+            console.log(`[Store EXPIRED] ${key}`);
+            return null;
+        }
+        console.log(`[Store HIT] ${key}`);
         return entry.data;
     }
 
@@ -43,12 +48,11 @@ const Store = (() => {
                 api.get("/courses/categories")
             ]);
 
-            if (profileRes.user) set("user:profile", profileRes.user, 0); // no expiry — invalidate on edit
+            if (profileRes.user) set("user:profile", profileRes.user, 0);
             if (coursesRes.courses) set("courses:all", coursesRes.courses, 10);
             if (categoriesRes.categories) set("categories:all", categoriesRes.categories, 30);
 
         } catch (err) {
-            // Prefetch failure is non-fatal — pages will fall back to direct API calls
             console.warn("Store prefetch failed:", err.message);
         }
     }
