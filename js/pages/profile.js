@@ -98,10 +98,18 @@ const init = async () => {
         document.getElementById("bio").value = user.bio || "";
     };
 
-    // ── LOAD PROFILE ──
+    // ── LOAD PROFILE — store first, fallback to API ──
     try {
-        const response = await api.get("/user/profile");
-        populateUser(response.user);
+        let user = Store.get("user:profile");
+
+        if (!user) {
+            const response = await api.get("/user/profile");
+            user = response.user;
+            Store.set("user:profile", user, 0); // no expiry — invalidated on edit
+        }
+
+        populateUser(user);
+
     } catch (error) {
         if (error.message.includes("authorized") || error.message.includes("token")) {
             Auth.logout();
@@ -138,6 +146,9 @@ const init = async () => {
             sidebarAvatar.innerHTML = imgHTML;
             topbarAvatar.innerHTML = imgHTML;
 
+            // Update store and session with new photo
+            const updatedUser = { ...Store.get("user:profile"), profilePhoto: data.user.profilePhoto };
+            Store.set("user:profile", updatedUser, 0);
             Auth.setSession(Auth.getToken(), {
                 ...Auth.getUser(),
                 profilePhoto: data.user.profilePhoto
@@ -162,6 +173,9 @@ const init = async () => {
                 phone: document.getElementById("phone").value.trim(),
                 bio: document.getElementById("bio").value.trim()
             });
+
+            // Invalidate profile in store — force fresh fetch next time
+            Store.invalidate("user:profile");
 
             Utils.toast(response.message, "success");
 
