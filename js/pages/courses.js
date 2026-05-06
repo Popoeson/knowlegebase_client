@@ -101,23 +101,29 @@ const init = async () => {
             return;
         }
 
+        
         coursesGrid.innerHTML = courses.map(course => `
-            <div class="course-card" onclick="window.location.href='./course-detail.html?id=${course._id}'">
-                <p class="course-card-category">${course.category?.name || "General"}</p>
-                <div class="course-card-icon">📘</div>
-                <h3 class="course-card-title">${course.title}</h3>
-                <p class="course-card-desc">${Utils.truncate(course.description, 100)}</p>
-                <div class="course-card-stats">
-                    <span class="course-card-stat">⏱ ${course.duration} mins</span>
-                    <span class="course-card-stat">📝 ${course.certificationQuestions} questions</span>
-                    <span class="course-card-stat">🎯 ${course.passMark}% pass mark</span>
-                </div>
-                <div class="course-card-meta">
-                    <span class="badge badge-info">${course.difficulty}</span>
-                    <span class="course-card-price">${formatPrice(course.price)}</span>
-                </div>
-            </div>
-        `).join("");
+    <div class="course-card" onclick="window.location.href='./course-detail.html?id=${course._id}'">
+        <p class="course-card-category">${course.category?.name || "General"}</p>
+        ${course.thumbnail
+            ? `<img src="${course.thumbnail}" alt="${course.title}"
+                style="width: 100%; height: 140px; object-fit: cover;
+                border-radius: var(--radius-md); margin-bottom: var(--space-3);">`
+            : `<div class="course-card-icon">📘</div>`
+        }
+        <h3 class="course-card-title">${course.title}</h3>
+        <p class="course-card-desc">${Utils.truncate(course.description, 100)}</p>
+        <div class="course-card-stats">
+            <span class="course-card-stat">⏱ ${course.duration} mins</span>
+            <span class="course-card-stat">📝 ${course.certificationQuestions} questions</span>
+            <span class="course-card-stat">🎯 ${course.passMark}% pass mark</span>
+        </div>
+        <div class="course-card-meta">
+            <span class="badge badge-info">${course.difficulty}</span>
+            <span class="course-card-price">${formatPrice(course.price)}</span>
+        </div>
+    </div>
+`).join("");
     };
 
     // ── FILTER COURSES ──
