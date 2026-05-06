@@ -40,6 +40,7 @@ const Auth = {
     },
 
     logout: () => {
+        Store.invalidateAll(); // clear all cached data before ending session
         Auth.clearSession();
         window.location.href = "/pages/login.html";
     }
