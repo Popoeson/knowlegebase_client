@@ -68,27 +68,34 @@ loginForm.addEventListener("submit", async (e) => {
     loginBtn.disabled = true;
     loginBtn.textContent = "Logging in...";
 
+    
     try {
-        const response = await api.post("/auth/login", {
-            email: emailInput.value.trim(),
-            password: passwordInput.value
-        });
+    const response = await api.post("/auth/login", {
+        email: emailInput.value.trim(),
+        password: passwordInput.value
+    });
 
-        // Save session
-        Auth.setSession(response.token, response.user);
+    // Save session
+    Auth.setSession(response.token, response.user);
 
-        Utils.toast(response.message, "success");
+    // Pre-load shared data into store before redirect
+    // Skip for admin — they have different data needs
+    if (response.user.role !== "admin") {
+        await Store.prefetch();
+    }
 
-        // Redirect based on role
-        setTimeout(() => {
-            if (response.user.role === "admin") {
-                window.location.href = "./admin/dashboard.html";
-            } else {
-                window.location.href = "./dashboard.html";
-            }
-        }, 1000);
+    Utils.toast(response.message, "success");
 
-    } catch (error) {
+    setTimeout(() => {
+        if (response.user.role === "admin") {
+            window.location.href = "./admin/dashboard.html";
+        } else {
+            window.location.href = "./dashboard.html";
+        }
+    }, 1000);
+
+} catch (error) {
+    
         // Handle unverified account
         if (error.message.includes("verify")) {
             Utils.toast(error.message, "warning");
