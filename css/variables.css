@@ -80,10 +80,26 @@
     --color-surface-2: #162032;
     --color-border: #1E3A5F;
     --color-text-primary: #F8F9FB;
-    --color-text-secondary: #94A3B8;
-    --color-text-muted: #475569;
+    --color-text-secondary: #CBD5E1;
+    --color-text-muted: #64748B; 
 
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
     --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
     --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .form-input::placeholder,
+[data-theme="dark"] .form-label,
+[data-theme="dark"] .profile-textarea,
+[data-theme="dark"] .profile-textarea::placeholder {
+    color: var(--color-text-primary);
+    font-weight: var(--font-medium);
+}
+
+[data-theme="dark"] .card p,
+[data-theme="dark"] .card span,
+[data-theme="dark"] .card li {
+    color: var(--color-text-secondary);
+    font-weight: var(--font-medium);
 }
