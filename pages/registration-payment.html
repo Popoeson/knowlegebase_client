@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activate Account — KNOWLEDGEBASE</title>
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/pages/auth.css">
+    <link rel="stylesheet" href="../css/pages/payment.css">
+</head>
+<body>
+<div style="
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg);
+    padding: var(--space-6);
+">
+    <div style="width: 100%; max-width: 460px;">
+
+        <div style="text-align: center; margin-bottom: var(--space-8);">
+            <span class="sidebar-brand-name" style="font-size: var(--text-2xl);">
+                KNOWLEDGE<span style="color: var(--color-accent);">BASE</span>
+            </span>
+        </div>
+
+        <div class="card" style="padding: var(--space-8);">
+
+            <div style="text-align: center; margin-bottom: var(--space-6);">
+                <div style="font-size: 2.5rem; margin-bottom: var(--space-3);">🎓</div>
+                <h2 style="
+                    font-size: var(--text-xl);
+                    font-weight: var(--font-bold);
+                    color: var(--color-text-primary);
+                    margin-bottom: var(--space-2);
+                ">Activate Your Account</h2>
+                <p style="font-size: var(--text-sm); color: var(--color-text-muted);">
+                    A one-time registration fee is required to access KNOWLEDGEBASE.
+                </p>
+            </div>
+
+            <div style="
+                background: var(--color-surface-2);
+                border-radius: var(--radius-lg);
+                padding: var(--space-5);
+                margin-bottom: var(--space-6);
+            ">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3);">
+                    <span style="font-size: var(--text-sm); color: var(--color-text-muted);">Registration Fee</span>
+                    <span style="font-size: var(--text-sm); font-weight: var(--font-semibold);">$2.00 USD</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3);">
+                    <span style="font-size: var(--text-sm); color: var(--color-text-muted);">Amount (NGN)</span>
+                    <span id="amountNGN" style="font-size: var(--text-sm); font-weight: var(--font-semibold);">Calculating...</span>
+                </div>
+                <div style="border-top: 1px solid var(--color-border); padding-top: var(--space-3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: var(--font-bold);">Total Due</span>
+                        <span id="totalDue" style="
+                            font-size: var(--text-lg);
+                            font-weight: var(--font-bold);
+                            color: var(--color-accent);
+                        ">...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-6);">
+                <div style="display: flex; align-items: center; gap: var(--space-3);">
+                    <span>✅</span>
+                    <span style="font-size: var(--text-sm); color: var(--color-text-secondary);">One-time fee — never charged again</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: var(--space-3);">
+                    <span>✅</span>
+                    <span style="font-size: var(--text-sm); color: var(--color-text-secondary);">Unlimited access to practice tests</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: var(--space-3);">
+                    <span>✅</span>
+                    <span style="font-size: var(--text-sm); color: var(--color-text-secondary);">Access to all courses and certification exams</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: var(--space-3);">
+                    <span>✅</span>
+                    <span style="font-size: var(--text-sm); color: var(--color-text-secondary);">Verifiable digital certificates</span>
+                </div>
+            </div>
+
+            <button class="btn btn-primary w-full btn-lg" id="payBtn" disabled>
+                💳 Activate Account
+            </button>
+
+            <p id="exchangeNote" style="
+                font-size: var(--text-xs);
+                color: var(--color-text-muted);
+                text-align: center;
+                margin-top: var(--space-3);
+            "></p>
+
+            <div style="
+                margin-top: var(--space-4);
+                padding: var(--space-3);
+                background: var(--color-surface-2);
+                border-radius: var(--radius-md);
+                text-align: center;
+                font-size: var(--text-xs);
+                color: var(--color-text-muted);
+            ">
+                🔒 Secured by Paystack. Your payment details are encrypted.
+            </div>
+
+        </div>
+
+        <p style="text-align: center; margin-top: var(--space-4); font-size: var(--text-sm); color: var(--color-text-muted);">
+            Already activated?
+            <a href="./login.html" style="color: var(--color-primary); font-weight: var(--font-medium);">Log in</a>
+        </p>
+
+    </div>
+</div>
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/pages/registration-payment.js"></script>
+</body>
+</html>
