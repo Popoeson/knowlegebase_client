@@ -2,6 +2,9 @@ Utils.initTheme();
 
 const init = async () => {
 
+    // Restore session from persisted token if this is a new tab
+    await Auth.restoreSession();
+
     if (!Auth.isLoggedIn()) {
         window.location.href = "./login.html";
         return;
