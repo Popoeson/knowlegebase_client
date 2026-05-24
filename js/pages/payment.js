@@ -63,6 +63,9 @@ const init = async () => {
         return;
     }
 
+    // Store courseId so callback page can use it
+    sessionStorage.setItem("kb_payment_courseId", courseId);
+
     let exchangeRate = 1600;
     try {
         const response = await fetch("https://open.er-api.com/v6/latest/USD");
@@ -192,7 +195,7 @@ const init = async () => {
                         </div>
                         <div style="display: flex; gap: var(--space-3); align-items: flex-start;">
                             <span style="color: var(--color-primary); font-weight: bold; flex-shrink: 0;">2.</span>
-                            <span style="font-size: var(--text-sm); color: var(--color-text-secondary);">You are redirected to start your exam</span>
+                            <span style="font-size: var(--text-sm); color: var(--color-text-secondary);">You are redirected back to start your exam</span>
                         </div>
                         <div style="display: flex; gap: var(--space-3); align-items: flex-start;">
                             <span style="color: var(--color-primary); font-weight: bold; flex-shrink: 0;">3.</span>
@@ -205,11 +208,11 @@ const init = async () => {
         </div>
     `;
 
-    // ── PAY NOW BUTTON ──
+    // ── PAY NOW — REDIRECT TO PAYSTACK ──
     document.getElementById("payNowBtn").addEventListener("click", async () => {
         const payBtn = document.getElementById("payNowBtn");
         payBtn.disabled = true;
-        payBtn.textContent = "Initializing payment...";
+        payBtn.textContent = "Redirecting to payment...";
 
         try {
             const response = await api.post("/payment/initialize", {
@@ -217,50 +220,8 @@ const init = async () => {
                 amountNGN: priceNGN
             });
 
-            const { reference } = response;
-
-            const handler = PaystackPop.setup({
-                key: CONFIG.PAYSTACK_PUBLIC_KEY,
-                email: user.email,
-                amount: priceNGN * 100,
-                ref: reference,
-                currency: "NGN",
-                metadata: {
-                    custom_fields: [
-                        {
-                            display_name: "Course",
-                            variable_name: "course",
-                            value: course.title
-                        },
-                        {
-                            display_name: "Student Name",
-                            variable_name: "student_name",
-                            value: user.fullName
-                        }
-                    ]
-                },
-                callback: function(paystackResponse) {
-                    Utils.showLoader();
-                    api.get(`/payment/verify/${paystackResponse.reference}`)
-                        .then(() => {
-                            Utils.toast("Payment successful! Starting your exam...", "success");
-                            setTimeout(() => {
-                                window.location.href = `./exam.html?id=${courseId}&type=certification`;
-                            }, 1500);
-                        })
-                        .catch(() => {
-                            Utils.hideLoader();
-                            Utils.toast("Payment verification failed. Please contact support.", "error");
-                        });
-                },
-                onClose: function() {
-                    payBtn.disabled = false;
-                    payBtn.textContent = `💳 Pay ₦${priceNGNFormatted} Now`;
-                    Utils.toast("Payment cancelled", "warning");
-                }
-            });
-
-            handler.openIframe();
+            // Redirect to Paystack hosted payment page
+            window.location.href = response.authorizationUrl;
 
         } catch (error) {
             Utils.toast(error.message, "error");
