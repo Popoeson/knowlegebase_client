@@ -1,5 +1,8 @@
 const Auth = {
 
+console.log("sessionStorage token:", sessionStorage.getItem("kb_token"));
+    console.log("localStorage persist token:", localStorage.getItem("kb_persist_token"));
+
     getToken: () => sessionStorage.getItem("kb_token"),
 
     getUser: () => {
