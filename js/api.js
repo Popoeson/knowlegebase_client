@@ -1,6 +1,7 @@
 const api = {
     request: async (endpoint, options = {}) => {
-        const token = localStorage.getItem("kb_token");
+        // Read from sessionStorage 
+        const token = sessionStorage.getItem("kb_token");
 
         const headers = {
             "Content-Type": "application/json",
@@ -16,11 +17,27 @@ const api = {
 
             const data = await response.json();
 
+            // Registration payment required — redirect to payment page
+            if (response.status === 402) {
+                window.location.href = "/pages/registration-payment.html";
+                return;
+            }
+
+            // Unauthorized — token invalid or expired, force logout
+            if (response.status === 401) {
+                sessionStorage.removeItem("kb_token");
+                sessionStorage.removeItem("kb_user");
+                localStorage.removeItem("kb_persist_token");
+                window.location.href = "/pages/login.html";
+                return;
+            }
+
             if (!response.ok) {
                 throw new Error(data.message || "Something went wrong");
             }
 
             return data;
+
         } catch (error) {
             throw error;
         }
