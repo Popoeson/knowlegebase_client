@@ -2,6 +2,8 @@ Utils.initTheme();
 
 const init = async () => {
 
+     await Auth.restoreSession();
+
     if (!Auth.isLoggedIn()) {
         window.location.href = "./login.html";
         return;
