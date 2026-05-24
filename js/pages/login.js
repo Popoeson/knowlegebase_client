@@ -1,24 +1,20 @@
 Utils.initTheme();
 
-// Redirect if already logged in
 if (Auth.isLoggedIn()) {
     window.location.href = "./dashboard.html";
 }
 
-// ── ELEMENT REFERENCES ──
 const loginForm = document.getElementById("loginForm");
 const loginBtn = document.getElementById("loginBtn");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 
-// ── PASSWORD TOGGLE ──
 document.getElementById("togglePassword").addEventListener("click", () => {
     const type = passwordInput.type === "password" ? "text" : "password";
     passwordInput.type = type;
     document.getElementById("togglePassword").textContent = type === "password" ? "👁" : "🙈";
 });
 
-// ── VALIDATION ──
 const showError = (id, message) => {
     const el = document.getElementById(id);
     if (el) {
@@ -59,7 +55,6 @@ const validateForm = () => {
     return valid;
 };
 
-// ── FORM SUBMIT ──
 loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -68,35 +63,46 @@ loginForm.addEventListener("submit", async (e) => {
     loginBtn.disabled = true;
     loginBtn.textContent = "Logging in...";
 
-    
     try {
-    const response = await api.post("/auth/login", {
-        email: emailInput.value.trim(),
-        password: passwordInput.value
-    });
+        const response = await api.post("/auth/login", {
+            email: emailInput.value.trim(),
+            password: passwordInput.value
+        });
 
-    // Save session
-    Auth.setSession(response.token, response.user);
+        Auth.setSession(response.token, response.user);
 
-    // Pre-load shared data into store before redirect
-    // Skip for admin — they have different data needs
-    if (response.user.role !== "admin") {
-        await Store.prefetch();
-    }
-
-    Utils.toast(response.message, "success");
-
-    setTimeout(() => {
+        // Admin bypasses registration payment
         if (response.user.role === "admin") {
-            window.location.href = "./admin/dashboard.html";
-        } else {
-            window.location.href = "./dashboard.html";
+            Utils.toast(response.message, "success");
+            setTimeout(() => {
+                window.location.href = "./admin/dashboard.html";
+            }, 1000);
+            return;
         }
-    }, 1000);
 
-} catch (error) {
-    
-        // Handle unverified account
+        // Check registration payment status
+        if (!response.user.hasPaidRegistration) {
+            Utils.toast("Please complete your registration payment to continue.", "warning");
+            // Store token so registration-payment page can use it
+            sessionStorage.setItem("kb_reg_email", emailInput.value.trim());
+            setTimeout(() => {
+                window.location.href = "./registration-payment.html";
+            }, 1500);
+            return;
+        }
+
+        // Fully registered user
+        if (response.user.role !== "admin") {
+            await Store.prefetch();
+        }
+
+        Utils.toast(response.message, "success");
+
+        setTimeout(() => {
+            window.location.href = "./dashboard.html";
+        }, 1000);
+
+    } catch (error) {
         if (error.message.includes("verify")) {
             Utils.toast(error.message, "warning");
             sessionStorage.setItem("kb_otp_email", emailInput.value.trim());
