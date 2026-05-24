@@ -1,8 +1,5 @@
 const Auth = {
 
-console.log("sessionStorage token:", sessionStorage.getItem("kb_token"));
-    console.log("localStorage persist token:", localStorage.getItem("kb_persist_token"));
-
     getToken: () => sessionStorage.getItem("kb_token"),
 
     getUser: () => {
@@ -11,12 +8,8 @@ console.log("sessionStorage token:", sessionStorage.getItem("kb_token"));
     },
 
     setSession: (token, user) => {
-        // Tab-isolated session
         sessionStorage.setItem("kb_token", token);
         sessionStorage.setItem("kb_user", JSON.stringify(user));
-
-        // Persist token across tabs and browser restarts
-        // Only the token is persisted — user data always comes from the server
         localStorage.setItem("kb_persist_token", token);
     },
 
@@ -33,14 +26,16 @@ console.log("sessionStorage token:", sessionStorage.getItem("kb_token"));
         return user && user.role === "admin";
     },
 
-    // Called on every page load to restore session if sessionStorage is empty
-    // but a persisted token exists in localStorage
     restoreSession: async () => {
-        // Already have a session in this tab — nothing to do
+        console.log("sessionStorage token:", sessionStorage.getItem("kb_token"));
+        console.log("localStorage persist token:", localStorage.getItem("kb_persist_token"));
+
         if (sessionStorage.getItem("kb_token")) return true;
 
         const persistedToken = localStorage.getItem("kb_persist_token");
         if (!persistedToken) return false;
+
+        console.log("Calling /auth/me with token:", persistedToken);
 
         try {
             const response = await fetch(`${CONFIG.API_BASE_URL}/auth/me`, {
@@ -49,15 +44,14 @@ console.log("sessionStorage token:", sessionStorage.getItem("kb_token"));
                 }
             });
 
+            console.log("me response status:", response.status);
+
             if (!response.ok) {
-                // Token expired or invalid — clear everything
                 localStorage.removeItem("kb_persist_token");
                 return false;
             }
 
             const data = await response.json();
-
-            // Restore into sessionStorage for this tab
             sessionStorage.setItem("kb_token", data.token);
             sessionStorage.setItem("kb_user", JSON.stringify(data.user));
 
