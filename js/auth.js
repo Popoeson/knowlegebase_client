@@ -27,42 +27,48 @@ const Auth = {
     },
 
     restoreSession: async () => {
-        console.log("sessionStorage token:", sessionStorage.getItem("kb_token"));
-        console.log("localStorage persist token:", localStorage.getItem("kb_persist_token"));
+    if (sessionStorage.getItem("kb_token")) return true;
 
-        if (sessionStorage.getItem("kb_token")) return true;
+    // Do not restore session for fresh tab navigations.
+    // Only restore if the user navigated within the same app
+    // (e.g. page refresh, internal link).
+    const referrer = document.referrer;
+    const sameOrigin = referrer && referrer.startsWith(window.location.origin);
+    const isRefresh = window.performance?.navigation?.type === 1 ||
+        performance.getEntriesByType("navigation")[0]?.type === "reload";
 
-        const persistedToken = localStorage.getItem("kb_persist_token");
-        if (!persistedToken) return false;
+    if (!sameOrigin && !isRefresh) {
+        // Fresh tab or pasted URL — require explicit login
+        return false;
+    }
 
-        console.log("Calling /auth/me with token:", persistedToken);
+    const persistedToken = localStorage.getItem("kb_persist_token");
+    if (!persistedToken) return false;
 
-        try {
-            const response = await fetch(`${CONFIG.API_BASE_URL}/auth/me`, {
-                headers: {
-                    Authorization: `Bearer ${persistedToken}`
-                }
-            });
-
-            console.log("me response status:", response.status);
-
-            if (!response.ok) {
-                localStorage.removeItem("kb_persist_token");
-                return false;
+    try {
+        const response = await fetch(`${CONFIG.API_BASE_URL}/auth/me`, {
+            headers: {
+                Authorization: `Bearer ${persistedToken}`
             }
+        });
 
-            const data = await response.json();
-            sessionStorage.setItem("kb_token", data.token);
-            sessionStorage.setItem("kb_user", JSON.stringify(data.user));
-
-            return true;
-
-        } catch (error) {
-            console.error("Session restore failed:", error);
+        if (!response.ok) {
             localStorage.removeItem("kb_persist_token");
             return false;
         }
-    },
+
+        const data = await response.json();
+        sessionStorage.setItem("kb_token", data.token);
+        sessionStorage.setItem("kb_user", JSON.stringify(data.user));
+
+        return true;
+
+    } catch (error) {
+        console.error("Session restore failed:", error);
+        localStorage.removeItem("kb_persist_token");
+        return false;
+    }
+},
 
     requireAuth: () => {
         if (!Auth.isLoggedIn()) {
