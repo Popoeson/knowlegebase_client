@@ -1,118 +1,88 @@
-Utils.initTheme();
+const Auth = {
 
-if (Auth.isLoggedIn()) {
-    window.location.href = "./dashboard.html";
-}
-const loginForm = document.getElementById("loginForm");
-const loginBtn = document.getElementById("loginBtn");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
+    getToken: () => sessionStorage.getItem("kb_token"),
 
-document.getElementById("togglePassword").addEventListener("click", () => {
-    const type = passwordInput.type === "password" ? "text" : "password";
-    passwordInput.type = type;
-    document.getElementById("togglePassword").textContent = type === "password" ? "👁" : "🙈";
-});
+    getUser: () => {
+        const user = sessionStorage.getItem("kb_user");
+        return user ? JSON.parse(user) : null;
+    },
 
-const showError = (id, message) => {
-    const el = document.getElementById(id);
-    if (el) {
-        el.textContent = message;
-        el.classList.remove("hidden");
+    setSession: (token, user) => {
+        sessionStorage.setItem("kb_token", token);
+        sessionStorage.setItem("kb_user", JSON.stringify(user));
+        localStorage.setItem("kb_persist_token", token);
+    },
+
+    clearSession: () => {
+        sessionStorage.removeItem("kb_token");
+        sessionStorage.removeItem("kb_user");
+        localStorage.removeItem("kb_persist_token");
+    },
+
+    isLoggedIn: () => !!sessionStorage.getItem("kb_token"),
+
+    isAdmin: () => {
+        const user = Auth.getUser();
+        return user && user.role === "admin";
+    },
+
+    restoreSession: async () => {
+        console.log("sessionStorage token:", sessionStorage.getItem("kb_token"));
+        console.log("localStorage persist token:", localStorage.getItem("kb_persist_token"));
+
+        if (sessionStorage.getItem("kb_token")) return true;
+
+        const persistedToken = localStorage.getItem("kb_persist_token");
+        if (!persistedToken) return false;
+
+        console.log("Calling /auth/me with token:", persistedToken);
+
+        try {
+            const response = await fetch(`${CONFIG.API_BASE_URL}/auth/me`, {
+                headers: {
+                    Authorization: `Bearer ${persistedToken}`
+                }
+            });
+
+            console.log("me response status:", response.status);
+
+            if (!response.ok) {
+                localStorage.removeItem("kb_persist_token");
+                return false;
+            }
+
+            const data = await response.json();
+            sessionStorage.setItem("kb_token", data.token);
+            sessionStorage.setItem("kb_user", JSON.stringify(data.user));
+
+            return true;
+
+        } catch (error) {
+            console.error("Session restore failed:", error);
+            localStorage.removeItem("kb_persist_token");
+            return false;
+        }
+    },
+
+    requireAuth: () => {
+        if (!Auth.isLoggedIn()) {
+            window.location.href = "/pages/login.html";
+            return false;
+        }
+        return true;
+    },
+
+    requireAdmin: () => {
+        if (!Auth.isLoggedIn() || !Auth.isAdmin()) {
+            window.location.href = "/pages/login.html";
+            return false;
+        }
+        return true;
+    },
+
+    logout: () => {
+        if (typeof Store !== "undefined") Store.invalidateAll();
+        Auth.clearSession();
+        window.location.href = "/pages/login.html";
     }
 };
-
-const clearErrors = () => {
-    ["emailError", "passwordError"].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.textContent = "";
-            el.classList.add("hidden");
-        }
-    });
-};
-
-const validateForm = () => {
-    let valid = true;
-    clearErrors();
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailInput.value.trim()) {
-        showError("emailError", "Email is required");
-        valid = false;
-    } else if (!emailRegex.test(emailInput.value.trim())) {
-        showError("emailError", "Enter a valid email address");
-        valid = false;
-    }
-
-    if (!passwordInput.value) {
-        showError("passwordError", "Password is required");
-        valid = false;
-    }
-
-    return valid;
-};
-
-loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) return;
-
-    loginBtn.disabled = true;
-    loginBtn.textContent = "Logging in...";
-
-    try {
-        const response = await api.post("/auth/login", {
-            email: emailInput.value.trim(),
-            password: passwordInput.value
-        });
-
-        Auth.setSession(response.token, response.user);
-
-        // Admin bypasses registration payment
-        if (response.user.role === "admin") {
-            Utils.toast(response.message, "success");
-            setTimeout(() => {
-                window.location.href = "./admin/dashboard.html";
-            }, 1000);
-            return;
-        }
-
-        // Check registration payment status
-        if (!response.user.hasPaidRegistration) {
-            Utils.toast("Please complete your registration payment to continue.", "warning");
-            // Store token so registration-payment page can use it
-            sessionStorage.setItem("kb_reg_email", emailInput.value.trim());
-            setTimeout(() => {
-                window.location.href = "./registration-payment.html";
-            }, 1500);
-            return;
-        }
-
-        // Fully registered user
-        if (response.user.role !== "admin") {
-            await Store.prefetch();
-        }
-
-        Utils.toast(response.message, "success");
-
-        setTimeout(() => {
-            window.location.href = "./dashboard.html";
-        }, 1000);
-
-    } catch (error) {
-        if (error.message.includes("verify")) {
-            Utils.toast(error.message, "warning");
-            sessionStorage.setItem("kb_otp_email", emailInput.value.trim());
-            setTimeout(() => {
-                window.location.href = "./otp.html";
-            }, 2000);
-        } else {
-            Utils.toast(error.message, "error");
-        }
-
-        loginBtn.disabled = false;
-        loginBtn.textContent = "Log In";
-    }
-});
