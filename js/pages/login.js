@@ -1,12 +1,8 @@
 Utils.initTheme();
 
-(async () => {
-    await Auth.restoreSession();
-    if (Auth.isLoggedIn()) {
-        window.location.href = "./dashboard.html";
-    }
-})();
-
+if (Auth.isLoggedIn()) {
+    window.location.href = "./dashboard.html";
+}
 const loginForm = document.getElementById("loginForm");
 const loginBtn = document.getElementById("loginBtn");
 const emailInput = document.getElementById("email");
