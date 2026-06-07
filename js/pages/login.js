@@ -108,20 +108,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.href = "./dashboard.html";
             }, 1000);
 
-        } catch (error) {
-            if (error.message.includes("verify")) {
-                Utils.toast(error.message, "warning");
-                sessionStorage.setItem("kb_otp_email", emailInput.value.trim());
-                setTimeout(() => {
-                    window.location.href = "./otp.html";
-                }, 2000);
-            } else {
-                Utils.toast(error.message, "error");
-            }
+        } } catch (error) {
+    console.error("Login error full object:", error);
+    console.error("error.message:", error.message);
+    console.error("error type:", typeof error);
+    console.error("error stack:", error.stack);
 
-            loginBtn.disabled = false;
-            loginBtn.textContent = "Log In";
-        }
-    });
+    if (error.message && error.message.includes("verify")) {
+        Utils.toast(error.message, "warning");
+        sessionStorage.setItem("kb_otp_email", emailInput.value.trim());
+        setTimeout(() => {
+            window.location.href = "./otp.html";
+        }, 2000);
+    } else {
+        Utils.toast(error.message || "Login failed. Please try again.", "error");
+    }
 
-});
+    loginBtn.disabled = false;
+    loginBtn.textContent = "Log In";
+}
