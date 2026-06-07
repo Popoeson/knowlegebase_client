@@ -67,6 +67,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return valid;
     };
 
+   loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    console.log("Form submitted");
+
+    if (!validateForm()) return;
+    
     loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
 
