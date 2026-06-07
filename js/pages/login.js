@@ -1,5 +1,7 @@
 Utils.initTheme();
 
+console.log("API URL:", CONFIG.API_BASE_URL);
+
 if (Auth.isLoggedIn()) {
     window.location.href = "./dashboard.html";
 }
