@@ -1,5 +1,14 @@
 Utils.initTheme();
 
+console.log("login.js loaded");
+console.log("Utils:", typeof Utils);
+console.log("Auth:", typeof Auth);
+console.log("api:", typeof api);
+console.log("Store:", typeof Store);
+console.log("CONFIG:", typeof CONFIG);
+console.log("loginForm:", document.getElementById("loginForm"));
+console.log("togglePassword:", document.getElementById("togglePassword"));
+
 document.addEventListener("DOMContentLoaded", () => {
 
     if (Auth.isLoggedIn()) {
