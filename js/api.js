@@ -14,9 +14,7 @@ const api = {
                 headers
             });
 
-const data = await response.json();
-
-console.log("API response status:", response.status, "endpoint:", endpoint, "data:", data);
+            const data = await response.json();
 
             // Registration payment required
             if (response.status === 402) {
@@ -24,14 +22,19 @@ console.log("API response status:", response.status, "endpoint:", endpoint, "dat
                 return;
             }
 
-            // Unauthorized — token invalid or expired
+            // Unauthorized
             if (response.status === 401) {
-                console.error("401 intercepted — url:", `${CONFIG.API_BASE_URL}${endpoint}`);
-                sessionStorage.removeItem("kb_token");
-                sessionStorage.removeItem("kb_user");
-                localStorage.removeItem("kb_persist_token");
-                window.location.href = "/pages/login.html";
-                return;
+                const existingToken = sessionStorage.getItem("kb_token");
+                if (existingToken) {
+                    // Session expired — clear and redirect
+                    sessionStorage.removeItem("kb_token");
+                    sessionStorage.removeItem("kb_user");
+                    localStorage.removeItem("kb_persist_token");
+                    window.location.href = "/pages/login.html";
+                    return;
+                }
+                // No existing session — throw error message to caller
+                throw new Error(data.message || "Invalid credentials");
             }
 
             if (!response.ok) {
