@@ -1,11 +1,10 @@
 Utils.initTheme();
+Utils.initTheme();
 
-// Only redirect if we have a valid session token in this tab
 const existingToken = sessionStorage.getItem("kb_token");
 if (existingToken) {
     window.location.href = "./dashboard.html";
 }
-
 if (Auth.isLoggedIn()) {
     window.location.href = "./dashboard.html";
 }
