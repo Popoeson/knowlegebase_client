@@ -11,7 +11,6 @@ const init = async () => {
 
     const resultBody = document.getElementById("resultBody");
 
-    // ── GET RESULT FROM SESSION OR URL ──
     let result = null;
 
     const stored = sessionStorage.getItem("kb_exam_result");
@@ -41,10 +40,8 @@ const init = async () => {
         }
     }
 
-    // ── INVALIDATE STATS — exam just completed, stats are now stale ──
     Store.invalidate("user:stats");
 
-    // ── FORMAT TIME ──
     const formatTimeTaken = (seconds) => {
         if (!seconds) return "—";
         const m = Math.floor(seconds / 60);
@@ -52,7 +49,6 @@ const init = async () => {
         return `${m}m ${s}s`;
     };
 
-    // ── RENDER REVIEW QUESTIONS ──
     const escapeHTML = (str) => {
         if (!str) return "";
         return String(str)
@@ -71,13 +67,11 @@ const init = async () => {
                 <p class="review-question-text">
                     ${index + 1}. ${escapeHTML(q.questionText)}
                 </p>
-
                 <div class="review-options">
                     ${["A", "B", "C", "D"].map(letter => {
                         let className = "review-option";
                         if (letter === q.correctAnswer) className += " correct-answer";
                         else if (letter === q.userAnswer && !q.isCorrect) className += " wrong-answer";
-
                         return `
                             <div class="${className}">
                                 <strong>${letter}.</strong>
@@ -87,7 +81,6 @@ const init = async () => {
                             </div>`;
                     }).join("")}
                 </div>
-
                 ${q.explanation ? `
                     <p class="review-explanation">
                         💡 ${escapeHTML(q.explanation)}
@@ -96,7 +89,6 @@ const init = async () => {
         `).join("");
     };
 
-    // ── RENDER RESULT ──
     const passed = result.passed;
     const isCertification = result.type === "certification";
     const isTimedOut = result.status === "timed-out";
@@ -148,17 +140,19 @@ const init = async () => {
         </div>
 
         <!-- ACTION BUTTONS -->
-        <div style="display: flex; gap: var(--space-4); justify-content: center; margin-bottom: var(--space-8); flex-wrap: wrap;">
+        <div style="display: flex; gap: var(--space-4); justify-content: center;
+            margin-bottom: var(--space-8); flex-wrap: wrap;">
+
             ${passed && isCertification ? `
-                <a href="./certificate.html?courseId=${result.courseId}&attemptId=${result.attemptId}"
+                <a href="./certificate-payment.html?attemptId=${result.attemptId}&courseId=${result.courseId}"
                    class="btn btn-accent btn-lg">
                     🏆 Get Your Certificate
                 </a>` : ""}
 
             ${!passed && isCertification ? `
-                <a href="./payment.html?id=${result.courseId}"
+                <a href="./exam.html?id=${result.courseId}&type=certification"
                    class="btn btn-primary btn-lg">
-                    🔄 Retry Exam
+                    🔄 Retake Exam
                 </a>` : ""}
 
             ${result.type === "practice" ? `
@@ -176,6 +170,26 @@ const init = async () => {
             </a>
         </div>
 
+        <!-- PASSED CERTIFICATION — payment prompt -->
+        ${passed && isCertification ? `
+            <div style="
+                background: var(--color-surface);
+                border: 1px solid var(--color-success);
+                border-radius: var(--radius-lg);
+                padding: var(--space-6);
+                margin-bottom: var(--space-8);
+                text-align: center;
+            ">
+                <p style="font-size: var(--text-base); font-weight: var(--font-semibold);
+                    color: var(--color-success); margin-bottom: var(--space-2);">
+                    🎓 You passed! Your certificate is ready.
+                </p>
+                <p style="font-size: var(--text-sm); color: var(--color-text-muted);">
+                    A one-time certificate fee applies. Click "Get Your Certificate" above to pay and download your certificate.
+                </p>
+            </div>
+        ` : ""}
+
         <!-- REVIEW SECTION -->
         ${result.review && result.review.length > 0 ? `
             <div class="section-header mb-6">
@@ -184,12 +198,10 @@ const init = async () => {
                     ${result.correct}/${result.total} correct
                 </span>
             </div>
-
             <div class="review-list">
                 ${renderReview(result.review)}
             </div>
         ` : ""}
-
     `;
 
 };
