@@ -1,55 +1,29 @@
 Utils.initTheme();
 
-// Redirect if already logged in
-if (Auth.isLoggedIn()) {
-    window.location.href = "./dashboard.html";
-}
-
-// Get email from session
 const email = sessionStorage.getItem("kb_reset_email");
 
-// If no email in session redirect back to forgot password
 if (!email) {
     window.location.href = "./forgot-password.html";
 }
 
-// Display email
 const displayEmail = document.getElementById("displayEmail");
 if (displayEmail) displayEmail.textContent = email;
 
-// ── ELEMENT REFERENCES ──
+const otpInputs = document.querySelectorAll(".otp-input");
 const resetForm = document.getElementById("resetForm");
 const resetBtn = document.getElementById("resetBtn");
 const passwordInput = document.getElementById("password");
 const confirmPasswordInput = document.getElementById("confirmPassword");
-const otpInputs = document.querySelectorAll(".otp-input");
-const countdownEl = document.getElementById("countdown");
-
-// ── PASSWORD TOGGLES ──
-document.getElementById("togglePassword").addEventListener("click", () => {
-    const type = passwordInput.type === "password" ? "text" : "password";
-    passwordInput.type = type;
-    document.getElementById("togglePassword").textContent = type === "password" ? "👁" : "🙈";
-});
-
-document.getElementById("toggleConfirmPassword").addEventListener("click", () => {
-    const type = confirmPasswordInput.type === "password" ? "text" : "password";
-    confirmPasswordInput.type = type;
-    document.getElementById("toggleConfirmPassword").textContent = type === "password" ? "👁" : "🙈";
-});
 
 // ── OTP INPUT BEHAVIOUR ──
 otpInputs.forEach((input, index) => {
     input.addEventListener("input", (e) => {
         const value = e.target.value;
-
         if (!/^\d$/.test(value)) {
             input.value = "";
             return;
         }
-
         input.classList.add("filled");
-
         if (value && index < otpInputs.length - 1) {
             otpInputs[index + 1].focus();
         }
@@ -75,10 +49,7 @@ otpInputs.forEach((input, index) => {
     });
 });
 
-// ── GET OTP VALUE ──
-const getOTPValue = () => {
-    return Array.from(otpInputs).map(inp => inp.value).join("");
-};
+const getOTPValue = () => Array.from(otpInputs).map(inp => inp.value).join("");
 
 // ── COUNTDOWN TIMER ──
 let timeLeft = 600;
@@ -90,15 +61,15 @@ const startTimer = () => {
 
     timerInterval = setInterval(() => {
         timeLeft--;
-
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
-        countdownEl.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+        document.getElementById("countdown").textContent =
+            `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
-            countdownEl.textContent = "00:00";
-            Utils.toast("Your OTP has expired. Please request a new one.", "warning");
+            document.getElementById("countdown").textContent = "00:00";
+            Utils.toast("OTP has expired. Please request a new one.", "warning");
             setTimeout(() => {
                 window.location.href = "./forgot-password.html";
             }, 2000);
@@ -108,77 +79,79 @@ const startTimer = () => {
 
 startTimer();
 
+// ── PASSWORD TOGGLE ──
+document.getElementById("togglePassword").addEventListener("click", () => {
+    const type = passwordInput.type === "password" ? "text" : "password";
+    passwordInput.type = type;
+    document.getElementById("togglePassword").textContent = type === "password" ? "👁" : "🙈";
+});
+
+document.getElementById("toggleConfirm").addEventListener("click", () => {
+    const type = confirmPasswordInput.type === "password" ? "text" : "password";
+    confirmPasswordInput.type = type;
+    document.getElementById("toggleConfirm").textContent = type === "password" ? "👁" : "🙈";
+});
+
 // ── VALIDATION ──
 const showError = (id, message) => {
     const el = document.getElementById(id);
-    if (el) {
-        el.textContent = message;
-        el.classList.remove("hidden");
-    }
+    if (el) { el.textContent = message; el.classList.remove("hidden"); }
 };
 
 const clearErrors = () => {
     ["passwordError", "confirmPasswordError"].forEach(id => {
         const el = document.getElementById(id);
-        if (el) {
-            el.textContent = "";
-            el.classList.add("hidden");
-        }
+        if (el) { el.textContent = ""; el.classList.add("hidden"); }
     });
-};
-
-const validateForm = () => {
-    let valid = true;
-    clearErrors();
-
-    if (!passwordInput.value) {
-        showError("passwordError", "Password is required");
-        valid = false;
-    } else if (passwordInput.value.length < 6) {
-        showError("passwordError", "Password must be at least 6 characters");
-        valid = false;
-    }
-
-    if (!confirmPasswordInput.value) {
-        showError("confirmPasswordError", "Please confirm your password");
-        valid = false;
-    } else if (passwordInput.value !== confirmPasswordInput.value) {
-        showError("confirmPasswordError", "Passwords do not match");
-        valid = false;
-    }
-
-    return valid;
 };
 
 // ── FORM SUBMIT ──
 resetForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    clearErrors();
 
     const otp = getOTPValue();
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+
+    let valid = true;
 
     if (otp.length !== 6) {
-        Utils.toast("Please enter all 6 digits of your OTP", "error");
-        return;
+        Utils.toast("Please enter all 6 OTP digits", "error");
+        valid = false;
     }
 
-    if (!validateForm()) return;
+    if (!password) {
+        showError("passwordError", "Password is required");
+        valid = false;
+    } else if (password.length < 6) {
+        showError("passwordError", "Password must be at least 6 characters");
+        valid = false;
+    }
+
+    if (!confirmPassword) {
+        showError("confirmPasswordError", "Please confirm your password");
+        valid = false;
+    } else if (password !== confirmPassword) {
+        showError("confirmPasswordError", "Passwords do not match");
+        valid = false;
+    }
+
+    if (!valid) return;
 
     resetBtn.disabled = true;
-    resetBtn.textContent = "Resetting password...";
+    resetBtn.textContent = "Resetting...";
 
     try {
         const response = await api.post("/auth/reset-password", {
             email,
             otp,
-            password: passwordInput.value,
-            confirmPassword: confirmPasswordInput.value
+            password,
+            confirmPassword
         });
 
         Utils.toast(response.message, "success");
-
-        // Clear session
         sessionStorage.removeItem("kb_reset_email");
-        clearInterval(timerInterval);
 
         setTimeout(() => {
             window.location.href = "./login.html";
