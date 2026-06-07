@@ -14,7 +14,9 @@ const api = {
                 headers
             });
 
-            const data = await response.json();
+const data = await response.json();
+
+console.log("API response status:", response.status, "endpoint:", endpoint, "data:", data);
 
             // Registration payment required
             if (response.status === 402) {
