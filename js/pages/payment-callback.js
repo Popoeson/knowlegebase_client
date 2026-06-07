@@ -3,7 +3,7 @@ Utils.initTheme();
 const verify = async () => {
     const params = new URLSearchParams(window.location.search);
     const reference = params.get("reference") || params.get("trxref");
-    const courseId = sessionStorage.getItem("kb_payment_courseId");
+    const attemptId = sessionStorage.getItem("kb_cert_attemptId");
 
     const statusIcon = document.getElementById("statusIcon");
     const statusTitle = document.getElementById("statusTitle");
@@ -13,10 +13,10 @@ const verify = async () => {
     const showSuccess = () => {
         statusIcon.textContent = "✅";
         statusTitle.textContent = "Payment Successful!";
-        statusMessage.textContent = "Your payment has been confirmed. Starting your exam now...";
+        statusMessage.textContent = "Your payment has been confirmed. Generating your certificate...";
+        sessionStorage.removeItem("kb_cert_attemptId");
         setTimeout(() => {
-            sessionStorage.removeItem("kb_payment_courseId");
-            window.location.href = `./exam.html?id=${courseId}&type=certification`;
+            window.location.href = `./certificate.html?attemptId=${attemptId}`;
         }, 2000);
     };
 
@@ -25,11 +25,8 @@ const verify = async () => {
         statusTitle.textContent = "Payment Failed";
         statusMessage.textContent = message || "Your payment could not be verified. Please try again.";
         actionArea.innerHTML = `
-            <a href="./payment.html?id=${courseId}" class="btn btn-primary w-full">
-                Try Again
-            </a>
-            <a href="./courses.html" class="btn btn-ghost w-full" style="margin-top: var(--space-3);">
-                Back to Courses
+            <a href="./exam-history.html" class="btn btn-primary w-full">
+                Back to Exam History
             </a>
         `;
     };
@@ -45,7 +42,7 @@ const verify = async () => {
     }
 
     try {
-        await api.get(`/payment/verify/${reference}`);
+        await api.get(`/payment/certificate/verify/${reference}`);
         showSuccess();
     } catch (error) {
         showFailure(error.message);
