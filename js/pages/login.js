@@ -1,5 +1,4 @@
 Utils.initTheme();
-Utils.initTheme();
 
 const existingToken = sessionStorage.getItem("kb_token");
 if (existingToken) {
