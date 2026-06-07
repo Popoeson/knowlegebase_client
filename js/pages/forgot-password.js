@@ -53,7 +53,7 @@ forgotForm.addEventListener("submit", async (e) => {
         Utils.toast(response.message, "success");
 
         // Store email for reset password page
-        sessionStorage.setItem("kb_reset_email", emailInput.value.trim());
+        localStorage.setItem("kb_reset_email", emailInput.value.trim());
 
         setTimeout(() => {
             window.location.href = "./reset-password.html";
