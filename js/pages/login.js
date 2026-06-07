@@ -69,7 +69,13 @@ loginForm.addEventListener("submit", async (e) => {
             password: passwordInput.value
         });
 
+        console.log("Login response:", response);
+
         Auth.setSession(response.token, response.user);
+
+        console.log("Session set. User:", response.user);
+        console.log("hasPaidRegistration:", response.user.hasPaidRegistration);
+        console.log("role:", response.user.role);
 
         if (response.user.role === "admin") {
             Utils.toast(response.message, "success");
@@ -88,7 +94,12 @@ loginForm.addEventListener("submit", async (e) => {
             return;
         }
 
-        await Store.prefetch();
+        try {
+            await Store.prefetch();
+            console.log("Store prefetch succeeded");
+        } catch (prefetchError) {
+            console.error("Store prefetch failed:", prefetchError);
+        }
 
         Utils.toast(response.message, "success");
 
@@ -97,7 +108,9 @@ loginForm.addEventListener("submit", async (e) => {
         }, 1000);
 
     } catch (error) {
-        console.error("Login error:", error);
+        console.error("Login catch error:", error);
+        console.error("error.message:", error.message);
+        console.error("error stack:", error.stack);
 
         if (error.message && error.message.includes("verify")) {
             Utils.toast(error.message, "warning");
