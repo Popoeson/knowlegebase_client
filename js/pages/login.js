@@ -4,9 +4,6 @@ const existingToken = sessionStorage.getItem("kb_token");
 if (existingToken) {
     window.location.href = "./dashboard.html";
 }
-if (Auth.isLoggedIn()) {
-    window.location.href = "./dashboard.html";
-}
 
 const loginForm = document.getElementById("loginForm");
 const loginBtn = document.getElementById("loginBtn");
@@ -77,10 +74,6 @@ loginForm.addEventListener("submit", async (e) => {
 
         Auth.setSession(response.token, response.user);
 
-        console.log("Session set. User:", response.user);
-        console.log("hasPaidRegistration:", response.user.hasPaidRegistration);
-        console.log("role:", response.user.role);
-
         if (response.user.role === "admin") {
             Utils.toast(response.message, "success");
             setTimeout(() => {
@@ -100,7 +93,6 @@ loginForm.addEventListener("submit", async (e) => {
 
         try {
             await Store.prefetch();
-            console.log("Store prefetch succeeded");
         } catch (prefetchError) {
             console.error("Store prefetch failed:", prefetchError);
         }
@@ -112,9 +104,7 @@ loginForm.addEventListener("submit", async (e) => {
         }, 1000);
 
     } catch (error) {
-        console.error("Login catch error:", error);
-        console.error("error.message:", error.message);
-        console.error("error stack:", error.stack);
+        console.error("Login error:", error.message);
 
         if (error.message && error.message.includes("verify")) {
             Utils.toast(error.message, "warning");
