@@ -34,7 +34,7 @@ document.addEventListener("click", (e) => {
 
 // ── FOOTER YEAR ──
 document.getElementById("footerYear").textContent =
-    `© ${new Date().getFullYear()} KNOWLEDGEBASE. All rights reserved.`;
+    `© ${new Date().getFullYear()} TECH COMPETENCE INSTITUTE. All rights reserved.`;
 
 // ── REDIRECT IF LOGGED IN ──
 if (Auth.isLoggedIn()) {
