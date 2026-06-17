@@ -22,7 +22,7 @@ const init = async () => {
     const totalDueEl = document.getElementById("totalDue");
     const exchangeNoteEl = document.getElementById("exchangeNote");
 
-    const REGISTRATION_FEE_USD = 2;
+    const REGISTRATION_FEE_USD = 1.99;
     let priceNGN = null;
 
     // Fetch live exchange rate
