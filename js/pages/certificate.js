@@ -135,7 +135,7 @@ const init = async () => {
                                 <p class="cert-footer-value">${issuedDate}</p>
                             </div>
                             <div class="cert-seal">
-                                <div class="cert-seal-text">✦<br>VERIFIED<br>KNOWLEDGEBASE<br>✦</div>
+                                <div class="cert-seal-text">✦<br>VERIFIED<br>TECH COMPETENCE INSTITUTE<br>✦</div>
                             </div>
                             <div class="cert-footer-item">
                                 <p class="cert-footer-label">Certificate ID</p>
