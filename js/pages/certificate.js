@@ -111,11 +111,11 @@ const init = async () => {
 
                 <div class="certificate-document" id="certDoc">
                     <div class="cert-header">
-                        <div class="cert-brand">KNOWLEDGEBASE</div>
+                        <div class="cert-brand">TECH COMPETENCE INSTITUTE</div>
                         <div class="cert-authority">Certification Authority</div>
                     </div>
                     <div class="cert-body">
-                        <div class="cert-watermark">KB</div>
+                        <div class="cert-watermark">TCI</div>
                         <div class="cert-achievement-title">Certificate of Achievement</div>
                         <p class="cert-certifies">This certifies that</p>
                         <h2 class="cert-name">${user.fullName}</h2>
