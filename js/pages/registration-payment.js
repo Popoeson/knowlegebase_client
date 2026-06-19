@@ -2,7 +2,12 @@ Utils.initTheme();
 
 const init = async () => {
 
-    // If already logged in and paid, go to login to confirm identity
+    // Read from the pending (unconfirmed) session, not the real one
+    const pendingToken = sessionStorage.getItem("kb_pending_token");
+    const pendingUserRaw = sessionStorage.getItem("kb_pending_user");
+    const pendingUser = pendingUserRaw ? JSON.parse(pendingUserRaw) : null;
+
+    // If a real, fully-paid session already exists, send to login to confirm identity
     if (Auth.isLoggedIn()) {
         const user = Auth.getUser();
         if (user && user.hasPaidRegistration) {
@@ -11,8 +16,8 @@ const init = async () => {
         }
     }
 
-    // Must be logged in (token set after OTP verification) to pay
-    if (!Auth.isLoggedIn()) {
+    // No pending session at all — user must log in first
+    if (!pendingToken || !pendingUser) {
         window.location.href = "./login.html";
         return;
     }
@@ -21,15 +26,27 @@ const init = async () => {
     const amountNGNEl = document.getElementById("amountNGN");
     const totalDueEl = document.getElementById("totalDue");
     const exchangeNoteEl = document.getElementById("exchangeNote");
+    const stuckLink = document.getElementById("stuckLink");
+    const manualRecoveryBox = document.getElementById("manualRecoveryBox");
+    const manualRefInput = document.getElementById("manualRefInput");
+    const manualVerifyBtn = document.getElementById("manualVerifyBtn");
 
     const REGISTRATION_FEE_USD = 0.50;
     let priceNGN = null;
 
-    // ── RECOVERY CHECK ──
-    // If a previous payment attempt was interrupted (e.g. bank transfer,
-    // slow callback, user navigated away), the reference is stored locally
-    // before redirecting to Paystack. On every load, check for it first
-    // and silently verify before showing the payment form again.
+    // Helper used by both the callback redirect path and manual recovery —
+    // promotes the pending session into a real one once payment is confirmed
+    const activateAndGoToLogin = (message) => {
+        sessionStorage.removeItem("kb_pending_token");
+        sessionStorage.removeItem("kb_pending_user");
+        localStorage.removeItem("kb_pending_reg_ref");
+        Utils.toast(message || "Payment verified! Please log in.", "success");
+        setTimeout(() => {
+            window.location.href = "./login.html";
+        }, 1500);
+    };
+
+    // ── RECOVERY CHECK — uses pending token to verify ──
     const recoverPendingPayment = async () => {
         const pendingRef = localStorage.getItem("kb_pending_reg_ref");
         if (!pendingRef) return false;
@@ -38,21 +55,14 @@ const init = async () => {
         payBtn.textContent = "Checking previous payment...";
 
         try {
-            const result = await api.get(`/auth/registration-payment/verify/${pendingRef}`);
+            const result = await fetch(`${CONFIG.API_BASE_URL}/auth/registration-payment/verify/${pendingRef}`, {
+                headers: { Authorization: `Bearer ${pendingToken}` }
+            }).then(r => r.json());
 
-            // Verified successfully — clean up and send to login
-            localStorage.removeItem("kb_pending_reg_ref");
-            Utils.toast(result.message || "Payment verified! Please log in.", "success");
-
-            setTimeout(() => {
-                window.location.href = "./login.html";
-            }, 1500);
-
+            activateAndGoToLogin(result.message);
             return true;
 
         } catch (error) {
-            // Genuinely failed or not yet completed — clear it so it doesn't
-            // block future attempts, and let the user pay normally
             localStorage.removeItem("kb_pending_reg_ref");
             console.warn("Pending payment recovery check:", error.message);
             return false;
@@ -60,7 +70,7 @@ const init = async () => {
     };
 
     const recovered = await recoverPendingPayment();
-    if (recovered) return; // page is redirecting to login, stop here
+    if (recovered) return;
 
     // ── NORMAL PAYMENT FORM SETUP ──
     try {
@@ -92,18 +102,16 @@ const init = async () => {
         payBtn.textContent = "Redirecting to payment...";
 
         try {
-            const response = await api.post("/auth/registration-payment/initialize", {
-                amountNGN: priceNGN
-            });
+            const response = await fetch(`${CONFIG.API_BASE_URL}/auth/registration-payment/initialize`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${pendingToken}`
+                },
+                body: JSON.stringify({ amountNGN: priceNGN })
+            }).then(r => r.json());
 
-            // Store the reference BEFORE redirecting so we can recover
-            // if the callback never completes (bank transfer, network drop, etc.)
-            localStorage.setItem("kb_pending_reg_ref", response.reference);
-
-            window.location.href = response.authorizationUrl;
-
-        } catch (error) {
-            if (error.message.includes("already paid") || error.code === "ALREADY_PAID") {
+            if (response.message && response.message.includes("already paid")) {
                 Utils.toast("Account already activated. Please log in.", "info");
                 setTimeout(() => {
                     window.location.href = "./login.html";
@@ -111,20 +119,17 @@ const init = async () => {
                 return;
             }
 
+            localStorage.setItem("kb_pending_reg_ref", response.reference);
+            window.location.href = response.authorizationUrl;
+
+        } catch (error) {
             Utils.toast(error.message || "Failed to initialize payment.", "error");
             payBtn.disabled = false;
             payBtn.textContent = `💳 Pay ₦${priceNGN.toLocaleString("en-NG")} to Activate`;
         }
     });
 
-};
-
-// ── MANUAL RECOVERY ──
-    const stuckLink = document.getElementById("stuckLink");
-    const manualRecoveryBox = document.getElementById("manualRecoveryBox");
-    const manualRefInput = document.getElementById("manualRefInput");
-    const manualVerifyBtn = document.getElementById("manualVerifyBtn");
-
+    // ── MANUAL RECOVERY ──
     stuckLink.addEventListener("click", (e) => {
         e.preventDefault();
         manualRecoveryBox.style.display =
@@ -143,14 +148,11 @@ const init = async () => {
         manualVerifyBtn.textContent = "Checking...";
 
         try {
-            const result = await api.get(`/auth/registration-payment/verify/${ref}`);
+            const result = await fetch(`${CONFIG.API_BASE_URL}/auth/registration-payment/verify/${ref}`, {
+                headers: { Authorization: `Bearer ${pendingToken}` }
+            }).then(r => r.json());
 
-            localStorage.removeItem("kb_pending_reg_ref");
-            Utils.toast(result.message || "Payment verified! Please log in.", "success");
-
-            setTimeout(() => {
-                window.location.href = "./login.html";
-            }, 1500);
+            activateAndGoToLogin(result.message);
 
         } catch (error) {
             Utils.toast(error.message || "Could not verify that reference. Please contact support.", "error");
@@ -158,5 +160,7 @@ const init = async () => {
             manualVerifyBtn.textContent = "Check My Payment";
         }
     });
+
+};
 
 init();
