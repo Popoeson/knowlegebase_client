@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Activate Account — KNOWLEDGEBASE</title>
+    <title>Activate Account — TECH COMPETENCE INSTITUTE</title>
     <link rel="stylesheet" href="../css/variables.css">
     <link rel="stylesheet" href="../css/reset.css">
     <link rel="stylesheet" href="../css/global.css">
@@ -23,7 +23,7 @@
 
         <div style="text-align: center; margin-bottom: var(--space-8);">
             <span class="sidebar-brand-name" style="font-size: var(--text-2xl);">
-                KNOWLEDGE<span style="color: var(--color-accent);">BASE</span>
+                TECH COMPETENCE-<span style="color: var(--color-accent);">INSTITUTE</span>
             </span>
         </div>
 
@@ -108,6 +108,46 @@
                 color: var(--color-text-muted);
             ">
                 🔒 Secured by Paystack. Your payment details are encrypted.
+            </div>
+
+            <!-- MANUAL RECOVERY LINK -->
+            <p style="text-align: center; margin-top: var(--space-5);">
+                <a href="#" id="stuckLink" style="
+                    font-size: var(--text-xs);
+                    color: var(--color-text-muted);
+                    text-decoration: underline;
+                ">Already paid but stuck? Click here</a>
+            </p>
+
+            <!-- MANUAL RECOVERY FORM — hidden by default -->
+            <div id="manualRecoveryBox" style="display: none; margin-top: var(--space-4);">
+                <div style="
+                    background: var(--color-surface-2);
+                    border-radius: var(--radius-md);
+                    padding: var(--space-4);
+                ">
+                    <p style="font-size: var(--text-xs); color: var(--color-text-muted); margin-bottom: var(--space-3);">
+                        Paste the payment reference from your email receipt (e.g. <code>TCI-REG-...</code>) and we'll check it for you.
+                    </p>
+                    <input
+                        type="text"
+                        id="manualRefInput"
+                        placeholder="e.g. TCI-REG-1781850560401-XXXXX"
+                        style="
+                            width: 100%;
+                            padding: var(--space-2) var(--space-3);
+                            border: 1px solid var(--color-border);
+                            border-radius: var(--radius-md);
+                            font-size: var(--text-sm);
+                            margin-bottom: var(--space-3);
+                            background: var(--color-bg);
+                            color: var(--color-text-primary);
+                        "
+                    >
+                    <button class="btn btn-outline w-full btn-sm" id="manualVerifyBtn">
+                        Check My Payment
+                    </button>
+                </div>
             </div>
 
         </div>
