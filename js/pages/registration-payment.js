@@ -25,7 +25,44 @@ const init = async () => {
     const REGISTRATION_FEE_USD = 0.50;
     let priceNGN = null;
 
-    // Fetch live exchange rate
+    // ── RECOVERY CHECK ──
+    // If a previous payment attempt was interrupted (e.g. bank transfer,
+    // slow callback, user navigated away), the reference is stored locally
+    // before redirecting to Paystack. On every load, check for it first
+    // and silently verify before showing the payment form again.
+    const recoverPendingPayment = async () => {
+        const pendingRef = localStorage.getItem("kb_pending_reg_ref");
+        if (!pendingRef) return false;
+
+        payBtn.disabled = true;
+        payBtn.textContent = "Checking previous payment...";
+
+        try {
+            const result = await api.get(`/auth/registration-payment/verify/${pendingRef}`);
+
+            // Verified successfully — clean up and send to login
+            localStorage.removeItem("kb_pending_reg_ref");
+            Utils.toast(result.message || "Payment verified! Please log in.", "success");
+
+            setTimeout(() => {
+                window.location.href = "./login.html";
+            }, 1500);
+
+            return true;
+
+        } catch (error) {
+            // Genuinely failed or not yet completed — clear it so it doesn't
+            // block future attempts, and let the user pay normally
+            localStorage.removeItem("kb_pending_reg_ref");
+            console.warn("Pending payment recovery check:", error.message);
+            return false;
+        }
+    };
+
+    const recovered = await recoverPendingPayment();
+    if (recovered) return; // page is redirecting to login, stop here
+
+    // ── NORMAL PAYMENT FORM SETUP ──
     try {
         const response = await fetch("https://open.er-api.com/v6/latest/USD");
         const data = await response.json();
@@ -40,7 +77,6 @@ const init = async () => {
         payBtn.disabled = false;
 
     } catch (error) {
-        // Fallback rate
         priceNGN = Math.round(REGISTRATION_FEE_USD * 1600);
         const formatted = priceNGN.toLocaleString("en-NG");
         amountNGNEl.textContent = `₦${formatted}`;
@@ -60,11 +96,13 @@ const init = async () => {
                 amountNGN: priceNGN
             });
 
-            // Redirect to Paystack hosted payment page
+            // Store the reference BEFORE redirecting so we can recover
+            // if the callback never completes (bank transfer, network drop, etc.)
+            localStorage.setItem("kb_pending_reg_ref", response.reference);
+
             window.location.href = response.authorizationUrl;
 
         } catch (error) {
-            // Already paid — go to login
             if (error.message.includes("already paid") || error.code === "ALREADY_PAID") {
                 Utils.toast("Account already activated. Please log in.", "info");
                 setTimeout(() => {
