@@ -70,11 +70,9 @@ loginForm.addEventListener("submit", async (e) => {
             password: passwordInput.value
         });
 
-        console.log("Login response:", response);
-
-        Auth.setSession(response.token, response.user);
-
+        // Admins always get a full session
         if (response.user.role === "admin") {
+            Auth.setSession(response.token, response.user);
             Utils.toast(response.message, "success");
             setTimeout(() => {
                 window.location.href = "./admin/dashboard.html";
@@ -82,14 +80,22 @@ loginForm.addEventListener("submit", async (e) => {
             return;
         }
 
+        // Unpaid users — do NOT persist a session yet.
+        // Store the token temporarily just to carry it to the payment page,
+        // without marking the user as "logged in" app-wide.
         if (!response.user.hasPaidRegistration) {
+            sessionStorage.setItem("kb_pending_token", response.token);
+            sessionStorage.setItem("kb_pending_user", JSON.stringify(response.user));
+
             Utils.toast("Please complete your registration payment to continue.", "warning");
-            sessionStorage.setItem("kb_reg_email", emailInput.value.trim());
             setTimeout(() => {
                 window.location.href = "./registration-payment.html";
             }, 1500);
             return;
         }
+
+        // Fully paid — now it's safe to persist the session
+        Auth.setSession(response.token, response.user);
 
         try {
             await Store.prefetch();
