@@ -119,4 +119,44 @@ const init = async () => {
 
 };
 
+// ── MANUAL RECOVERY ──
+    const stuckLink = document.getElementById("stuckLink");
+    const manualRecoveryBox = document.getElementById("manualRecoveryBox");
+    const manualRefInput = document.getElementById("manualRefInput");
+    const manualVerifyBtn = document.getElementById("manualVerifyBtn");
+
+    stuckLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        manualRecoveryBox.style.display =
+            manualRecoveryBox.style.display === "none" ? "block" : "none";
+    });
+
+    manualVerifyBtn.addEventListener("click", async () => {
+        const ref = manualRefInput.value.trim();
+
+        if (!ref) {
+            Utils.toast("Please paste your payment reference.", "error");
+            return;
+        }
+
+        manualVerifyBtn.disabled = true;
+        manualVerifyBtn.textContent = "Checking...";
+
+        try {
+            const result = await api.get(`/auth/registration-payment/verify/${ref}`);
+
+            localStorage.removeItem("kb_pending_reg_ref");
+            Utils.toast(result.message || "Payment verified! Please log in.", "success");
+
+            setTimeout(() => {
+                window.location.href = "./login.html";
+            }, 1500);
+
+        } catch (error) {
+            Utils.toast(error.message || "Could not verify that reference. Please contact support.", "error");
+            manualVerifyBtn.disabled = false;
+            manualVerifyBtn.textContent = "Check My Payment";
+        }
+    });
+
 init();
