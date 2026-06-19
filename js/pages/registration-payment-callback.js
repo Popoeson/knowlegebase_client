@@ -34,20 +34,53 @@ const verify = async () => {
         `;
     };
 
+    // Still pending — bank transfer or network hiccup, not a hard failure.
+    // Save the reference so it can be auto-recovered later from
+    // registration-payment.html, login.html, or a retry here.
+    const showPending = (message) => {
+        statusIcon.textContent = "⏳";
+        statusTitle.textContent = "Confirming Your Payment";
+        statusMessage.textContent = message || "Your payment is still being confirmed by your bank. This can take a few minutes — don't worry, your money is safe.";
+        actionArea.innerHTML = `
+            <button class="btn btn-primary w-full" id="retryVerifyBtn">
+                🔄 Check Again
+            </button>
+            <a href="./login.html" class="btn btn-ghost w-full" style="margin-top: var(--space-3);">
+                I'll check back later
+            </a>
+        `;
+
+        document.getElementById("retryVerifyBtn").addEventListener("click", () => {
+            verify();
+        });
+    };
+
     if (!reference) {
         showFailure("No payment reference found.");
         return;
     }
 
+    // Always preserve the reference for recovery, regardless of login state
+    localStorage.setItem("kb_pending_reg_ref", reference);
+
+    // If session was lost (e.g. redirected to login mid-flow), don't just
+    // bounce away — the registration-payment.html recovery check will
+    // pick this reference up automatically once the user logs back in.
     if (!Auth.isLoggedIn()) {
-        window.location.href = "./login.html";
+        statusIcon.textContent = "🔐";
+        statusTitle.textContent = "Please Log In";
+        statusMessage.textContent = "Your session expired, but your payment reference has been saved. Log in to confirm your payment.";
+        actionArea.innerHTML = `
+            <a href="./login.html" class="btn btn-primary w-full">
+                Log In to Continue
+            </a>
+        `;
         return;
     }
 
     try {
         await api.get(`/auth/registration-payment/verify/${reference}`);
 
-        // Update local session so hasPaidRegistration reflects true
         const user = Auth.getUser();
         if (user) {
             Auth.setSession(Auth.getToken(), {
@@ -56,15 +89,31 @@ const verify = async () => {
             });
         }
 
+        localStorage.removeItem("kb_pending_reg_ref");
         showSuccess();
 
     } catch (error) {
         if (error.message.includes("already")) {
-            // Already paid — treat as success
+            localStorage.removeItem("kb_pending_reg_ref");
             showSuccess();
             return;
         }
-        showFailure(error.message);
+
+        // Distinguish "not yet completed" (pending bank transfer) from a
+        // genuine failure. Paystack returns specific failure language for
+        // declined/abandoned transactions; anything else is treated as pending.
+        const lower = error.message.toLowerCase();
+        const isHardFailure = lower.includes("not successful") ||
+                               lower.includes("declined") ||
+                               lower.includes("failed") ||
+                               lower.includes("abandoned");
+
+        if (isHardFailure) {
+            localStorage.removeItem("kb_pending_reg_ref");
+            showFailure(error.message);
+        } else {
+            showPending();
+        }
     }
 };
 
