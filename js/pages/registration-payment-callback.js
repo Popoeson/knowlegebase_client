@@ -11,7 +11,15 @@ const verify = async () => {
 
     const pendingToken = sessionStorage.getItem("kb_pending_token");
 
+    const cleanup = () => {
+        sessionStorage.removeItem("kb_pending_token");
+        sessionStorage.removeItem("kb_pending_user");
+        localStorage.removeItem("kb_pending_reg_ref");
+        localStorage.removeItem("kb_payment_in_progress");
+    };
+
     const showSuccess = () => {
+        cleanup();
         statusIcon.textContent = "🎉";
         statusTitle.textContent = "Account Activated!";
         statusMessage.textContent = "Your registration is complete. Please log in to access your dashboard.";
@@ -36,10 +44,10 @@ const verify = async () => {
         `;
     };
 
-    const showPending = (message) => {
+    const showPending = () => {
         statusIcon.textContent = "⏳";
         statusTitle.textContent = "Confirming Your Payment";
-        statusMessage.textContent = message || "Your payment is still being confirmed by your bank. This can take a few minutes — don't worry, your money is safe.";
+        statusMessage.textContent = "Your payment is still being confirmed by your bank. This can take a few minutes — don't worry, your money is safe.";
         actionArea.innerHTML = `
             <button class="btn btn-primary w-full" id="retryVerifyBtn">
                 🔄 Check Again
@@ -48,7 +56,6 @@ const verify = async () => {
                 I'll check back later
             </a>
         `;
-
         document.getElementById("retryVerifyBtn").addEventListener("click", () => {
             verify();
         });
@@ -59,13 +66,15 @@ const verify = async () => {
         return;
     }
 
+    // Always preserve reference for recovery
     localStorage.setItem("kb_pending_reg_ref", reference);
 
-    // No pending session token — user needs to log back in to resume
+    // No pending token — session was lost (switched device, browser cleared, etc.)
+    // The reference is saved so manual recovery on the payment page still works
     if (!pendingToken) {
         statusIcon.textContent = "🔐";
         statusTitle.textContent = "Please Log In";
-        statusMessage.textContent = "Your session expired, but your payment reference has been saved. Log in to confirm your payment.";
+        statusMessage.textContent = "Your session expired, but your payment reference has been saved. Log in and your payment will be automatically confirmed.";
         actionArea.innerHTML = `
             <a href="./login.html" class="btn btn-primary w-full">
                 Log In to Continue
@@ -75,32 +84,19 @@ const verify = async () => {
     }
 
     try {
-        const result = await fetch(`${CONFIG.API_BASE_URL}/auth/registration-payment/verify/${reference}`, {
+        const r = await fetch(`${CONFIG.API_BASE_URL}/auth/registration-payment/verify/${reference}`, {
             headers: { Authorization: `Bearer ${pendingToken}` }
-        }).then(async (r) => {
-            const data = await r.json();
-            if (!r.ok) throw new Error(data.message || "Verification failed");
-            return data;
         });
 
-        // Payment confirmed — clean up pending state, do NOT auto-login.
-        // User must log in fresh to get a fully-paid session.
-        sessionStorage.removeItem("kb_pending_token");
-        sessionStorage.removeItem("kb_pending_user");
-        localStorage.removeItem("kb_pending_reg_ref");
+        const result = await r.json();
 
-        showSuccess();
-
-    } catch (error) {
-        if (error.message.includes("already")) {
-            sessionStorage.removeItem("kb_pending_token");
-            sessionStorage.removeItem("kb_pending_user");
-            localStorage.removeItem("kb_pending_reg_ref");
+        if (r.ok || result.code === "ALREADY_PAID") {
             showSuccess();
             return;
         }
 
-        const lower = error.message.toLowerCase();
+        // Payment not confirmed — check if it's still pending or genuinely failed
+        const lower = (result.message || "").toLowerCase();
         const isHardFailure = lower.includes("not successful") ||
                                lower.includes("declined") ||
                                lower.includes("failed") ||
@@ -108,6 +104,22 @@ const verify = async () => {
 
         if (isHardFailure) {
             localStorage.removeItem("kb_pending_reg_ref");
+            localStorage.removeItem("kb_payment_in_progress");
+            showFailure(result.message);
+        } else {
+            showPending();
+        }
+
+    } catch (error) {
+        const lower = (error.message || "").toLowerCase();
+        const isHardFailure = lower.includes("not successful") ||
+                               lower.includes("declined") ||
+                               lower.includes("failed") ||
+                               lower.includes("abandoned");
+
+        if (isHardFailure) {
+            localStorage.removeItem("kb_pending_reg_ref");
+            localStorage.removeItem("kb_payment_in_progress");
             showFailure(error.message);
         } else {
             showPending();
