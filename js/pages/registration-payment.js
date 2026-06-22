@@ -2,6 +2,19 @@ Utils.initTheme();
 
 const init = async () => {
 
+    // If a payment was in progress and the user lands back here
+    // (Paystack session interrupted during bank transfer), redirect to
+    // callback page which will check if the bank transfer actually completed
+    if (localStorage.getItem("kb_payment_in_progress") === "true") {
+        const pendingRef = localStorage.getItem("kb_pending_reg_ref");
+        if (pendingRef) {
+            localStorage.removeItem("kb_payment_in_progress");
+            window.location.href = `./registration-payment-callback.html?reference=${pendingRef}`;
+            return;
+        }
+        localStorage.removeItem("kb_payment_in_progress");
+    }
+
     // Read from the pending (unconfirmed) session, not the real one
     const pendingToken = sessionStorage.getItem("kb_pending_token");
     const pendingUserRaw = sessionStorage.getItem("kb_pending_user");
@@ -34,19 +47,18 @@ const init = async () => {
     const REGISTRATION_FEE_USD = 0.50;
     let priceNGN = null;
 
-    // Helper used by both the callback redirect path and manual recovery —
-    // promotes the pending session into a real one once payment is confirmed
     const activateAndGoToLogin = (message) => {
         sessionStorage.removeItem("kb_pending_token");
         sessionStorage.removeItem("kb_pending_user");
         localStorage.removeItem("kb_pending_reg_ref");
+        localStorage.removeItem("kb_payment_in_progress");
         Utils.toast(message || "Payment verified! Please log in.", "success");
         setTimeout(() => {
             window.location.href = "./login.html";
         }, 1500);
     };
 
-    // ── RECOVERY CHECK — uses pending token to verify ──
+    // ── RECOVERY CHECK ──
     const recoverPendingPayment = async () => {
         const pendingRef = localStorage.getItem("kb_pending_reg_ref");
         if (!pendingRef) return false;
@@ -55,16 +67,25 @@ const init = async () => {
         payBtn.textContent = "Checking previous payment...";
 
         try {
-            const result = await fetch(`${CONFIG.API_BASE_URL}/auth/registration-payment/verify/${pendingRef}`, {
+            const r = await fetch(`${CONFIG.API_BASE_URL}/auth/registration-payment/verify/${pendingRef}`, {
                 headers: { Authorization: `Bearer ${pendingToken}` }
-            }).then(r => r.json());
+            });
+            const result = await r.json();
 
-            activateAndGoToLogin(result.message);
-            return true;
+            if (r.ok || result.code === "ALREADY_PAID") {
+                activateAndGoToLogin(result.message);
+                return true;
+            }
+
+            // Payment genuinely not confirmed yet — show form normally
+            localStorage.removeItem("kb_pending_reg_ref");
+            payBtn.disabled = false;
+            return false;
 
         } catch (error) {
             localStorage.removeItem("kb_pending_reg_ref");
             console.warn("Pending payment recovery check:", error.message);
+            payBtn.disabled = false;
             return false;
         }
     };
@@ -102,24 +123,30 @@ const init = async () => {
         payBtn.textContent = "Redirecting to payment...";
 
         try {
-            const response = await fetch(`${CONFIG.API_BASE_URL}/auth/registration-payment/initialize`, {
+            const r = await fetch(`${CONFIG.API_BASE_URL}/auth/registration-payment/initialize`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${pendingToken}`
                 },
                 body: JSON.stringify({ amountNGN: priceNGN })
-            }).then(r => r.json());
+            });
+            const response = await r.json();
 
-            if (response.message && response.message.includes("already paid")) {
-                Utils.toast("Account already activated. Please log in.", "info");
-                setTimeout(() => {
-                    window.location.href = "./login.html";
-                }, 1500);
-                return;
+            if (!r.ok) {
+                if (response.code === "ALREADY_PAID") {
+                    Utils.toast("Account already activated. Please log in.", "info");
+                    setTimeout(() => { window.location.href = "./login.html"; }, 1500);
+                    return;
+                }
+                throw new Error(response.message || "Failed to initialize payment.");
             }
 
+            // Mark payment as in progress BEFORE redirecting to Paystack
+            // so we can recover if the user comes back without completing
             localStorage.setItem("kb_pending_reg_ref", response.reference);
+            localStorage.setItem("kb_payment_in_progress", "true");
+
             window.location.href = response.authorizationUrl;
 
         } catch (error) {
@@ -148,11 +175,17 @@ const init = async () => {
         manualVerifyBtn.textContent = "Checking...";
 
         try {
-            const result = await fetch(`${CONFIG.API_BASE_URL}/auth/registration-payment/verify/${ref}`, {
+            const r = await fetch(`${CONFIG.API_BASE_URL}/auth/registration-payment/verify/${ref}`, {
                 headers: { Authorization: `Bearer ${pendingToken}` }
-            }).then(r => r.json());
+            });
+            const result = await r.json();
 
-            activateAndGoToLogin(result.message);
+            if (r.ok || result.code === "ALREADY_PAID") {
+                activateAndGoToLogin(result.message);
+                return;
+            }
+
+            throw new Error(result.message || "Could not verify payment.");
 
         } catch (error) {
             Utils.toast(error.message || "Could not verify that reference. Please contact support.", "error");
