@@ -144,13 +144,12 @@ const init = async () => {
             margin-bottom: var(--space-8); flex-wrap: wrap;">
 
             ${passed && isCertification ? `
-                <a href="./certificate-payment.html?attemptId=${result.attemptId}&courseId=${result.courseId}"
-                   class="btn btn-accent btn-lg">
+                <button id="getCertBtn" class="btn btn-accent btn-lg">
                     🏆 Get Your Certificate
-                </a>` : ""}
+                </button>` : ""}
 
             ${!passed && isCertification ? `
-                <a href="./exam.html?id=${result.courseId}&type=certification"
+                <a href="./payment.html?id=${result.courseId}"
                    class="btn btn-primary btn-lg">
                     🔄 Retake Exam
                 </a>` : ""}
@@ -170,7 +169,7 @@ const init = async () => {
             </a>
         </div>
 
-        <!-- PASSED CERTIFICATION — payment prompt -->
+        <!-- PASSED CERTIFICATION — ready notice -->
         ${passed && isCertification ? `
             <div style="
                 background: var(--color-surface);
@@ -185,7 +184,23 @@ const init = async () => {
                     🎓 You passed! Your certificate is ready.
                 </p>
                 <p style="font-size: var(--text-sm); color: var(--color-text-muted);">
-                    A one-time certificate fee applies. Click "Get Your Certificate" above to pay and download your certificate.
+                    Click "Get Your Certificate" above to generate and download it — no additional payment required.
+                </p>
+            </div>
+        ` : ""}
+
+        <!-- FAILED CERTIFICATION — retry notice -->
+        ${!passed && isCertification ? `
+            <div style="
+                background: var(--color-surface);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-lg);
+                padding: var(--space-6);
+                margin-bottom: var(--space-8);
+                text-align: center;
+            ">
+                <p style="font-size: var(--text-sm); color: var(--color-text-muted);">
+                    Each certification attempt requires its own exam fee. Click "Retake Exam" to pay for another sitting.
                 </p>
             </div>
         ` : ""}
@@ -203,6 +218,29 @@ const init = async () => {
             </div>
         ` : ""}
     `;
+
+    // ── GET CERTIFICATE — generate directly, payment already made pre-attempt ──
+    if (passed && isCertification) {
+        const getCertBtn = document.getElementById("getCertBtn");
+        getCertBtn.addEventListener("click", async () => {
+            getCertBtn.disabled = true;
+            getCertBtn.textContent = "Generating your certificate...";
+
+            try {
+                const response = await api.post("/certificates/generate", {
+                    attemptId: result.attemptId
+                });
+
+                Store.invalidate("user:certificates");
+                window.location.href = `./certificate.html?id=${response.certificate._id}`;
+
+            } catch (error) {
+                Utils.toast(error.message, "error");
+                getCertBtn.disabled = false;
+                getCertBtn.textContent = "🏆 Get Your Certificate";
+            }
+        });
+    }
 
 };
 
