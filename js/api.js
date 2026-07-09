@@ -16,8 +16,10 @@ const api = {
 
             const data = await response.json();
 
-            // Registration payment required
-            if (response.status === 402) {
+            // Registration payment required — only redirect for THIS specific
+            // gate. Other 402s (e.g. exam-attempt payment) must fall through
+            // to the caller instead of being hijacked here.
+            if (response.status === 402 && data.code === "REGISTRATION_PAYMENT_REQUIRED") {
                 window.location.href = "/pages/registration-payment.html";
                 return;
             }
@@ -34,11 +36,17 @@ const api = {
                     return;
                 }
                 // No existing session — throw error message to caller
-                throw new Error(data.message || "Invalid credentials");
+                const error = new Error(data.message || "Invalid credentials");
+                error.code = data.code;
+                error.status = response.status;
+                throw error;
             }
 
             if (!response.ok) {
-                throw new Error(data.message || "Something went wrong");
+                const error = new Error(data.message || "Something went wrong");
+                error.code = data.code;
+                error.status = response.status;
+                throw error;
             }
 
             return data;
