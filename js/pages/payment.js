@@ -215,15 +215,26 @@ const init = async () => {
         payBtn.textContent = "Redirecting to payment...";
 
         try {
-            const response = await api.post("/payment/initialize", {
-                courseId,
-                amountNGN: priceNGN
-            });
+            // amountNGN is no longer sent — the backend computes the real
+            // charge server-side from the course's stored price. priceNGN
+            // here was only ever used to render the estimate on this page.
+            const response = await api.post("/payment/initialize", { courseId });
 
             // Redirect to Paystack hosted payment page
             window.location.href = response.authorizationUrl;
 
         } catch (error) {
+            // If the user already has an unused payment for this course
+            // (e.g. they paid earlier and left before starting), send them
+            // straight into the exam instead of showing an error.
+            if (error.code === "ALREADY_PAID") {
+                Utils.toast("You've already paid for this exam. Taking you to it now...", "success");
+                setTimeout(() => {
+                    window.location.href = `./exam.html?id=${courseId}&type=certification`;
+                }, 1200);
+                return;
+            }
+
             Utils.toast(error.message, "error");
             payBtn.disabled = false;
             payBtn.textContent = `💳 Pay ₦${priceNGNFormatted} Now`;
