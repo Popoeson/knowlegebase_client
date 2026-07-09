@@ -330,6 +330,29 @@ const init = async () => {
 
     } catch (error) {
         Utils.hideLoader();
+
+        // Certification attempt requires an unused, successful payment for
+        // this course — backend returns 402 EXAM_PAYMENT_REQUIRED when none
+        // exists. Send the user to pay instead of showing a dead-end error.
+        const needsPayment = error.code === "EXAM_PAYMENT_REQUIRED"
+            || error.status === 402
+            || (error.message && error.message.toLowerCase().includes("payment required"));
+
+        if (needsPayment && type === "certification") {
+            examBody.innerHTML = `
+                <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="empty-state-icon">💳</div>
+                    <h3 class="empty-state-title">Payment required</h3>
+                    <p class="empty-state-text">
+                        You need to pay the exam fee before taking this certification exam.
+                    </p>
+                    <a href="./payment.html?id=${courseId}" class="btn btn-primary mt-4">
+                        Go to Payment
+                    </a>
+                </div>`;
+            return;
+        }
+
         examBody.innerHTML = `
             <div class="empty-state" style="grid-column: 1/-1;">
                 <div class="empty-state-icon">⚠️</div>
