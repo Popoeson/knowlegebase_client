@@ -1,4 +1,3 @@
-Utils.initTheme();
 
 const init = async () => {
 
@@ -44,8 +43,12 @@ const init = async () => {
     const manualRefInput = document.getElementById("manualRefInput");
     const manualVerifyBtn = document.getElementById("manualVerifyBtn");
 
-    const REGISTRATION_FEE_USD = 0.50;
-    let priceNGN = null;
+    // NOTE: this is now display-only — an estimate so the user knows
+    // roughly what to expect before clicking pay. The real, authoritative
+    // amount is computed server-side (REGISTRATION_FEE_USD env var) inside
+    // initializeRegistrationPayment and is what Paystack actually charges.
+    const REGISTRATION_FEE_USD_ESTIMATE = 0.50;
+    let estimatedPriceNGN = null;
 
     const activateAndGoToLogin = (message) => {
         sessionStorage.removeItem("kb_pending_token");
@@ -93,13 +96,13 @@ const init = async () => {
     const recovered = await recoverPendingPayment();
     if (recovered) return;
 
-    // ── NORMAL PAYMENT FORM SETUP ──
+    // ── NORMAL PAYMENT FORM SETUP (display estimate only) ──
     try {
         const response = await fetch("https://open.er-api.com/v6/latest/USD");
         const data = await response.json();
         const rate = data.rates.NGN;
-        priceNGN = Math.round(REGISTRATION_FEE_USD * rate);
-        const formatted = priceNGN.toLocaleString("en-NG");
+        estimatedPriceNGN = Math.round(REGISTRATION_FEE_USD_ESTIMATE * rate);
+        const formatted = estimatedPriceNGN.toLocaleString("en-NG");
 
         amountNGNEl.textContent = `₦${formatted}`;
         totalDueEl.textContent = `₦${formatted}`;
@@ -108,8 +111,8 @@ const init = async () => {
         payBtn.disabled = false;
 
     } catch (error) {
-        priceNGN = Math.round(REGISTRATION_FEE_USD * 1600);
-        const formatted = priceNGN.toLocaleString("en-NG");
+        estimatedPriceNGN = Math.round(REGISTRATION_FEE_USD_ESTIMATE * 1600);
+        const formatted = estimatedPriceNGN.toLocaleString("en-NG");
         amountNGNEl.textContent = `₦${formatted}`;
         totalDueEl.textContent = `₦${formatted}`;
         exchangeNoteEl.textContent = "Using fallback exchange rate.";
@@ -123,13 +126,17 @@ const init = async () => {
         payBtn.textContent = "Redirecting to payment...";
 
         try {
+            // amountNGN is no longer sent — the backend computes the real
+            // fee server-side. The displayed estimate above may differ
+            // slightly from the actual charge if the exchange rate moved
+            // between page load and click.
             const r = await fetch(`${CONFIG.API_BASE_URL}/auth/registration-payment/initialize`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${pendingToken}`
                 },
-                body: JSON.stringify({ amountNGN: priceNGN })
+                body: JSON.stringify({})
             });
             const response = await r.json();
 
@@ -152,7 +159,7 @@ const init = async () => {
         } catch (error) {
             Utils.toast(error.message || "Failed to initialize payment.", "error");
             payBtn.disabled = false;
-            payBtn.textContent = `💳 Pay ₦${priceNGN.toLocaleString("en-NG")} to Activate`;
+            payBtn.textContent = `💳 Pay ₦${estimatedPriceNGN.toLocaleString("en-NG")} to Activate`;
         }
     });
 
