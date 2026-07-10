@@ -149,6 +149,50 @@ const init = async () => {
         }
     };
 
+    // ── DOWNLOAD QUESTIONS AS EXCEL ──
+    // Generated client-side from already-loaded/cached question data —
+    // no backend round trip needed for this.
+    window.downloadQuestions = async (courseId, type) => {
+        try {
+            const questions = await fetchQuestions(courseId, type);
+
+            if (!questions || questions.length === 0) {
+                Utils.toast("No questions to download", "info");
+                return;
+            }
+
+            const rows = questions.map(q => ({
+                question: q.question,
+                option_a: q.optionA,
+                option_b: q.optionB,
+                option_c: q.optionC,
+                option_d: q.optionD,
+                correct_answer: q.correctAnswer,
+                explanation: q.explanation || ""
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(rows, {
+                header: [
+                    "question", "option_a", "option_b", "option_c",
+                    "option_d", "correct_answer", "explanation"
+                ]
+            });
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Questions");
+
+            const course = allCourses.find(c => c._id === courseId);
+            const safeTitle = (course ? course.title : "questions")
+                .replace(/[^a-z0-9]/gi, "_")
+                .toLowerCase();
+
+            XLSX.writeFile(workbook, `${safeTitle}_${type}_questions.xlsx`);
+
+        } catch (error) {
+            Utils.toast("Failed to download questions", "error");
+        }
+    };
+
     // ── RENDER QUESTION TABLE FOR A COURSE + TYPE ──
     const renderQuestionTable = (questions, courseId, type, containerId) => {
         const container = document.getElementById(containerId);
@@ -180,6 +224,12 @@ const init = async () => {
                         0 selected
                     </span>
                 </div>
+                <button
+                    class="btn btn-outline btn-sm"
+                    onclick="downloadQuestions('${courseId}', '${type}')"
+                >
+                    ⬇ Download Questions
+                </button>
                 <button
                     class="btn btn-accent btn-sm"
                     id="deleteSelectedBtn_${courseId}_${type}"
@@ -471,7 +521,7 @@ const init = async () => {
         openModal(bulkDeleteModal);
     };
 
-        // ── BULK DELETE MODAL CONTROLS ──
+    // ── BULK DELETE MODAL CONTROLS ──
     document.getElementById("closeBulkDeleteModal").addEventListener("click",
         () => closeModal(bulkDeleteModal));
     document.getElementById("cancelBulkDeleteBtn").addEventListener("click",
@@ -858,192 +908,211 @@ const init = async () => {
         }
     });
 
- // ════════════════════════════════════════
-// ── AI QUESTION GENERATION ──
-// ════════════════════════════════════════
+    
+    // ════════════════════════════════════════
+    // ── AI QUESTION GENERATION ──
+    // ════════════════════════════════════════
 
-let pendingQuestions = [];
+    let pendingQuestions = [];
 
-const renderQuestionCards = (questions) => {
-    aiQuestionsList.innerHTML = questions.map((q, index) => `
-        <div class="card mb-4" style="border: 1px solid var(--color-border);">
-            <div style="display: flex; align-items: flex-start; gap: var(--space-3);">
-                <input
-                    type="checkbox"
-                    class="question-checkbox"
-                    data-index="${index}"
-                    checked
-                    style="margin-top: 3px; flex-shrink: 0;
-                        width: 16px; height: 16px; cursor: pointer;"
-                >
-                <div style="flex: 1;">
-                    <div style="display: flex; align-items: center;
-                        gap: var(--space-2); margin-bottom: var(--space-3);">
-                        <span style="font-size: var(--text-xs); font-weight: 600;
-                            padding: 2px 8px; border-radius: var(--radius-full);
-                            background: rgba(37,99,235,0.1);
-                            color: var(--color-primary);">
-                            Q${index + 1}
-                        </span>
-                        <span style="font-size: var(--text-xs); padding: 2px 8px;
-                            border-radius: var(--radius-full);
-                            background: var(--color-surface-2);
-                            color: var(--color-text-muted);">
-                            ${document.getElementById("aiDifficulty").value}
-                        </span>
+    const renderQuestionCards = (questions) => {
+        aiQuestionsList.innerHTML = questions.map((q, index) => `
+            <div class="card mb-4" style="border: 1px solid var(--color-border);">
+                <div style="display: flex; align-items: flex-start; gap: var(--space-3);">
+                    <input
+                        type="checkbox"
+                        class="question-checkbox"
+                        data-index="${index}"
+                        checked
+                        style="margin-top: 3px; flex-shrink: 0;
+                            width: 16px; height: 16px; cursor: pointer;"
+                    >
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center;
+                            gap: var(--space-2); margin-bottom: var(--space-3);">
+                            <span style="font-size: var(--text-xs); font-weight: 600;
+                                padding: 2px 8px; border-radius: var(--radius-full);
+                                background: rgba(37,99,235,0.1);
+                                color: var(--color-primary);">
+                                Q${index + 1}
+                            </span>
+                            <span style="font-size: var(--text-xs); padding: 2px 8px;
+                                border-radius: var(--radius-full);
+                                background: var(--color-surface-2);
+                                color: var(--color-text-muted);">
+                                ${document.getElementById("aiDifficulty").value}
+                            </span>
+                        </div>
+                        <p style="font-weight: 500; margin-bottom: var(--space-3);
+                            font-size: var(--text-sm); line-height: 1.5;">
+                            ${q.question}
+                        </p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr;
+                            gap: var(--space-2); margin-bottom: var(--space-3);">
+                            ${["A", "B", "C", "D"].map(letter => `
+                                <div style="padding: var(--space-2) var(--space-3);
+                                    border-radius: var(--radius-md);
+                                    font-size: var(--text-sm);
+                                    border: 1px solid ${q.correctAnswer === letter
+                                        ? "var(--color-success)"
+                                        : "var(--color-border)"};
+                                    background: ${q.correctAnswer === letter
+                                        ? "rgba(16,185,129,0.08)"
+                                        : "transparent"};
+                                    color: ${q.correctAnswer === letter
+                                        ? "var(--color-success)"
+                                        : "var(--color-text-secondary)"};">
+                                    <strong>${letter}.</strong> ${q[`option${letter}`]}
+                                    ${q.correctAnswer === letter ? " ✓" : ""}
+                                </div>
+                            `).join("")}
+                        </div>
+                        ${q.explanation ? `
+                            <p style="font-size: var(--text-xs);
+                                color: var(--color-text-muted); font-style: italic;
+                                border-top: 1px solid var(--color-border);
+                                padding-top: var(--space-2);">
+                                💡 ${q.explanation}
+                            </p>` : ""}
                     </div>
-                    <p style="font-weight: 500; margin-bottom: var(--space-3);
-                        font-size: var(--text-sm); line-height: 1.5;">
-                        ${q.question}
-                    </p>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr;
-                        gap: var(--space-2); margin-bottom: var(--space-3);">
-                        ${["A", "B", "C", "D"].map(letter => `
-                            <div style="padding: var(--space-2) var(--space-3);
-                                border-radius: var(--radius-md);
-                                font-size: var(--text-sm);
-                                border: 1px solid ${q.correctAnswer === letter
-                                    ? "var(--color-success)"
-                                    : "var(--color-border)"};
-                                background: ${q.correctAnswer === letter
-                                    ? "rgba(16,185,129,0.08)"
-                                    : "transparent"};
-                                color: ${q.correctAnswer === letter
-                                    ? "var(--color-success)"
-                                    : "var(--color-text-secondary)"};">
-                                <strong>${letter}.</strong> ${q[`option${letter}`]}
-                                ${q.correctAnswer === letter ? " ✓" : ""}
-                            </div>
-                        `).join("")}
-                    </div>
-                    ${q.explanation ? `
-                        <p style="font-size: var(--text-xs);
-                            color: var(--color-text-muted); font-style: italic;
-                            border-top: 1px solid var(--color-border);
-                            padding-top: var(--space-2);">
-                            💡 ${q.explanation}
-                        </p>` : ""}
                 </div>
             </div>
-        </div>
-    `).join("");
-};
+        `).join("");
+    };
 
-if (selectAllCheckbox) {
-    selectAllCheckbox.addEventListener("change", () => {
-        document.querySelectorAll(".question-checkbox").forEach(cb => {
-            cb.checked = selectAllCheckbox.checked;
-        });
-    });
-}
-
-if (generateBtn) {
-    generateBtn.addEventListener("click", async () => {
-        const courseId = document.getElementById("aiCourse").value;
-        const topicName = document.getElementById("aiTopic").value.trim();
-        const difficulty = document.getElementById("aiDifficulty").value;
-        const type = document.getElementById("aiType").value;
-        const count = parseInt(document.getElementById("aiCount").value);
-
-        if (!courseId) { Utils.toast("Please select a course", "error"); return; }
-        if (!topicName) { Utils.toast("Please enter a topic", "error"); return; }
-        if (!count || count < 1 || count > 50) {
-            Utils.toast("Enter a number between 1 and 50", "error"); return;
-        }
-
-        generateBtn.disabled = true;
-        generateBtn.textContent = "✨ Generating...";
-        reviewPanel.classList.add("hidden");
-        duplicateNotice.classList.add("hidden");
-        pendingQuestions = [];
-
-        try {
-            const data = await api.post("/admin/questions/ai-generate", {
-                courseId,
-                topicName,
-                difficulty,
-                count,
-                type
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener("change", () => {
+            document.querySelectorAll(".question-checkbox").forEach(cb => {
+                cb.checked = selectAllCheckbox.checked;
             });
+        });
+    }
 
-            pendingQuestions = data.questions;
+    if (generateBtn) {
+        generateBtn.addEventListener("click", async () => {
+            const courseId = document.getElementById("aiCourse").value;
+            const topicName = document.getElementById("aiTopic").value.trim();
+            const difficulty = document.getElementById("aiDifficulty").value;
+            const type = document.getElementById("aiType").value;
+            const count = parseInt(document.getElementById("aiCount").value);
 
-            if (data.duplicatesRemoved > 0) {
-                duplicateNoticeText.textContent =
-                    `${data.duplicatesRemoved} question${data.duplicatesRemoved > 1 ? "s were" : " was"} already in the question bank and removed.`;
-                duplicateNotice.classList.remove("hidden");
+            if (!courseId) { Utils.toast("Please select a course", "error"); return; }
+            if (!topicName) { Utils.toast("Please enter a topic", "error"); return; }
+            if (!count || count < 1 || count > 50) {
+                Utils.toast("Enter a number between 1 and 50", "error"); return;
             }
 
-            renderQuestionCards(pendingQuestions);
-            reviewPanel.classList.remove("hidden");
-            reviewStatus.textContent = `${pendingQuestions.length} question${pendingQuestions.length !== 1 ? "s" : ""} generated. Review and select which to save.`;
-            reviewPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+            generateBtn.disabled = true;
+            generateBtn.textContent = "✨ Generating...";
+            reviewPanel.classList.add("hidden");
+            duplicateNotice.classList.add("hidden");
+            pendingQuestions = [];
 
-        } catch (error) {
-            Utils.toast(error.message || "Failed to generate questions. Try again.", "error");
-            console.error(error);
-        } finally {
-            generateBtn.disabled = false;
-            generateBtn.textContent = "✨ Generate Questions";
-        }
-    });
-}
+            try {
+                const data = await api.post("/admin/questions/ai-generate", {
+                    courseId,
+                    topicName,
+                    difficulty,
+                    count,
+                    type
+                });
 
-if (approveBtn) {
-    approveBtn.addEventListener("click", async () => {
-        const courseId = document.getElementById("aiCourse").value;
-        const difficulty = document.getElementById("aiDifficulty").value;
-        const type = document.getElementById("aiType").value;
+                pendingQuestions = data.questions;
 
-        const checked = document.querySelectorAll(".question-checkbox:checked");
-        const selected = Array.from(checked).map(
-            cb => pendingQuestions[parseInt(cb.dataset.index)]
-        );
+                if (data.duplicatesRemoved > 0) {
+                    duplicateNoticeText.textContent =
+                        `${data.duplicatesRemoved} question${data.duplicatesRemoved > 1 ? "s were" : " was"} already in the question bank and removed.`;
+                    duplicateNotice.classList.remove("hidden");
+                }
 
-        if (selected.length === 0) {
-            Utils.toast("No questions selected", "error"); return;
-        }
+                renderQuestionCards(pendingQuestions);
+                reviewPanel.classList.remove("hidden");
+                reviewStatus.textContent = `${pendingQuestions.length} question${pendingQuestions.length !== 1 ? "s" : ""} generated. Review and select which to save.`;
+                reviewPanel.scrollIntoView({ behavior: "smooth", block: "start" });
 
-        approveBtn.disabled = true;
-        approveBtn.textContent = "Saving...";
+            } catch (error) {
+                Utils.toast(error.message || "Failed to generate questions. Try again.", "error");
+                console.error(error);
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = "✨ Generate Questions";
+            }
+        });
+    }
 
-        try {
-            const data = await api.post("/admin/questions/ai-save", {
-                courseId,
-                questions: selected,
-                difficulty,
-                type
-            });
+    if (approveBtn) {
+        approveBtn.addEventListener("click", async () => {
+            const courseId = document.getElementById("aiCourse").value;
+            const difficulty = document.getElementById("aiDifficulty").value;
+            const type = document.getElementById("aiType").value;
 
-            Utils.toast(data.message, "success");
+            const checked = document.querySelectorAll(".question-checkbox:checked");
+            const selected = Array.from(checked).map(
+                cb => pendingQuestions[parseInt(cb.dataset.index)]
+            );
+
+            if (selected.length === 0) {
+                Utils.toast("No questions selected", "error"); return;
+            }
+
+            approveBtn.disabled = true;
+            approveBtn.textContent = "Saving...";
+
+            try {
+                const data = await api.post("/admin/questions/ai-save", {
+                    courseId,
+                    questions: selected,
+                    difficulty,
+                    type
+                });
+
+                Utils.toast(data.message, "success");
+                reviewPanel.classList.add("hidden");
+                duplicateNotice.classList.add("hidden");
+                pendingQuestions = [];
+                reviewStatus.textContent = "";
+
+                invalidateCache(courseId, type);
+                const body = document.getElementById(`body_${courseId}`);
+                if (body && body.classList.contains("open")) {
+                    await loadTabQuestions(courseId, type);
+                }
+
+                const counts = await getQuestionCounts(courseId);
+                const badgesEl = document.getElementById(`badges_${courseId}`);
+                if (badgesEl) {
+                    badgesEl.innerHTML = `
+                        <span class="count-badge count-badge-practice">
+                            Practice: ${counts.practice}
+                        </span>
+                        <span class="count-badge count-badge-cert">
+                            Certification: ${counts.certification}
+                        </span>
+                    `;
+                }
+
+            } catch (error) {
+                Utils.toast(error.message || "Failed to save questions.", "error");
+            } finally {
+                approveBtn.disabled = false;
+                approveBtn.textContent = "✅ Save Selected Questions";
+            }
+        });
+    }
+
+    if (rejectBtn) {
+        rejectBtn.addEventListener("click", async () => {
+            try {
+                await api.post("/admin/questions/ai-reject", {});
+            } catch (_) {}
+
             reviewPanel.classList.add("hidden");
             duplicateNotice.classList.add("hidden");
             pendingQuestions = [];
             reviewStatus.textContent = "";
-            await loadQuestions();
-
-        } catch (error) {
-            Utils.toast(error.message || "Failed to save questions.", "error");
-        } finally {
-            approveBtn.disabled = false;
-            approveBtn.textContent = "✅ Save Selected Questions";
-        }
-    });
-}
-
-if (rejectBtn) {
-    rejectBtn.addEventListener("click", async () => {
-        try {
-            await api.post("/admin/questions/ai-reject", {});
-        } catch (_) {}
-
-        reviewPanel.classList.add("hidden");
-        duplicateNotice.classList.add("hidden");
-        pendingQuestions = [];
-        reviewStatus.textContent = "";
-        Utils.toast("Questions discarded.", "info");
-    });
-}
+            Utils.toast("Questions discarded.", "info");
+        });
+    }
 
     // ── INIT ──
     await loadCourses();
