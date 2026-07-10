@@ -47,7 +47,7 @@ const init = async () => {
     // roughly what to expect before clicking pay. The real, authoritative
     // amount is computed server-side (REGISTRATION_FEE_USD env var) inside
     // initializeRegistrationPayment and is what Paystack actually charges.
-    const REGISTRATION_FEE_USD_ESTIMATE = 0.50;
+    const REGISTRATION_FEE_USD_ESTIMATE = 2;
     let estimatedPriceNGN = null;
 
     const activateAndGoToLogin = (message) => {
