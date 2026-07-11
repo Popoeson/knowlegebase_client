@@ -14,6 +14,9 @@ const verify = async () => {
         statusTitle.textContent = "Payment Successful!";
         statusMessage.textContent = "Your payment has been confirmed. Taking you to your exam...";
         sessionStorage.removeItem("kb_payment_courseId");
+        localStorage.removeItem("kb_pending_cert_ref");
+        localStorage.removeItem("kb_pending_cert_courseId");
+        localStorage.removeItem("kb_cert_payment_in_progress");
         setTimeout(() => {
             window.location.href = `./exam.html?id=${courseId}&type=certification`;
         }, 2000);
