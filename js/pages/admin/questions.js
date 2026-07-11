@@ -231,6 +231,14 @@ const init = async () => {
                     ⬇ Download Questions
                 </button>
                 <button
+                    class="btn btn-outline btn-sm"
+                    id="copyToOtherBtn_${courseId}_${type}"
+                    onclick="copySelectedToOtherType('${courseId}', '${type}')"
+                    disabled
+                >
+                    ${type === "practice" ? "→ Copy to Certification" : "→ Copy to Practice"}
+                </button>
+                <button
                     class="btn btn-accent btn-sm"
                     id="deleteSelectedBtn_${courseId}_${type}"
                     onclick="deleteSelected('${courseId}', '${type}')"
@@ -457,6 +465,11 @@ const init = async () => {
         if (countEl) countEl.textContent = `${checked.length} selected`;
         if (deleteBtn) deleteBtn.disabled = checked.length === 0;
 
+        const copyBtn = document.getElementById(
+            `copyToOtherBtn_${courseId}_${type}`
+        );
+        if (copyBtn) copyBtn.disabled = checked.length === 0;
+
         // Update select all checkbox state
         const selectAllCb = document.getElementById(
             `selectAll_${courseId}_${type}`
@@ -480,7 +493,7 @@ const init = async () => {
         updateSelectedCount(courseId, type);
     };
 
-    // ── DELETE SELECTED ──
+        // ── DELETE SELECTED ──
     window.deleteSelected = async (courseId, type) => {
         const checkboxes = document.querySelectorAll(
             `.question-row-checkbox[data-course="${courseId}"][data-type="${type}"]:checked`
@@ -503,6 +516,120 @@ const init = async () => {
         window._bulkDeleteMode = "selected";
 
         openModal(bulkDeleteModal);
+    };
+
+    // ── COPY SELECTED QUESTIONS TO THE OTHER TYPE ──
+    // Duplicates selected questions from practice→certification or
+    // certification→practice. The originals stay put — this is a copy,
+    // not a move. Uses the same single-question-create endpoint the
+    // Add Question modal uses, one call per selected question.
+    window.copySelectedToOtherType = async (courseId, type) => {
+        const otherType = type === "practice" ? "certification" : "practice";
+
+        const checkboxes = document.querySelectorAll(
+            `.question-row-checkbox[data-course="${courseId}"][data-type="${type}"]:checked`
+        );
+        const ids = Array.from(checkboxes).map(cb => cb.dataset.id);
+
+        if (ids.length === 0) return;
+
+        const copyBtn = document.getElementById(`copyToOtherBtn_${courseId}_${type}`);
+        const originalText = copyBtn ? copyBtn.textContent : "";
+        if (copyBtn) {
+            copyBtn.disabled = true;
+            copyBtn.textContent = "Copying...";
+        }
+
+        try {
+            const questions = await fetchQuestions(courseId, type);
+            const selectedQuestions = questions.filter(q => ids.includes(q._id));
+
+            // Duplicate check — skip any selected question whose text already
+            // matches (case/whitespace-insensitive) a question already in
+            // the target type, so re-running this doesn't pile up copies.
+            const targetQuestions = await fetchQuestions(courseId, otherType);
+            const normalize = (str) => (str || "")
+                .trim()
+                .toLowerCase()
+                .replace(/\s+/g, " ");
+            const existingTextSet = new Set(
+                targetQuestions.map(q => normalize(q.question))
+            );
+
+            const toCopy = selectedQuestions.filter(
+                q => !existingTextSet.has(normalize(q.question))
+            );
+            const skippedCount = selectedQuestions.length - toCopy.length;
+
+            if (toCopy.length === 0) {
+                Utils.toast(
+                    `All ${selectedQuestions.length} selected question${selectedQuestions.length !== 1 ? "s" : ""} already exist in ${otherType} — nothing copied.`,
+                    "info"
+                );
+                return;
+            }
+
+            const results = await Promise.allSettled(
+                toCopy.map(q => api.post("/admin/questions", {
+                    course: courseId,
+                    type: otherType,
+                    question: q.question,
+                    optionA: q.optionA,
+                    optionB: q.optionB,
+                    optionC: q.optionC,
+                    optionD: q.optionD,
+                    correctAnswer: q.correctAnswer,
+                    explanation: q.explanation || ""
+                }))
+            );
+
+            const succeeded = results.filter(r => r.status === "fulfilled").length;
+            const failed = results.length - succeeded;
+
+            let message = `${succeeded} question${succeeded !== 1 ? "s" : ""} copied to ${otherType}`;
+            if (skippedCount > 0) {
+                message += `, ${skippedCount} skipped (already existed)`;
+            }
+            if (failed > 0) {
+                message += `, ${failed} failed`;
+            }
+
+            Utils.toast(
+                message,
+                (failed > 0) ? "warning" : (skippedCount > 0 ? "info" : "success")
+            );
+
+            invalidateCache(courseId, otherType);
+
+            // Refresh the destination tab's table only if it's the active one
+            const otherTabBtn = document.getElementById(`tab_${otherType}_${courseId}`);
+            if (otherTabBtn && otherTabBtn.classList.contains("active")) {
+                await loadTabQuestions(courseId, otherType);
+            }
+
+            // Refresh badge counts
+            const counts = await getQuestionCounts(courseId);
+            const badgesEl = document.getElementById(`badges_${courseId}`);
+            if (badgesEl) {
+                badgesEl.innerHTML = `
+                    <span class="count-badge count-badge-practice">
+                        Practice: ${counts.practice}
+                    </span>
+                    <span class="count-badge count-badge-cert">
+                        Certification: ${counts.certification}
+                    </span>
+                `;
+            }
+
+        } catch (error) {
+            Utils.toast("Failed to copy questions", "error");
+        } finally {
+            if (copyBtn) {
+                copyBtn.textContent = originalText;
+            }
+            // Re-derives disabled state from current checkbox selection
+            updateSelectedCount(courseId, type);
+        }
     };
 
     // ── CONFIRM DELETE ALL ──
@@ -715,6 +842,7 @@ const init = async () => {
         }
     );
 
+
     // ── DELETE SINGLE QUESTION ──
     window.confirmDeleteOne = (id, courseId, type) => {
         document.getElementById("deleteQuestionId").value = id;
@@ -908,7 +1036,6 @@ const init = async () => {
         }
     });
 
-    
     // ════════════════════════════════════════
     // ── AI QUESTION GENERATION ──
     // ════════════════════════════════════════
