@@ -90,7 +90,7 @@ const init = async () => {
             day: "numeric", month: "long", year: "numeric"
         });
 
-        const verifyUrl = `https://knowlegebase-client.vercel.app/pages/verify.html?id=${certificate.certificateId}`;
+        const verifyUrl = `https://asodem.com/pages/verify.html?id=${certificate.certificateId}`;
 
         certificateContent.innerHTML = `
             <div class="certificate-view-wrapper">
@@ -111,11 +111,11 @@ const init = async () => {
 
                 <div class="certificate-document" id="certDoc">
                     <div class="cert-header">
-                        <div class="cert-brand">TECH COMPETENCE INSTITUTE</div>
+                        <div class="cert-brand">ASODEM</div>
                         <div class="cert-authority">Certification Authority</div>
                     </div>
                     <div class="cert-body">
-                        <div class="cert-watermark">TCI</div>
+                        <div class="cert-watermark">ASO</div>
                         <div class="cert-achievement-title">Certificate of Achievement</div>
                         <p class="cert-certifies">This certifies that</p>
                         <h2 class="cert-name">${user.fullName}</h2>
@@ -135,7 +135,7 @@ const init = async () => {
                                 <p class="cert-footer-value">${issuedDate}</p>
                             </div>
                             <div class="cert-seal">
-                                <div class="cert-seal-text">✦<br>VERIFIED<br>TECH COMPETENCE INSTITUTE<br>✦</div>
+                                <div class="cert-seal-text">✦<br>VERIFIED<br>ASODEM<br>✦</div>
                             </div>
                             <div class="cert-footer-item">
                                 <p class="cert-footer-label">Certificate ID</p>
