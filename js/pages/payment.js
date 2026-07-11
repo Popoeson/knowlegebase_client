@@ -66,6 +66,49 @@ const init = async () => {
     // Store courseId so callback page can use it
     sessionStorage.setItem("kb_payment_courseId", courseId);
 
+    // ── RECOVERY CHECK ──
+    // If a payment was in progress and the user lands back on this page
+    // (Paystack session interrupted, tab closed, came back later) without
+    // ever hitting payment-callback.html, check whether that payment
+    // actually went through before showing the pay form again.
+    const recoverPendingPayment = async () => {
+        const pendingRef = localStorage.getItem("kb_pending_cert_ref");
+        const pendingCourseId = localStorage.getItem("kb_pending_cert_courseId");
+
+        if (!pendingRef || pendingCourseId !== courseId) return false;
+
+        paymentContent.innerHTML = `
+            <div class="card" style="text-align: center; padding: var(--space-8);">
+                <div class="spinner" style="margin: 0 auto var(--space-4);"></div>
+                <p>Checking your previous payment...</p>
+            </div>`;
+
+        try {
+            const response = await api.get(`/payment/verify/${pendingRef}`);
+            localStorage.removeItem("kb_pending_cert_ref");
+            localStorage.removeItem("kb_pending_cert_courseId");
+            localStorage.removeItem("kb_cert_payment_in_progress");
+
+            Utils.toast("Payment confirmed! Taking you to your exam...", "success");
+            setTimeout(() => {
+                window.location.href = `./exam.html?id=${response.courseId || courseId}&type=certification`;
+            }, 1500);
+            return true;
+
+        } catch (error) {
+            // Payment genuinely not confirmed yet (or failed) — clear the
+            // stale pending state and let the normal payment form render.
+            localStorage.removeItem("kb_pending_cert_ref");
+            localStorage.removeItem("kb_pending_cert_courseId");
+            localStorage.removeItem("kb_cert_payment_in_progress");
+            console.warn("Pending exam payment recovery check:", error.message);
+            return false;
+        }
+    };
+
+    const recovered = await recoverPendingPayment();
+    if (recovered) return;
+
     let exchangeRate = 1600;
     try {
         const response = await fetch("https://open.er-api.com/v6/latest/USD");
@@ -147,6 +190,26 @@ const init = async () => {
                 <div class="payment-secure-note">
                     🔒 Secured by Paystack. Your payment details are encrypted.
                 </div>
+
+                <p style="text-align: center; margin-top: var(--space-4);
+                    font-size: var(--text-sm);">
+                    <a href="#" id="stuckLink" style="color: var(--color-primary);">
+                        Already paid but stuck here?
+                    </a>
+                </p>
+
+                <div id="manualRecoveryBox" style="display: none; margin-top: var(--space-4);
+                    padding: var(--space-4); background: var(--color-surface-2);
+                    border-radius: var(--radius-md);">
+                    <p style="font-size: var(--text-sm); margin-bottom: var(--space-3);">
+                        Paste your Paystack payment reference below and we'll check it.
+                    </p>
+                    <input type="text" id="manualRefInput" class="form-input"
+                        placeholder="e.g. ASO-CERT-..." style="margin-bottom: var(--space-3);">
+                    <button class="btn btn-outline w-full" id="manualVerifyBtn">
+                        Check My Payment
+                    </button>
+                </div>
             </div>
 
             <div>
@@ -220,24 +283,68 @@ const init = async () => {
             // here was only ever used to render the estimate on this page.
             const response = await api.post("/payment/initialize", { courseId });
 
+            // Mark payment as in progress BEFORE redirecting to Paystack
+            // so we can recover if the user comes back without completing
+            localStorage.setItem("kb_pending_cert_ref", response.reference);
+            localStorage.setItem("kb_pending_cert_courseId", courseId);
+            localStorage.setItem("kb_cert_payment_in_progress", "true");
+
             // Redirect to Paystack hosted payment page
             window.location.href = response.authorizationUrl;
 
         } catch (error) {
-            // If the user already has an unused payment for this course
-            // (e.g. they paid earlier and left before starting), send them
-            // straight into the exam instead of showing an error.
             if (error.code === "ALREADY_PAID") {
-                Utils.toast("You've already paid for this exam. Taking you to it now...", "success");
+                Utils.toast("You already have an unused payment for this course. Taking you to your exam...", "info");
                 setTimeout(() => {
                     window.location.href = `./exam.html?id=${courseId}&type=certification`;
-                }, 1200);
+                }, 1500);
                 return;
             }
-
             Utils.toast(error.message, "error");
             payBtn.disabled = false;
             payBtn.textContent = `💳 Pay ₦${priceNGNFormatted} Now`;
+        }
+    });
+
+    // ── STUCK? MANUAL RECOVERY ──
+    const stuckLink = document.getElementById("stuckLink");
+    const manualRecoveryBox = document.getElementById("manualRecoveryBox");
+    const manualRefInput = document.getElementById("manualRefInput");
+    const manualVerifyBtn = document.getElementById("manualVerifyBtn");
+
+    stuckLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        manualRecoveryBox.style.display =
+            manualRecoveryBox.style.display === "none" ? "block" : "none";
+    });
+
+    manualVerifyBtn.addEventListener("click", async () => {
+        const ref = manualRefInput.value.trim();
+
+        if (!ref) {
+            Utils.toast("Please paste your payment reference.", "error");
+            return;
+        }
+
+        manualVerifyBtn.disabled = true;
+        manualVerifyBtn.textContent = "Checking...";
+
+        try {
+            const response = await api.get(`/payment/verify/${ref}`);
+
+            localStorage.removeItem("kb_pending_cert_ref");
+            localStorage.removeItem("kb_pending_cert_courseId");
+            localStorage.removeItem("kb_cert_payment_in_progress");
+
+            Utils.toast("Payment confirmed! Taking you to your exam...", "success");
+            setTimeout(() => {
+                window.location.href = `./exam.html?id=${response.courseId || courseId}&type=certification`;
+            }, 1500);
+
+        } catch (error) {
+            Utils.toast(error.message || "Could not verify that reference. Please contact support.", "error");
+            manualVerifyBtn.disabled = false;
+            manualVerifyBtn.textContent = "Check My Payment";
         }
     });
 
