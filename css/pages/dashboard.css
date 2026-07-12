@@ -40,32 +40,30 @@
     color: var(--color-accent);
 }*/
 
+/* Sidebar Logo Container */
 .navbar-brand {
+    padding: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
     display: flex;
     align-items: center;
-    text-decoration: none;
+    justify-content: flex-start;
     flex-shrink: 0;
+    text-decoration: none;
 }
 
+/* Logo Image */
 .navbar-logo {
-    height: 48px; /* Adjust as needed */
-    border-radius: 10px;
+    height: 48px; /* Increase/decrease as needed */
     width: auto;
     display: block;
     object-fit: contain;
+    border-radius: 10px;
     transition: transform var(--transition-fast);
 }
 
 .navbar-brand:hover .navbar-logo {
     transform: scale(1.03);
 }
-
-.sidebar-nav {
-    flex: 1;
-    padding: var(--space-4) 0;
-    overflow-y: auto;
-}
-
 .sidebar-nav-section {
     margin-bottom: var(--space-6);
 }
