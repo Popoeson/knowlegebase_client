@@ -57,6 +57,7 @@
 
 .navbar-logo {
     height: 48px; /* Adjust as needed */
+    border-radius: 10px;
     width: auto;
     display: block;
     object-fit: contain;
