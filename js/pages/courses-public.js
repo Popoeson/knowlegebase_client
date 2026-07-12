@@ -91,7 +91,7 @@ const renderCourses = (courses) => {
         return;
     }
 
-    
+
 coursesGrid.innerHTML = courses.map(course => `
     <div class="course-card">
         <p class="course-card-category">
@@ -99,8 +99,9 @@ coursesGrid.innerHTML = courses.map(course => `
         </p>
         ${course.thumbnail
             ? `<img src="${course.thumbnail}" alt="${course.title}"
-                style="width: 100%; height: 140px; object-fit: cover;
-                border-radius: var(--radius-md); margin-bottom: var(--space-3);">`
+                style="width: 100%; aspect-ratio: 16 / 9; object-fit: cover;
+                object-position: top; border-radius: var(--radius-md);
+                margin-bottom: var(--space-3); display: block;">`
             : `<div class="course-card-icon">📘</div>`
         }
         <h3 class="course-card-title">${course.title}</h3>
