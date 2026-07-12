@@ -32,7 +32,7 @@
     justify-content: space-between;
 }
 
-/* ── BRAND ── */
+/* ── BRAND ── 
 .navbar-brand {
     font-family: var(--font-heading);
     font-size: var(--text-xl);
@@ -45,6 +45,26 @@
 
 .navbar-brand span {
     color: var(--color-accent);
+} */
+
+/* ── BRAND ── */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.navbar-logo {
+    height: 48px; /* Adjust as needed */
+    width: auto;
+    display: block;
+    object-fit: contain;
+    transition: transform var(--transition-fast);
+}
+
+.navbar-brand:hover .navbar-logo {
+    transform: scale(1.03);
 }
 
 /* ── NAV LINKS ── */
