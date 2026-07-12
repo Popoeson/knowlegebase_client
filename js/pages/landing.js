@@ -132,7 +132,7 @@ const loadStats = async () => {
 
 // ── FIX COPYRIGHT YEAR ──
 document.querySelector(".footer-copyright").textContent =
-    `© ${new Date().getFullYear()} KNOWLEDGEBASE. All rights reserved.`;
+    `© ${new Date().getFullYear()} ASODEM. All rights reserved.`;
 
 // ── INIT ──
 loadFeaturedCourses();
