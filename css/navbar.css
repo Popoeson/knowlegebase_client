@@ -68,6 +68,10 @@
     transform: scale(1.03);
 }
 
+.navbar-brand span {
+    color: var(--color-accent);
+}
+    
 /* ── NAV LINKS ── */
 .navbar-nav {
     display: flex;
