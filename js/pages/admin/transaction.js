@@ -19,6 +19,13 @@ const init = async () => {
     const transactionsCount = document.getElementById("transactionsCount");
     const searchInput = document.getElementById("searchInput");
     const statusFilter = document.getElementById("statusFilter");
+    const typeFilter = document.getElementById("typeFilter");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const selectAllCheckbox = document.getElementById("selectAllCheckbox");
+    const selectedCount = document.getElementById("selectedCount");
+    const deleteSelectedBtn = document.getElementById("deleteSelectedBtn");
+    const deleteModal = document.getElementById("deleteModal");
+    const bulkDeleteModal = document.getElementById("bulkDeleteModal");
 
     // ── SIDEBAR TOGGLE ──
     hamburger.addEventListener("click", () => {
@@ -63,13 +70,25 @@ const init = async () => {
         }
     }
 
+    // ── MODAL HELPERS ──
+    const openModal = (modal) => modal.classList.remove("hidden");
+    const closeModal = (modal) => modal.classList.add("hidden");
+
     // ── STATE ──
     let allPayments = [];
+    let currentlyDisplayed = [];
 
     // ── FORMAT AMOUNT ──
     const formatAmount = (kobo) => {
         const naira = kobo / 100;
         return `₦${naira.toLocaleString("en-NG")}`;
+    };
+
+    // ── TYPE LABEL ──
+    const typeLabel = (type) => {
+        if (type === "registration") return "Registration";
+        if (type === "certificate") return "Exam Payment";
+        return type || "—";
     };
 
     // ── LOAD TRANSACTIONS ──
@@ -79,7 +98,6 @@ const init = async () => {
             allPayments = response.payments;
             const totalRevenue = response.totalRevenue;
 
-            // Stats
             const successful = allPayments.filter(p => p.status === "success");
             const failed = allPayments.filter(p => p.status === "failed");
 
@@ -93,25 +111,35 @@ const init = async () => {
         } catch (error) {
             transactionsTable.innerHTML = `
                 <tr>
-                    <td colspan="8" class="text-center text-muted">Failed to load transactions</td>
+                    <td colspan="11" class="text-center text-muted">Failed to load transactions</td>
                 </tr>`;
         }
     };
 
     // ── RENDER TRANSACTIONS ──
     const renderTransactions = (payments) => {
+        currentlyDisplayed = payments;
         transactionsCount.textContent = `(${payments.length})`;
 
         if (payments.length === 0) {
             transactionsTable.innerHTML = `
                 <tr>
-                    <td colspan="8" class="text-center text-muted">No transactions found</td>
+                    <td colspan="11" class="text-center text-muted">No transactions found</td>
                 </tr>`;
+            updateSelectedCount();
             return;
         }
 
         transactionsTable.innerHTML = payments.map((payment, index) => `
             <tr>
+                <td>
+                    <input
+                        type="checkbox"
+                        class="q-checkbox transaction-row-checkbox"
+                        data-id="${payment._id}"
+                        onchange="updateSelectedCount()"
+                    >
+                </td>
                 <td>${index + 1}</td>
                 <td>
                     <p style="font-weight: var(--font-semibold);">
@@ -122,6 +150,11 @@ const init = async () => {
                     <p style="font-size: var(--text-xs); color: var(--color-text-muted);">
                         ${payment.user?.email || ""}
                     </p>
+                </td>
+                <td>
+                    <span class="badge ${payment.type === "registration" ? "badge-warning" : "badge-info"}">
+                        ${typeLabel(payment.type)}
+                    </span>
                 </td>
                 <td>${payment.course?.title || "—"}</td>
                 <td>
@@ -148,25 +181,42 @@ const init = async () => {
                     </span>
                 </td>
                 <td>${Utils.formatDate(payment.createdAt)}</td>
+                <td>
+                    <div class="table-actions">
+                        <button
+                            class="btn-icon btn-icon-delete"
+                            onclick="confirmDeleteOne('${payment._id}')"
+                            title="Delete"
+                        >🗑️</button>
+                    </div>
+                </td>
             </tr>
         `).join("");
+
+        updateSelectedCount();
     };
 
     // ── FILTER ──
     const filterTransactions = () => {
         const search = searchInput.value.toLowerCase().trim();
         const status = statusFilter.value;
+        const type = typeFilter.value;
 
         const filtered = allPayments.filter(payment => {
+            const fullName = payment.user
+                ? `${payment.user.firstName || ""} ${payment.user.otherName || ""} ${payment.user.surname || ""}`.trim().toLowerCase()
+                : "";
+
             const matchesSearch = !search ||
-                payment.user?.fullName?.toLowerCase().includes(search) ||
+                fullName.includes(search) ||
                 payment.user?.email?.toLowerCase().includes(search) ||
                 payment.course?.title?.toLowerCase().includes(search) ||
                 payment.reference.toLowerCase().includes(search);
 
             const matchesStatus = !status || payment.status === status;
+            const matchesType = !type || payment.type === type;
 
-            return matchesSearch && matchesStatus;
+            return matchesSearch && matchesStatus && matchesType;
         });
 
         renderTransactions(filtered);
@@ -174,6 +224,144 @@ const init = async () => {
 
     searchInput.addEventListener("input", filterTransactions);
     statusFilter.addEventListener("change", filterTransactions);
+    typeFilter.addEventListener("change", filterTransactions);
+
+    // ── SELECTION HANDLING ──
+    window.updateSelectedCount = () => {
+        const checkboxes = document.querySelectorAll(".transaction-row-checkbox");
+        const checked = Array.from(checkboxes).filter(cb => cb.checked);
+
+        selectedCount.textContent = `${checked.length} selected`;
+        deleteSelectedBtn.disabled = checked.length === 0;
+
+        selectAllCheckbox.checked = checkboxes.length > 0 && checked.length === checkboxes.length;
+        selectAllCheckbox.indeterminate = checked.length > 0 && checked.length < checkboxes.length;
+    };
+
+    selectAllCheckbox.addEventListener("change", () => {
+        document.querySelectorAll(".transaction-row-checkbox").forEach(cb => {
+            cb.checked = selectAllCheckbox.checked;
+        });
+        updateSelectedCount();
+    });
+
+    // ── DELETE SINGLE ──
+    window.confirmDeleteOne = (id) => {
+        document.getElementById("deleteTransactionId").value = id;
+        openModal(deleteModal);
+    };
+
+    document.getElementById("closeDeleteModal").addEventListener("click", () => closeModal(deleteModal));
+    document.getElementById("cancelDeleteBtn").addEventListener("click", () => closeModal(deleteModal));
+
+    document.getElementById("confirmDeleteBtn").addEventListener("click", async () => {
+        const id = document.getElementById("deleteTransactionId").value;
+        const confirmBtn = document.getElementById("confirmDeleteBtn");
+
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = "Deleting...";
+
+        try {
+            await api.delete(`/admin/transactions/${id}`);
+            Utils.toast("Transaction deleted successfully", "success");
+            closeModal(deleteModal);
+            await loadTransactions();
+            filterTransactions();
+
+        } catch (error) {
+            Utils.toast(error.message, "error");
+        } finally {
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = "Delete";
+        }
+    });
+
+    // ── DELETE SELECTED (BULK) ──
+    deleteSelectedBtn.addEventListener("click", () => {
+        const checkboxes = document.querySelectorAll(".transaction-row-checkbox:checked");
+        const ids = Array.from(checkboxes).map(cb => cb.dataset.id);
+
+        if (ids.length === 0) return;
+
+        document.getElementById("bulkDeleteTitle").textContent =
+            `Delete ${ids.length} Transaction${ids.length > 1 ? "s" : ""}`;
+        document.getElementById("bulkDeleteText").innerHTML =
+            `Are you sure you want to delete
+            <strong>${ids.length} selected transaction${ids.length > 1 ? "s" : ""}</strong>?
+            This cannot be undone.`;
+
+        window._bulkDeleteTransactionIds = ids;
+
+        openModal(bulkDeleteModal);
+    });
+
+    document.getElementById("closeBulkDeleteModal").addEventListener("click", () => closeModal(bulkDeleteModal));
+    document.getElementById("cancelBulkDeleteBtn").addEventListener("click", () => closeModal(bulkDeleteModal));
+
+    document.getElementById("confirmBulkDeleteBtn").addEventListener("click", async () => {
+        const confirmBtn = document.getElementById("confirmBulkDeleteBtn");
+        const ids = window._bulkDeleteTransactionIds || [];
+
+        if (ids.length === 0) return;
+
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = "Deleting...";
+
+        try {
+            const response = await api.request("/admin/transactions/bulk-delete", {
+                method: "DELETE",
+                body: JSON.stringify({ transactionIds: ids }),
+                headers: { "Content-Type": "application/json" }
+            });
+
+            Utils.toast(response.message, "success");
+            closeModal(bulkDeleteModal);
+            window._bulkDeleteTransactionIds = null;
+            await loadTransactions();
+            filterTransactions();
+
+        } catch (error) {
+            Utils.toast(error.message, "error");
+        } finally {
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = "Delete";
+        }
+    });
+
+    // ── DOWNLOAD (CURRENTLY FILTERED VIEW) ──
+    downloadBtn.addEventListener("click", () => {
+        if (!currentlyDisplayed || currentlyDisplayed.length === 0) {
+            Utils.toast("No transactions to download", "info");
+            return;
+        }
+
+        const rows = currentlyDisplayed.map(payment => ({
+            user_name: payment.user
+                ? `${payment.user.firstName || ""} ${payment.user.otherName || ""} ${payment.user.surname || ""}`.trim()
+                : "",
+            user_email: payment.user?.email || "",
+            type: typeLabel(payment.type),
+            course: payment.course?.title || "",
+            reference: payment.reference,
+            amount_ngn: payment.amount / 100,
+            channel: payment.channel || "",
+            status: payment.status,
+            date: new Date(payment.createdAt).toISOString()
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(rows, {
+            header: [
+                "user_name", "user_email", "type", "course", "reference",
+                "amount_ngn", "channel", "status", "date"
+            ]
+        });
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Transactions");
+
+        const dateStamp = new Date().toISOString().slice(0, 10);
+        XLSX.writeFile(workbook, `asodem_transactions_${dateStamp}.xlsx`);
+    });
 
     await loadTransactions();
 
