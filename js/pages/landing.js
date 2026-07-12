@@ -82,7 +82,13 @@ const loadFeaturedCourses = async () => {
                 <p class="course-card-category">
                     ${course.category?.name || "General"}
                 </p>
-                <div class="course-card-icon">📘</div>
+                ${course.thumbnail
+                    ? `<img src="${course.thumbnail}" alt="${course.title}"
+                        style="width: 100%; aspect-ratio: 16 / 9; object-fit: cover;
+                        object-position: top; border-radius: var(--radius-md);
+                        margin-bottom: var(--space-3); display: block;">`
+                    : `<div class="course-card-icon">📘</div>`
+                }
                 <h3 class="course-card-title">${course.title}</h3>
                 <p class="course-card-desc">
                     ${Utils.truncate(course.description, 100)}
@@ -136,4 +142,3 @@ document.querySelector(".footer-copyright").textContent =
 
 // ── INIT ──
 loadFeaturedCourses();
-loadStats();
