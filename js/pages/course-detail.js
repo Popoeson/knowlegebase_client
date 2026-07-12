@@ -205,7 +205,7 @@ const init = async () => {
                             </div>
                             <div class="topic-item">
                                 <div class="topic-bullet"></div>
-                                <span>Publicly verifiable at knowledgebase.com/verify</span>
+                                <span>Publicly verifiable at www.asodem.com/verify</span>
                             </div>
                             <div class="topic-item">
                                 <div class="topic-bullet"></div>
