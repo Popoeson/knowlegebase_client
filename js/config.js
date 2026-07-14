@@ -7,7 +7,7 @@ const isProduction = ["www.asodem.com", "asodem.com"].includes(window.location.h
 const CONFIG = isProduction
     ? {
         API_BASE_URL: "https://knowlegebase-server.onrender.com/api",
-        PAYSTACK_PUBLIC_KEY: "pk_live_REPLACE_WITH_YOUR_LIVE_PUBLIC_KEY"
+        PAYSTACK_PUBLIC_KEY: "pk_live_9ea850872c6c1053cbf1530b95c65bdf4535048d"
     }
     : {
         API_BASE_URL: "https://asodem.onrender.com/api",
