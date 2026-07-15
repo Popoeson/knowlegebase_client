@@ -6,7 +6,7 @@ const init = async () => {
 
     if (!Auth.isLoggedIn()) {
         window.location.href = "./login.html";
-        return;
+        return; 
     }
 
     // ── ELEMENT REFERENCES ──
