@@ -96,6 +96,25 @@
 
         <main class="page-content">
 
+<!-- DATA BACKUPS -->
+            <div class="card mb-6">
+                <div class="section-header mb-4">
+                    <h2 class="section-title">Data Backups</h2>
+                </div>
+                <p class="text-muted" style="font-size: var(--text-sm); margin-bottom: var(--space-2);" id="backupStatus">
+                    Checking backup history...
+                </p>
+                <p class="text-muted" style="font-size: var(--text-xs); margin-bottom: var(--space-4);">
+                    Full backup downloads everything. "Since last backup" only downloads what's changed —
+                    faster, but on its own it won't capture anything that's been deleted, so do a full
+                    backup periodically regardless.
+                </p>
+                <div style="display: flex; gap: var(--space-3);">
+                    <button class="btn btn-primary btn-sm" id="fullBackupBtn">⬇ Full Backup</button>
+                    <button class="btn btn-outline btn-sm" id="incrementalBackupBtn">⬇ Since Last Backup</button>
+                </div>
+            </div>
+
             <!-- STATS -->
             <div class="error-stats">
                 <div class="error-stat-card">
