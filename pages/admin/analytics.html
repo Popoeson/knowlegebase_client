@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics — ASODEM Admin</title>
+
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/reset.css">
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="../../css/pages/dashboard.css">
+    <link rel="stylesheet" href="../../css/pages/courses.css">
+    <link rel="stylesheet" href="../../css/pages/analytics.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span class="sidebar-brand-name">ASO<span>DEM</span></span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Admin Panel</p>
+                <a href="./dashboard.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="./users.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">👥</span>
+                    Users
+                </a>
+                <a href="./courses.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📚</span>
+                    Courses
+                </a>
+                <a href="./questions.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🧠</span>
+                    Questions
+                </a>
+                <a href="./certificates.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🏆</span>
+                    Certificates
+                </a>
+                <a href="./transactions.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">💳</span>
+                    Transactions
+                </a>
+                <a href="./analytics.html" class="sidebar-nav-item active">
+                    <span class="sidebar-nav-icon">📈</span>
+                    Analytics
+                </a>
+                <a href="./console.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🩺</span>
+                    Error Monitor
+                </a>
+            </div>
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Account</p>
+                <a href="./profile.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">👤</span>
+                    Profile
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar" id="sidebarAvatar"></div>
+                <div class="sidebar-user-info">
+                    <p class="sidebar-user-name" id="sidebarName"></p>
+                    <p class="sidebar-user-role">Administrator</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="main-content">
+
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger" id="hamburger">
+                    <span></span><span></span><span></span>
+                </button>
+                <h1 class="topbar-title">Analytics</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle">🌙</button>
+                <div class="topbar-avatar" id="topbarAvatar"></div>
+            </div>
+        </header>
+
+        <main class="page-content">
+
+            <div class="analytics-tabs">
+                <button class="analytics-tab active" data-tab="overview">Overview</button>
+                <button class="analytics-tab" data-tab="feed">Activity Feed</button>
+            </div>
+
+            <!-- OVERVIEW TAB -->
+            <div class="analytics-panel active" id="panel-overview">
+
+                <div class="funnel-grid">
+                    <div class="funnel-card">
+                        <p class="funnel-card-title">Registration Funnel</p>
+                        <p class="funnel-card-period">Last 30 days</p>
+                        <div class="funnel-steps" id="registrationFunnel"></div>
+                    </div>
+                    <div class="funnel-card">
+                        <p class="funnel-card-title">Exam Payment Funnel</p>
+                        <p class="funnel-card-period">Last 30 days</p>
+                        <div class="funnel-steps" id="paymentFunnel"></div>
+                    </div>
+                </div>
+
+                <div class="section-header mb-4">
+                    <h2 class="section-title">Exam Outcomes by Course</h2>
+                </div>
+                <div class="card mb-6">
+                    <div id="courseOutcomes">
+                        <p class="text-center text-muted" style="padding: var(--space-6) 0;">Loading...</p>
+                    </div>
+                </div>
+
+                <div class="section-header mb-4">
+                    <h2 class="section-title">Users Who May Need Support</h2>
+                </div>
+                <div class="signals-grid">
+                    <div class="card">
+                        <div class="signal-card-header">
+                            <span class="signal-card-icon">🔐</span>
+                            <span class="signal-card-title">Repeated Failed Logins</span>
+                        </div>
+                        <div id="signalFailedLogins"></div>
+                    </div>
+                    <div class="card">
+                        <div class="signal-card-header">
+                            <span class="signal-card-icon">📝</span>
+                            <span class="signal-card-title">Repeated Exam Failures</span>
+                        </div>
+                        <div id="signalExamFailures"></div>
+                    </div>
+                    <div class="card">
+                        <div class="signal-card-header">
+                            <span class="signal-card-icon">💳</span>
+                            <span class="signal-card-title">Abandoned Payments</span>
+                        </div>
+                        <div id="signalAbandonedPayments"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ACTIVITY FEED TAB -->
+            <div class="analytics-panel" id="panel-feed">
+
+                <div class="feed-toolbar">
+                    <input type="text" class="form-input" id="feedSearch" placeholder="Search by email...">
+                    <select class="filter-select" id="feedEventFilter">
+                        <option value="">All Events</option>
+                        <option value="user_registered">Registered</option>
+                        <option value="registration_payment_verified">Registration Paid</option>
+                        <option value="login_success">Login Success</option>
+                        <option value="login_failed">Login Failed</option>
+                        <option value="password_changed">Password Changed</option>
+                        <option value="password_reset_completed">Password Reset</option>
+                        <option value="exam_started">Exam Started</option>
+                        <option value="exam_passed">Exam Passed</option>
+                        <option value="exam_failed">Exam Failed</option>
+                        <option value="exam_timed_out">Exam Timed Out</option>
+                        <option value="certificate_generated">Certificate Generated</option>
+                        <option value="certificate_payment_verified">Exam Payment Verified</option>
+                    </select>
+                </div>
+
+                <div class="card">
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Event</th>
+                                    <th>User</th>
+                                    <th>Details</th>
+                                    <th>When</th>
+                                </tr>
+                            </thead>
+                            <tbody id="feedTable">
+                                <tr><td colspan="4" class="text-center text-muted">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="feed-pagination">
+                        <span id="feedPageInfo"></span>
+                        <div style="display: flex; gap: var(--space-2);">
+                            <button class="btn btn-outline btn-sm" id="feedPrevBtn">← Previous</button>
+                            <button class="btn btn-outline btn-sm" id="feedNextBtn">Next →</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- USER TIMELINE PANEL -->
+<div class="timeline-overlay hidden" id="timelineOverlay">
+    <div class="timeline-panel">
+        <div class="timeline-panel-header">
+            <div>
+                <p class="timeline-user-name" id="timelineUserName">—</p>
+                <p class="timeline-user-email" id="timelineUserEmail">—</p>
+            </div>
+            <button class="modal-close" id="closeTimelineBtn">✕</button>
+        </div>
+        <div id="timelineEntries"></div>
+    </div>
+</div>
+
+<script src="../../js/config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/store.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/utils.js"></script>
+<script src="../../js/pages/admin/analytics.js"></script>
+
+</body>
+</html>
