@@ -73,6 +73,72 @@ const init = async () => {
         return "badge-info";
     };
 
+// ── DATA BACKUPS ──
+    const backupStatusEl = document.getElementById("backupStatus");
+    const fullBackupBtn = document.getElementById("fullBackupBtn");
+    const incrementalBackupBtn = document.getElementById("incrementalBackupBtn");
+
+    const loadBackupStatus = async () => {
+        try {
+            const status = await api.get("/backup/status");
+            if (!status.lastBackup) {
+                backupStatusEl.textContent = "No backups have been taken yet. Run a full backup now.";
+            } else {
+                backupStatusEl.textContent =
+                    `Last backup: ${Utils.formatDate(status.lastBackup)} (${status.lastBackupType}). ` +
+                    `Last full backup: ${status.lastFullBackup ? Utils.formatDate(status.lastFullBackup) : "none yet"}.`;
+            }
+        } catch (error) {
+            backupStatusEl.textContent = "Could not check backup status.";
+        }
+    };
+
+    const downloadBackup = async (mode, btn) => {
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = "Preparing...";
+
+        try {
+            const token = sessionStorage.getItem("kb_token");
+            const response = await fetch(`${CONFIG.API_BASE_URL}/backup/export?mode=${mode}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (!response.ok) {
+                const body = await response.json().catch(() => ({}));
+                throw new Error(body.message || "Backup export failed");
+            }
+
+            const blob = await response.blob();
+            const disposition = response.headers.get("Content-Disposition") || "";
+            const match = disposition.match(/filename=([^;]+)/);
+            const filename = match ? match[1].trim() : `asodem-backup-${mode}.json`;
+
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+
+            Utils.toast("Backup downloaded successfully", "success");
+            await loadBackupStatus();
+
+        } catch (error) {
+            Utils.toast(error.message || "Backup download failed", "error");
+        } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
+    };
+
+    fullBackupBtn.addEventListener("click", () => downloadBackup("full", fullBackupBtn));
+    incrementalBackupBtn.addEventListener("click", () => downloadBackup("incremental", incrementalBackupBtn));
+
+    loadBackupStatus();
+
     // ── LOAD ERRORS ──
     const loadErrors = async () => {
         errorList.innerHTML = `
