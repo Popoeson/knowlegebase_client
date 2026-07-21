@@ -99,8 +99,11 @@ const init = async () => {
         btn.textContent = "Preparing...";
 
         try {
+            const zipToggle = document.getElementById("zipFormatToggle");
+            const format = zipToggle.checked ? "zip" : "json";
+
             const token = sessionStorage.getItem("kb_token");
-            const response = await fetch(`${CONFIG.API_BASE_URL}/backup/export?mode=${mode}`, {
+            const response = await fetch(`${CONFIG.API_BASE_URL}/backup/export?mode=${mode}&format=${format}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
