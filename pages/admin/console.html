@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Monitor — ASODEM Admin</title>
+
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/reset.css">
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="../../css/pages/dashboard.css">
+    <link rel="stylesheet" href="../../css/pages/errors.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span class="sidebar-brand-name">ASO<span>DEM</span></span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Admin Panel</p>
+                <a href="./dashboard.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="./users.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">👥</span>
+                    Users
+                </a>
+                <a href="./courses.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📚</span>
+                    Courses
+                </a>
+                <a href="./questions.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🧠</span>
+                    Questions
+                </a>
+                <a href="./certificates.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🏆</span>
+                    Certificates
+                </a>
+                <a href="./transactions.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">💳</span>
+                    Transactions
+                </a>
+                <a href="./console.html" class="sidebar-nav-item active">
+                    <span class="sidebar-nav-icon">🩺</span>
+                    Error Monitor
+                </a>
+            </div>
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Account</p>
+                <a href="./profile.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">👤</span>
+                    Profile
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar" id="sidebarAvatar"></div>
+                <div class="sidebar-user-info">
+                    <p class="sidebar-user-name" id="sidebarName"></p>
+                    <p class="sidebar-user-role">Administrator</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- OVERLAY -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <h1 class="topbar-title">Error Monitor</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle">🌙</button>
+                <div class="topbar-avatar" id="topbarAvatar"></div>
+            </div>
+        </header>
+
+        <main class="page-content">
+
+<!-- DATA BACKUPS -->
+            <div class="card mb-6">
+                <div class="section-header mb-4">
+                    <h2 class="section-title">Data Backups</h2>
+                </div>
+                <p class="text-muted" style="font-size: var(--text-sm); margin-bottom: var(--space-2);" id="backupStatus">
+                    Checking backup history...
+                </p>
+                <p class="text-muted" style="font-size: var(--text-xs); margin-bottom: var(--space-4);">
+                    Full backup downloads everything. "Since last backup" only downloads what's changed —
+                    faster, but on its own it won't capture anything that's been deleted, so do a full
+                    backup periodically regardless.
+                </p>
+                <div style="display: flex; gap: var(--space-3);">
+                    <button class="btn btn-primary btn-sm" id="fullBackupBtn">⬇ Full Backup</button>
+                    <button class="btn btn-outline btn-sm" id="incrementalBackupBtn">⬇ Since Last Backup</button>
+                </div>
+            </div>
+
+            <!-- STATS -->
+            <div class="error-stats">
+                <div class="error-stat-card">
+                    <span class="error-stat-label">Unresolved Issues</span>
+                    <span class="error-stat-value" id="statTotal">—</span>
+                </div>
+                <div class="error-stat-card">
+                    <span class="error-stat-label">Total Occurrences (14 days)</span>
+                    <span class="error-stat-value" id="statOccurrences">—</span>
+                </div>
+                <div class="error-stat-card">
+                    <span class="error-stat-label">Users Affected</span>
+                    <span class="error-stat-value" id="statUsers">—</span>
+                </div>
+            </div>
+
+            <!-- TOOLBAR -->
+            <div class="error-toolbar">
+                <input
+                    type="text"
+                    class="form-input"
+                    id="searchInput"
+                    placeholder="Search errors..."
+                >
+                <button class="btn btn-outline btn-sm" id="refreshBtn">
+                    ↻ Refresh
+                </button>
+            </div>
+
+            <!-- LIST -->
+            <div class="section-header mb-4">
+                <h2 class="section-title">
+                    Recent Errors
+                    <span id="errorsCount" class="text-muted"
+                        style="font-size: var(--text-sm); font-weight: 400;"></span>
+                </h2>
+            </div>
+
+            <div class="error-list" id="errorList">
+                <div class="card">
+                    <p class="text-center text-muted" style="padding: var(--space-8) 0;">Loading...</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script src="../../js/config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/store.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/utils.js"></script>
+<script src="../../js/pages/admin/console.js"></script>
+
+</body>
+</html>
