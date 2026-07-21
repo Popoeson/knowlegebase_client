@@ -96,7 +96,49 @@
 
         <main class="page-content">
 
-<!-- DATA BACKUPS -->
+            <div class="em-header">
+                <div>
+                    <p class="em-header-sub">Last 14 days · production</p>
+                </div>
+                <span class="em-live-badge"><span class="em-live-dot"></span> Live</span>
+            </div>
+
+            <div class="error-stats">
+                <div class="error-stat-card">
+                    <div class="error-stat-top">
+                        <span class="error-stat-label">Unresolved</span>
+                        <span class="error-stat-icon warn">⚠️</span>
+                    </div>
+                    <span class="error-stat-value" id="statTotal">—</span>
+                    <span class="error-stat-sub">Open issues</span>
+                </div>
+                <div class="error-stat-card">
+                    <div class="error-stat-top">
+                        <span class="error-stat-label">Occurrences</span>
+                        <span class="error-stat-icon">⚡</span>
+                    </div>
+                    <span class="error-stat-value" id="statOccurrences">—</span>
+                    <span class="error-stat-sub">Total events (14d)</span>
+                </div>
+                <div class="error-stat-card">
+                    <div class="error-stat-top">
+                        <span class="error-stat-label">Users Affected</span>
+                        <span class="error-stat-icon">👥</span>
+                    </div>
+                    <span class="error-stat-value" id="statUsers">—</span>
+                    <span class="error-stat-sub">Unique users</span>
+                </div>
+                <div class="error-stat-card">
+                    <div class="error-stat-top">
+                        <span class="error-stat-label">Critical</span>
+                        <span class="error-stat-icon critical">🔔</span>
+                    </div>
+                    <span class="error-stat-value" id="statCritical">—</span>
+                    <span class="error-stat-sub">Fatal &amp; errors</span>
+                </div>
+            </div>
+
+            <!-- DATA BACKUPS -->
             <div class="card mb-6">
                 <div class="section-header mb-4">
                     <h2 class="section-title">Data Backups</h2>
@@ -117,44 +159,28 @@
                         Download as ZIP (one file per collection)
                     </label>
                 </div>
-                </div>
             </div>
 
-            <!-- STATS -->
-            <div class="error-stats">
-                <div class="error-stat-card">
-                    <span class="error-stat-label">Unresolved Issues</span>
-                    <span class="error-stat-value" id="statTotal">—</span>
+            <div class="em-toolbar">
+                <div class="em-search">
+                    <span class="em-search-icon">🔍</span>
+                    <input type="text" class="form-input" id="searchInput" placeholder="Search errors...">
                 </div>
-                <div class="error-stat-card">
-                    <span class="error-stat-label">Total Occurrences (14 days)</span>
-                    <span class="error-stat-value" id="statOccurrences">—</span>
-                </div>
-                <div class="error-stat-card">
-                    <span class="error-stat-label">Users Affected</span>
-                    <span class="error-stat-value" id="statUsers">—</span>
-                </div>
+                <button class="btn btn-outline btn-sm" id="refreshBtn">↻ Refresh</button>
             </div>
 
-            <!-- TOOLBAR -->
-            <div class="error-toolbar">
-                <input
-                    type="text"
-                    class="form-input"
-                    id="searchInput"
-                    placeholder="Search errors..."
-                >
-                <button class="btn btn-outline btn-sm" id="refreshBtn">
-                    ↻ Refresh
-                </button>
+            <div class="em-filter-pills" id="filterPills">
+                <button class="em-pill active" data-level="all">All</button>
+                <button class="em-pill" data-level="fatal">Fatal</button>
+                <button class="em-pill" data-level="error">Errors</button>
+                <button class="em-pill" data-level="warning">Warnings</button>
+                <button class="em-pill" data-level="info">Info</button>
             </div>
 
-            <!-- LIST -->
             <div class="section-header mb-4">
                 <h2 class="section-title">
                     Recent Errors
-                    <span id="errorsCount" class="text-muted"
-                        style="font-size: var(--text-sm); font-weight: 400;"></span>
+                    <span id="errorsCount" class="text-muted" style="font-size: var(--text-sm); font-weight: 400;"></span>
                 </h2>
             </div>
 
@@ -165,6 +191,7 @@
             </div>
 
         </main>
+
     </div>
 </div>
 
