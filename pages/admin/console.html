@@ -109,9 +109,14 @@
                     faster, but on its own it won't capture anything that's been deleted, so do a full
                     backup periodically regardless.
                 </p>
-                <div style="display: flex; gap: var(--space-3);">
+                <div style="display: flex; gap: var(--space-3); align-items: center; flex-wrap: wrap;">
                     <button class="btn btn-primary btn-sm" id="fullBackupBtn">⬇ Full Backup</button>
                     <button class="btn btn-outline btn-sm" id="incrementalBackupBtn">⬇ Since Last Backup</button>
+                    <label style="display: flex; align-items: center; gap: 6px; font-size: var(--text-sm); color: var(--color-text-secondary); margin-left: var(--space-2);">
+                        <input type="checkbox" class="q-checkbox" id="zipFormatToggle" checked>
+                        Download as ZIP (one file per collection)
+                    </label>
+                </div>
                 </div>
             </div>
 
