@@ -201,6 +201,52 @@
     text-align: center;
 }
 
+/* ── QUICK ACTION TILES (admin dashboard shortcuts —
+   deliberately separate from .course-card since these have no
+   thumbnail/price/stats and shouldn't inherit that layout) ── */
+.quick-action-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-base), box-shadow var(--transition-base),
+        border-color var(--transition-base);
+    cursor: pointer;
+}
+
+.quick-action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary);
+}
+
+.quick-action-icon {
+    width: 48px;
+    height: 48px;
+    background-color: rgba(37, 99, 235, 0.1);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-4);
+}
+
+.quick-action-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-2);
+}
+
+.quick-action-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+}
+
 /* ── COURSE DETAIL PAGE ── */
 .course-detail-layout {
     display: grid;
