@@ -145,6 +145,7 @@
 /* ── MAIN CONTENT ── */
 .main-content {
     flex: 1;
+    min-width: 0;
     margin-left: 260px;
     display: flex;
     flex-direction: column;
@@ -245,6 +246,8 @@
 /* ── PAGE CONTENT ── */
 .page-content {
     flex: 1;
+    min-width: 0;
+    overflow-x: hidden;
     padding: var(--space-8);
 }
 
