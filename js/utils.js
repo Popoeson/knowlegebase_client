@@ -1,4 +1,17 @@
 const Utils = {
+    // Escape untrusted text before inserting into innerHTML —
+    // use this any time a template literal injects user-supplied data
+    // (names, bios, course titles, error messages, etc.) into the DOM.
+    escapeHTML: (str) => {
+        if (str === null || str === undefined) return "";
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    },
+
     // Toast notifications
     toast: (message, type = "info", duration = 4000) => {
         let container = document.querySelector(".toast-container");
@@ -10,7 +23,7 @@ const Utils = {
 
         const toast = document.createElement("div");
         toast.className = `toast toast-${type}`;
-        toast.innerHTML = `<span class="toast-message">${message}</span>`;
+        toast.innerHTML = `<span class="toast-message">${Utils.escapeHTML(message)}</span>`;
         container.appendChild(toast);
 
         setTimeout(() => {
