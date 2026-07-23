@@ -328,61 +328,6 @@
     color: var(--color-text-primary);
 }
 
-/* ── COURSE CARDS ── */
-.courses-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: var(--space-6);
-}
-
-.course-card {
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-6);
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition-base);
-    cursor: pointer;
-}
-
-.course-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--color-primary);
-}
-
-.course-card-icon {
-    width: 48px;
-    height: 48px;
-    background-color: rgba(37, 99, 235, 0.1);
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--text-2xl);
-    margin-bottom: var(--space-4);
-}
-
-.course-card-title {
-    font-size: var(--text-base);
-    font-weight: var(--font-semibold);
-    color: var(--color-text-primary);
-    margin-bottom: var(--space-2);
-}
-
-.course-card-desc {
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-4);
-    line-height: 1.5;
-}
-
-.course-card-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
 /* ── EMPTY STATE ── */
 .empty-state {
     text-align: center;
