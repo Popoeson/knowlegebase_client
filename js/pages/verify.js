@@ -45,31 +45,32 @@ const init = () => {
                         <span class="verify-result-icon">✅</span>
                         <span class="verify-result-status valid">Valid Certificate</span>
                     </div>
+
                     <div class="verify-result-details">
                         <div class="verify-detail-item">
                             <span class="verify-detail-label">Certificate Holder</span>
-                            <span class="verify-detail-value">${data.fullName}</span>
+                            <span class="verify-detail-value">${Utils.escapeHTML(data.fullName)}</span>
                         </div>
                         <div class="verify-detail-item">
                             <span class="verify-detail-label">Course</span>
-                            <span class="verify-detail-value">${data.course}</span>
+                            <span class="verify-detail-value">${Utils.escapeHTML(data.course)}</span>
                         </div>
                         <div class="verify-detail-item">
                             <span class="verify-detail-label">Date Issued</span>
-                            <span class="verify-detail-value">${data.issuedAt}</span>
+                            <span class="verify-detail-value">${Utils.escapeHTML(data.issuedAt)}</span>
                         </div>
                         <div class="verify-detail-item">
                             <span class="verify-detail-label">Certificate ID</span>
                             <span class="verify-detail-value"
                                 style="font-family: monospace;">
-                                ${data.certificateId}
+                                ${Utils.escapeHTML(data.certificateId)}
                             </span>
                         </div>
                         <div class="verify-detail-item">
                             <span class="verify-detail-label">Status</span>
                             <span class="verify-detail-value"
                                 style="color: var(--color-success);">
-                                ✅ ${data.message}
+                                ✅ ${Utils.escapeHTML(data.message)}
                             </span>
                         </div>
                     </div>
@@ -88,10 +89,11 @@ const init = () => {
                     <p style="font-size: var(--text-sm);
                         color: var(--color-text-secondary);
                         margin-top: var(--space-3);">
-                        ${data.status === "revoked"
-                            ? "This certificate has been revoked by KNOWLEDGEBASE."
+
+${data.status === "revoked"
+                            ? "This certificate has been revoked by ASODEM."
                             : "No certificate was found with this ID. Please check and try again."}
-                    </p>
+ </p>
                 `;
             }
 
