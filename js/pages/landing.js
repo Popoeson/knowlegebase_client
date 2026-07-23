@@ -79,32 +79,33 @@ const loadFeaturedCourses = async () => {
         featuredCourses.innerHTML = courses.map(course => `
             <div class="course-card"
                 onclick="window.location.href='./pages/courses-public.html'">
-                <p class="course-card-category">
-                    ${course.category?.name || "General"}
-                </p>
-                ${course.thumbnail
-                    ? `<img src="${course.thumbnail}" alt="${course.title}"
-                        style="width: 100%; aspect-ratio: 16 / 9; object-fit: cover;
-                        object-position: top; border-radius: var(--radius-md);
-                        margin-bottom: var(--space-3); display: block;">`
-                    : `<div class="course-card-icon">📘</div>`
-                }
-                <h3 class="course-card-title">${course.title}</h3>
-                <p class="course-card-desc">
-                    ${Utils.truncate(course.description, 100)}
-                </p>
-                <div class="course-card-stats">
-                    <span class="course-card-stat">⏱ ${course.duration} mins</span>
-                    <span class="course-card-stat">
-                        📝 ${course.certificationQuestions} questions
-                    </span>
-                    <span class="course-card-stat">
-                        🎯 ${course.passMark}% pass mark
-                    </span>
+                <div class="course-card-thumb">
+                    <p class="course-card-category">
+                        ${Utils.escapeHTML(course.category?.name || "General")}
+                    </p>
+                    ${course.thumbnail
+                        ? `<img src="${course.thumbnail}" alt="${Utils.escapeHTML(course.title)}">`
+                        : `<div class="course-card-icon">📘</div>`
+                    }
                 </div>
-                <div class="course-card-meta">
-                    <span class="badge badge-info">${course.difficulty}</span>
-                    <span class="course-card-price">$${course.price}</span>
+                <div class="course-card-body">
+                    <h3 class="course-card-title">${Utils.escapeHTML(course.title)}</h3>
+                    <p class="course-card-desc">
+                        ${Utils.escapeHTML(Utils.truncate(course.description, 100))}
+                    </p>
+                    <div class="course-card-stats">
+                        <span class="course-card-stat">⏱ ${course.duration} mins</span>
+                        <span class="course-card-stat">
+                            📝 ${course.certificationQuestions} questions
+                        </span>
+                        <span class="course-card-stat">
+                            🎯 ${course.passMark}% pass mark
+                        </span>
+                    </div>
+                    <div class="course-card-meta">
+                        <span class="badge ${Utils.difficultyBadgeClass(course.difficulty)}">${course.difficulty}</span>
+                        <span class="course-card-price">$${course.price}</span>
+                    </div>
                 </div>
             </div>
         `).join("");
