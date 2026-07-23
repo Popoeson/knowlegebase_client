@@ -405,24 +405,10 @@
     }
 }
 
-@media (max-width: 480px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-}
 
 @media (max-width: 640px) {
     .stats-grid {
         grid-template-columns: 1fr 1fr;
     }
 
-    .welcome-banner {
-        flex-direction: column;
-        text-align: center;
-        gap: var(--space-4);
-    }
-
-    .courses-grid {
-        grid-template-columns: 1fr;
-    }
-}
+    
