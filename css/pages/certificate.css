@@ -125,6 +125,13 @@
     background: linear-gradient(90deg, #C9A84C, #F0D080, #C9A84C);
 }
 
+.cert-logo {
+    display: block;
+    max-height: 56px;
+    width: auto;
+    margin: 0 auto var(--space-3);
+}
+
 .cert-brand {
     font-family: var(--font-heading);
     font-size: 2rem;
