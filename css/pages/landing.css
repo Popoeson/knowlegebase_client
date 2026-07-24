@@ -156,7 +156,7 @@
     height: 32px;
     border-radius: 50%;
     border: 2px solid #0F172A;
-    background: linear-gradient(135deg, #2563EB, #1D4ED8);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -334,7 +334,7 @@
     left: 10%;
     right: 10%;
     height: 2px;
-    background: linear-gradient(90deg, transparent, #2563EB, #C9A84C, #2563EB, transparent);
+    background: linear-gradient(90deg, transparent, var(--color-primary), #C9A84C, var(--color-primary), transparent);
 }
 
 .step-card {
@@ -347,7 +347,7 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-primary), #1D4ED8);
+    background: linear-gradient(135deg, background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
     color: #FFFFFF;
     font-size: var(--text-2xl);
     font-weight: var(--font-bold);
@@ -381,7 +381,7 @@
 }
 
 /* ══════════════════════════════════════
-   WHY KNOWLEDGEBASE
+   WHY ASODEM
 ══════════════════════════════════════ */
 .why-section {
     background-color: var(--color-surface);
@@ -553,10 +553,11 @@
 }
 
 .testimonial-avatar {
+    .testimonial-avatar {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #2563EB, #C9A84C);
+    background: linear-gradient(135deg, var(--color-primary), #C9A84C);
     display: flex;
     align-items: center;
     justify-content: center;
