@@ -32,7 +32,7 @@ const init = async () => {
 
     const updateThemeIcon = () => {
         const theme = document.documentElement.getAttribute("data-theme");
-        themeToggle.textContent = theme === "dark" ? "\u2600\ufe0f" : "\ud83c\udf19";
+        themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
     };
 
     themeToggle.addEventListener("click", () => {
@@ -51,8 +51,8 @@ const init = async () => {
     if (user) {
         sidebarName.textContent = user.fullName;
         if (user.profilePhoto) {
-            sidebarAvatar.innerHTML = `<img src="${user.profilePhoto}" alt="${user.fullName}">`;
-            topbarAvatar.innerHTML = `<img src="${user.profilePhoto}" alt="${user.fullName}">`;
+            sidebarAvatar.innerHTML = `<img src="${Utils.escapeHTML(user.profilePhoto)}" alt="${Utils.escapeHTML(user.fullName)}">`;
+            topbarAvatar.innerHTML = `<img src="${Utils.escapeHTML(user.profilePhoto)}" alt="${Utils.escapeHTML(user.fullName)}">`;
         } else {
             sidebarAvatar.innerHTML = defaultAvatar;
             topbarAvatar.innerHTML = defaultAvatar;
@@ -78,7 +78,7 @@ const init = async () => {
         } else {
             certificateContent.innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-state-icon">\u26a0\ufe0f</div>
+                    <div class="empty-state-icon">⚠️</div>
                     <h3 class="empty-state-title">No certificate specified</h3>
                     <a href="./certificates.html" class="btn btn-primary mt-4">My Certificates</a>
                 </div>`;
@@ -97,17 +97,17 @@ const init = async () => {
         certificateContent.innerHTML = `
             <div class="certificate-view-wrapper">
                 <div class="certificate-actions-bar">
-                    <a href="./certificates.html" class="btn btn-ghost btn-sm">\u2190 My Certificates</a>
+                    <a href="./certificates.html" class="btn btn-ghost btn-sm">← My Certificates</a>
                     ${certificate.pdfUrl ? `
                         <a href="${certificate.pdfUrl}" target="_blank" download
                             class="btn btn-primary btn-sm">
-                            \u2b07 Download PDF
+                            ⬇ Download PDF
                         </a>` : ""}
                     <button class="btn btn-outline btn-sm" id="shareBtn">
-                        \ud83d\udd17 Copy Verification Link
+                        🔗 Copy Verification Link
                     </button>
                     <a href="${verifyUrl}" target="_blank" class="btn btn-ghost btn-sm">
-                        \ud83d\udd0d Verify Certificate
+                        🔍 Verify Certificate
                     </a>
                 </div>
 
@@ -120,15 +120,15 @@ const init = async () => {
                         <div class="cert-watermark">ASO</div>
                         <div class="cert-achievement-title">Certificate of Achievement</div>
                         <p class="cert-certifies">This certifies that</p>
-                        <h2 class="cert-name">${user.fullName}</h2>
+                        <h2 class="cert-name">${Utils.escapeHTML(user.fullName)}</h2>
                         <div class="cert-name-underline"></div>
                         <p class="cert-completed-text">
                             has successfully completed and passed the certification exam in
                         </p>
-                        <h3 class="cert-course-name">${certificate.course?.title || "\u2014"}</h3>
+                        <h3 class="cert-course-name">${Utils.escapeHTML(certificate.course?.title || "—")}</h3>
                         <div class="cert-divider">
                             <div class="cert-divider-line"></div>
-                            <div class="cert-divider-diamond">\u25c6</div>
+                            <div class="cert-divider-diamond">◆</div>
                             <div class="cert-divider-line"></div>
                         </div>
                         <div class="cert-footer">
@@ -137,11 +137,11 @@ const init = async () => {
                                 <p class="cert-footer-value">${issuedDate}</p>
                             </div>
                             <div class="cert-seal">
-                                <div class="cert-seal-text">\u2726<br>VERIFIED<br>ASODEM<br>\u2726</div>
+                                <div class="cert-seal-text">✦<br>VERIFIED<br>ASODEM<br>✦</div>
                             </div>
                             <div class="cert-footer-item">
                                 <p class="cert-footer-label">Certificate ID</p>
-                                <p class="cert-footer-value">${certificate.certificateId}</p>
+                                <p class="cert-footer-value">${Utils.escapeHTML(certificate.certificateId)}</p>
                             </div>
                         </div>
                     </div>
@@ -174,8 +174,8 @@ const init = async () => {
 
         certificateContent.innerHTML = `
             <div class="empty-state">
-                <div class="empty-state-icon">\u26a0\ufe0f</div>
-                <h3 class="empty-state-title">${error.message}</h3>
+                <div class="empty-state-icon">⚠️</div>
+                <h3 class="empty-state-title">${Utils.escapeHTML(error.message)}</h3>
                 <a href="./dashboard.html" class="btn btn-primary mt-4">Go to Dashboard</a>
             </div>`;
     }
