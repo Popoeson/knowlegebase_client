@@ -120,7 +120,7 @@ const init = async () => {
                         <div class="cert-watermark">ASO</div>
                         <div class="cert-achievement-title">Certificate of Achievement</div>
                         <p class="cert-certifies">This certifies that</p>
-                        <h2 class="cert-name">${Utils.escapeHTML(user.fullName)}</h2>
+                        <h2 class="cert-name">${Utils.escapeHTML(certificate.userFullNameSnapshot || user.fullName)}</h2>
                         <div class="cert-name-underline"></div>
                         <p class="cert-completed-text">
                             has successfully completed and passed the certification exam in
