@@ -347,7 +347,7 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
     color: #FFFFFF;
     font-size: var(--text-2xl);
     font-weight: var(--font-bold);
@@ -553,7 +553,6 @@
 }
 
 .testimonial-avatar {
-    .testimonial-avatar {
     width: 44px;
     height: 44px;
     border-radius: 50%;
