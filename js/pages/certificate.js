@@ -163,14 +163,8 @@ const init = async () => {
     } catch (error) {
         Utils.hideLoader();
 
-        // Payment required — redirect to certificate payment page
-        if (error.message.includes("Payment required") || error.message.includes("payment")) {
-            Utils.toast("Please complete payment to get your certificate.", "warning");
-            setTimeout(() => {
-                window.location.href = `./certificate-payment.html?attemptId=${attemptId}&courseId=${params.get("courseId") || ""}`;
-            }, 1500);
-            return;
-        }
+       
+ 
 
         certificateContent.innerHTML = `
             <div class="empty-state">
