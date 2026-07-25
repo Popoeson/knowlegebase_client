@@ -94,52 +94,51 @@ const renderCourses = (courses) => {
 
 coursesGrid.innerHTML = courses.map(course => `
     <div class="course-card">
-        <p class="course-card-category">
-            ${course.category?.name || "General"}
-        </p>
-        ${course.thumbnail
-            ? `<img src="${course.thumbnail}" alt="${course.title}"
-                style="width: 100%; aspect-ratio: 16 / 9; object-fit: cover;
-                object-position: top; border-radius: var(--radius-md);
-                margin-bottom: var(--space-3); display: block;">`
-            : `<div class="course-card-icon">📘</div>`
-        }
-        <h3 class="course-card-title">${course.title}</h3>
-        <p class="course-card-desc">
-            ${Utils.truncate(course.description, 100)}
-        </p>
-        <div class="course-card-stats">
-            <span class="course-card-stat">⏱ ${course.duration} mins</span>
-            <span class="course-card-stat">
-                📝 ${course.certificationQuestions} questions
-            </span>
-            <span class="course-card-stat">
-                🎯 ${course.passMark}% pass mark
-            </span>
+        <div class="course-card-thumb">
+            <p class="course-card-category">
+                ${Utils.escapeHTML(course.category?.name || "General")}
+            </p>
+            ${course.thumbnail
+                ? `<img src="${course.thumbnail}" alt="${Utils.escapeHTML(course.title)}">`
+                : `<div class="course-card-icon">📘</div>`
+            }
         </div>
-        <div class="course-card-meta" style="margin-bottom: var(--space-4);">
-            <span class="badge badge-info">${course.difficulty}</span>
-            <span class="course-card-price">${formatPrice(course.price)}</span>
-        </div>
-        <div style="display: flex; gap: var(--space-2);">
-            <a
-                href="${Auth.isLoggedIn()
-                    ? `./exam.html?id=${course._id}&type=practice`
-                    : `./register.html`}"
-                class="btn btn-ghost btn-sm"
-                style="flex: 1; text-align: center;"
-            >
-                Practice Free
-            </a>
-            <a
-                href="${Auth.isLoggedIn()
-                    ? `./payment.html?id=${course._id}`
-                    : `./register.html`}"
-                class="btn btn-primary btn-sm"
-                style="flex: 1; text-align: center;"
-            >
-                Get Certified
-            </a>
+        <div class="course-card-body">
+            <h3 class="course-card-title">${Utils.escapeHTML(course.title)}</h3>
+            <p class="course-card-desc">
+                ${Utils.escapeHTML(Utils.truncate(course.description, 100))}
+            </p>
+            <div class="course-card-stats">
+                <span class="course-card-stat">⏱ ${course.duration} mins</span>
+                <span class="course-card-stat">
+                    📝 ${course.certificationQuestions} questions
+                </span>
+                <span class="course-card-stat">
+                    🎯 ${course.passMark}% pass mark
+                </span>
+            </div>
+            <div class="course-card-meta">
+                <span class="badge ${Utils.difficultyBadgeClass(course.difficulty)}">${course.difficulty}</span>
+                <span class="course-card-price">${formatPrice(course.price)}</span>
+            </div>
+            <div class="course-card-actions">
+                <a
+                    href="${Auth.isLoggedIn()
+                        ? `./exam.html?id=${course._id}&type=practice`
+                        : `./register.html`}"
+                    class="btn btn-ghost btn-sm"
+                >
+                    Practice Free
+                </a>
+                <a
+                    href="${Auth.isLoggedIn()
+                        ? `./payment.html?id=${course._id}`
+                        : `./register.html`}"
+                    class="btn btn-primary btn-sm"
+                >
+                    Get Certified
+                </a>
+            </div>
         </div>
     </div>
 `).join("");

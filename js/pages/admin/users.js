@@ -57,8 +57,8 @@ const init = async () => {
     if (user) {
         sidebarName.textContent = user.fullName;
         if (user.profilePhoto) {
-            sidebarAvatar.innerHTML = `<img src="${user.profilePhoto}" alt="${user.fullName}">`;
-            topbarAvatar.innerHTML = `<img src="${user.profilePhoto}" alt="${user.fullName}">`;
+            sidebarAvatar.innerHTML = `<img src="${user.profilePhoto}" alt="${Utils.escapeHTML(user.fullName)}">`;
+            topbarAvatar.innerHTML = `<img src="${user.profilePhoto}" alt="${Utils.escapeHTML(user.fullName)}">`;
         } else {
             sidebarAvatar.innerHTML = defaultAvatar;
             topbarAvatar.innerHTML = defaultAvatar;
@@ -127,12 +127,12 @@ const init = async () => {
                             color: white; flex-shrink: 0; overflow: hidden;">
                             ${user.profilePhoto
                                 ? `<img src="${user.profilePhoto}" style="width:100%;height:100%;object-fit:cover;">`
-                                : user.firstName[0] + user.surname[0]}
+                                : Utils.escapeHTML(user.firstName[0] + user.surname[0])}
                         </div>
-                        <span>${user.fullName}</span>
+                        <span>${Utils.escapeHTML(user.fullName)}</span>
                     </div>
                 </td>
-                <td>${user.email}</td>
+                <td>${Utils.escapeHTML(user.email)}</td>
                 <td>
                     <span class="badge ${user.isVerified ? "badge-success" : "badge-error"}">
                         ${user.isVerified ? "Verified" : "Unverified"}
@@ -148,7 +148,7 @@ const init = async () => {
                         >👁</button>
                         <button
                             class="btn-icon btn-icon-delete"
-                            onclick="confirmDelete('${user._id}', '${user.fullName}')"
+                            onclick="confirmDelete('${user._id}')"
                             title="Delete"
                         >🗑️</button>
                     </div>
@@ -187,15 +187,15 @@ const init = async () => {
         document.getElementById("userDetailContent").innerHTML = `
             <div class="profile-info-item">
                 <span class="profile-info-label">Full Name</span>
-                <span class="profile-info-value">${user.fullName}</span>
+                <span class="profile-info-value">${Utils.escapeHTML(user.fullName)}</span>
             </div>
             <div class="profile-info-item">
                 <span class="profile-info-label">Email</span>
-                <span class="profile-info-value">${user.email}</span>
+                <span class="profile-info-value">${Utils.escapeHTML(user.email)}</span>
             </div>
             <div class="profile-info-item">
                 <span class="profile-info-label">Phone</span>
-                <span class="profile-info-value">${user.phone || "—"}</span>
+                <span class="profile-info-value">${Utils.escapeHTML(user.phone) || "—"}</span>
             </div>
             <div class="profile-info-item">
                 <span class="profile-info-label">Status</span>
@@ -211,7 +211,7 @@ const init = async () => {
             </div>
             <div class="profile-info-item">
                 <span class="profile-info-label">Bio</span>
-                <span class="profile-info-value">${user.bio || "—"}</span>
+                <span class="profile-info-value">${Utils.escapeHTML(user.bio) || "—"}</span>
             </div>
         `;
 
@@ -219,8 +219,9 @@ const init = async () => {
     };
 
     // ── CONFIRM DELETE (GLOBAL) ──
-    window.confirmDelete = (id, name) => {
-        document.getElementById("deleteUserName").textContent = name;
+    window.confirmDelete = (id) => {
+        const user = allUsers.find(u => u._id === id);
+        document.getElementById("deleteUserName").textContent = user ? user.fullName : "";
         document.getElementById("deleteUserId").value = id;
         openModal(deleteModal);
     };
