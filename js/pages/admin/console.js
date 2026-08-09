@@ -7,6 +7,11 @@ const init = async () => {
         return;
     }
 
+    if (!Auth.isSuperAdmin()) {
+        window.location.href = "./dashboard.html";
+        return;
+    }
+
     // ── ELEMENT REFERENCES ──
     const sidebar = document.getElementById("sidebar");
     const hamburger = document.getElementById("hamburger");
