@@ -149,13 +149,13 @@
                     <option value="pending">Pending</option>
                     <option value="failed">Failed</option>
                 </select>
-                <button class="btn btn-outline btn-sm" id="downloadBtn">
+                <button class="btn btn-outline btn-sm superadmin-only" id="downloadBtn">
                     ⬇ Download
                 </button>
             </div>
 
             <!-- BULK TOOLBAR -->
-            <div class="bulk-toolbar mb-4">
+            <div class="bulk-toolbar mb-4 superadmin-only">
                 <div class="bulk-toolbar-left">
                     <label class="bulk-select-all">
                         <input type="checkbox" class="q-checkbox" id="selectAllCheckbox">
@@ -182,7 +182,7 @@
                     <table class="admin-table">
                         <thead>
                             <tr>
-                                <th style="width: 40px;"></th>
+                                <th style="width: 40px;" class="superadmin-only"></th>
                                 <th>#</th>
                                 <th>User</th>
                                 <th>Type</th>
