@@ -49,6 +49,11 @@ const init = async () => {
 
     updateThemeIcon();
 
+   // ── SUPERADMIN-ONLY SIDEBAR ITEMS ──
+    document.querySelectorAll(".superadmin-only").forEach(el => {
+        if (!Auth.isSuperAdmin()) el.style.display = "none";
+    });
+
     // ── PASSWORD TOGGLES ──
     const setupToggle = (btnId, inputId) => {
         document.getElementById(btnId).addEventListener("click", () => {
