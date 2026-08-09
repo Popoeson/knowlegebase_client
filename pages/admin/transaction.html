@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transactions — KNOWLEDGEBASE Admin</title>
+    <title>Transactions — ASODEM Admin</title>
 
     <link rel="stylesheet" href="../../css/variables.css">
     <link rel="stylesheet" href="../../css/reset.css">
@@ -19,7 +19,9 @@
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <span class="sidebar-brand-name">KNOWLEDGE<span>BASE</span></span>
+            <span class="navbar-brand">
+    <img src="../../asset/images/logo3.png" alt="ASODEM Logo" class="navbar-logo">
+</span>
         </div>
 
         <nav class="sidebar-nav">
@@ -49,13 +51,17 @@
                     <span class="sidebar-nav-icon">💳</span>
                     Transactions
                 </a>
-                <a href="./console.html" class="sidebar-nav-item">
+                <a href="./console.html" class="sidebar-nav-item superadmin-only">
                     <span class="sidebar-nav-icon">🩺</span>
                     Error Monitor
                 </a>
                 <a href="./analytics.html" class="sidebar-nav-item">
                     <span class="sidebar-nav-icon">📈</span>
                     Analytics
+                </a>
+                <a href="./admin-management.html" class="sidebar-nav-item superadmin-only">
+                    <span class="sidebar-nav-icon">🛡️</span>
+                    Admin Management
                 </a>
             </div>
             <div class="sidebar-nav-section">
@@ -143,13 +149,13 @@
                     <option value="pending">Pending</option>
                     <option value="failed">Failed</option>
                 </select>
-                <button class="btn btn-outline btn-sm" id="downloadBtn">
+                <button class="btn btn-outline btn-sm superadmin-only" id="downloadBtn">
                     ⬇ Download
                 </button>
             </div>
 
             <!-- BULK TOOLBAR -->
-            <div class="bulk-toolbar mb-4">
+            <div class="bulk-toolbar mb-4 superadmin-only">
                 <div class="bulk-toolbar-left">
                     <label class="bulk-select-all">
                         <input type="checkbox" class="q-checkbox" id="selectAllCheckbox">
@@ -176,7 +182,7 @@
                     <table class="admin-table">
                         <thead>
                             <tr>
-                                <th style="width: 40px;"></th>
+                                <th style="width: 40px;" class="superadmin-only"></th>
                                 <th>#</th>
                                 <th>User</th>
                                 <th>Type</th>

@@ -44,6 +44,11 @@ const init = async () => {
     });
 
     updateThemeIcon();
+   
+    // ── SUPERADMIN-ONLY SIDEBAR ITEMS ──
+    document.querySelectorAll(".superadmin-only").forEach(el => {
+        if (!Auth.isSuperAdmin()) el.style.display = "none";
+    });
 
     // ── DEFAULT AVATAR ──
     const defaultAvatar = `
@@ -137,7 +142,7 @@ const init = async () => {
                         ${cert.status === "active" ? "✅ Active" : "🚫 Revoked"}
                     </span>
                 </td>
-                <td>
+               <td>
                     <div class="table-actions">
                         <a
                             href="../../pages/verify.html?id=${cert.certificateId}"
@@ -145,11 +150,12 @@ const init = async () => {
                             class="btn-icon btn-icon-edit"
                             title="Verify"
                         >🔍</a>
+                        ${Auth.isSuperAdmin() ? `
                         <button
                             class="btn-icon ${cert.status === "active" ? "btn-icon-delete" : "btn-icon-toggle"}"
                             onclick="toggleRevoke('${cert._id}', '${cert.certificateId}', '${cert.status}')"
                             title="${cert.status === "active" ? "Revoke" : "Reinstate"}"
-                        >${cert.status === "active" ? "🚫" : "✅"}</button>
+                        >${cert.status === "active" ? "🚫" : "✅"}</button>` : ""}
                     </div>
                 </td>
             </tr>
@@ -180,6 +186,10 @@ const init = async () => {
 
     // ── TOGGLE REVOKE (GLOBAL) ──
     window.toggleRevoke = (id, certId, currentStatus) => {
+        if (!Auth.isSuperAdmin()) {
+            Utils.toast("You don't have permission to revoke or reinstate certificates.", "error");
+            return;
+        }
         const isRevoking = currentStatus === "active";
 
         document.getElementById("revokeModalTitle").textContent = isRevoking

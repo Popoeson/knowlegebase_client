@@ -7,6 +7,11 @@ const init = async () => {
         return;
     }
 
+    if (!Auth.isSuperAdmin()) {
+        window.location.href = "./courses.html";
+        return;
+    }
+
     // ── ELEMENT REFERENCES ──
     const sidebar = document.getElementById("sidebar");
     const hamburger = document.getElementById("hamburger");
@@ -46,6 +51,11 @@ const init = async () => {
     });
 
     updateThemeIcon();
+
+// ── SUPERADMIN-ONLY SIDEBAR ITEMS ──
+    document.querySelectorAll(".superadmin-only").forEach(el => {
+        if (!Auth.isSuperAdmin()) el.style.display = "none";
+    });
 
     // ── DEFAULT AVATAR ──
     const defaultAvatar = `

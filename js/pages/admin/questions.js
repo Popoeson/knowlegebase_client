@@ -57,6 +57,11 @@ const init = async () => {
     });
 
     updateThemeIcon();
+     
+     // ── SUPERADMIN-ONLY SIDEBAR ITEMS ──
+    document.querySelectorAll(".superadmin-only").forEach(el => {
+        if (!Auth.isSuperAdmin()) el.style.display = "none";
+    });
 
     // ── DEFAULT AVATAR ──
     const defaultAvatar = `
@@ -375,6 +380,21 @@ const init = async () => {
             </div>
         `).join("");
 
+        // View-only lock: regular admins can see course cards (title +
+        // question counts) but cannot expand them — every destructive
+        // action (edit/delete/bulk-upload/AI-gen) lives inside the
+        // expanded body, so keeping it closed is the actual boundary,
+        // not just a hidden button.
+        if (!Auth.isSuperAdmin()) {
+            document.querySelectorAll(".course-accordion-header").forEach(header => {
+                header.style.cursor = "not-allowed";
+                header.title = "View only — expanding requires superadmin access";
+            });
+            document.querySelectorAll(".course-accordion-arrow").forEach(arrow => {
+                arrow.textContent = "🔒";
+            });
+        }
+
         // Load counts for all courses
         allCourses.forEach(async (course) => {
             const counts = await getQuestionCounts(course._id);
@@ -394,6 +414,11 @@ const init = async () => {
 
     // ── TOGGLE ACCORDION ──
     window.toggleAccordion = async (courseId) => {
+        if (!Auth.isSuperAdmin()) {
+            Utils.toast("You don't have permission to view question details.", "error");
+            return;
+        }
+
         const body = document.getElementById(`body_${courseId}`);
         const header = body.previousElementSibling;
         const arrow = document.getElementById(`arrow_${courseId}`);
@@ -709,6 +734,10 @@ const init = async () => {
 
     // ── ADD QUESTION MODAL ──
     document.getElementById("addQuestionBtn").addEventListener("click", () => {
+        if (!Auth.isSuperAdmin()) {
+            Utils.toast("You don't have permission to add questions.", "error");
+            return;
+        }
         document.getElementById("questionModalTitle").textContent = "Add Question";
         document.getElementById("questionId").value = "";
         document.getElementById("qCourse").value = "";
@@ -930,6 +959,10 @@ const init = async () => {
     // ── DOWNLOAD TEMPLATE ──
     document.getElementById("downloadTemplateBtn").addEventListener("click",
         async () => {
+            if (!Auth.isSuperAdmin()) {
+                Utils.toast("You don't have permission to download the template.", "error");
+                return;
+            }
             try {
                 const token = Auth.getToken();
                 const response = await fetch(
@@ -953,8 +986,12 @@ const init = async () => {
         }
     );
 
-    // ── BULK UPLOAD ──
+   // ── BULK UPLOAD ──
     document.getElementById("uploadBtn").addEventListener("click", async () => {
+        if (!Auth.isSuperAdmin()) {
+            Utils.toast("You don't have permission to upload questions.", "error");
+            return;
+        }
         const courseId = document.getElementById("bulkCourse").value;
         const type = document.getElementById("bulkType").value;
         const file = bulkFile.files[0];
@@ -1117,6 +1154,10 @@ const init = async () => {
 
     if (generateBtn) {
         generateBtn.addEventListener("click", async () => {
+            if (!Auth.isSuperAdmin()) {
+                Utils.toast("You don't have permission to generate questions.", "error");
+                return;
+            }
             const courseId = document.getElementById("aiCourse").value;
             const topicName = document.getElementById("aiTopic").value.trim();
             const difficulty = document.getElementById("aiDifficulty").value;
@@ -1169,6 +1210,10 @@ const init = async () => {
 
     if (approveBtn) {
         approveBtn.addEventListener("click", async () => {
+            if (!Auth.isSuperAdmin()) {
+                Utils.toast("You don't have permission to save questions.", "error");
+                return;
+            }
             const courseId = document.getElementById("aiCourse").value;
             const difficulty = document.getElementById("aiDifficulty").value;
             const type = document.getElementById("aiType").value;

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Questions — KNOWLEDGEBASE</title>
+    <title>Manage Questions — ASODEM</title>
 
     <link rel="stylesheet" href="../../css/variables.css">
     <link rel="stylesheet" href="../../css/reset.css">
@@ -19,7 +19,9 @@
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <span class="sidebar-brand-name">KNOWLEDGE<span>BASE</span></span>
+            <span class="navbar-brand">
+    <img src="../../asset/images/logo3.png" alt="ASODEM Logo" class="navbar-logo">
+</span>
         </div>
 
         <nav class="sidebar-nav">
@@ -37,7 +39,7 @@
                     <span class="sidebar-nav-icon">📚</span>
                     Courses
                 </a>
-                <a href="./questions.html" class="sidebar-nav-item active">
+                <a href="./questions.html" class="sidebar-nav-item">
                     <span class="sidebar-nav-icon">🧠</span>
                     Questions
                 </a>
@@ -49,13 +51,17 @@
                     <span class="sidebar-nav-icon">💳</span>
                     Transactions
                 </a>
-                <a href="./console.html" class="sidebar-nav-item">
+                <a href="./console.html" class="sidebar-nav-item superadmin-only">
                     <span class="sidebar-nav-icon">🩺</span>
                     Error Monitor
                 </a>
                 <a href="./analytics.html" class="sidebar-nav-item">
                     <span class="sidebar-nav-icon">📈</span>
                     Analytics
+                </a>
+                <a href="./admin-management.html" class="sidebar-nav-item superadmin-only">
+                    <span class="sidebar-nav-icon">🛡️</span>
+                    Admin Management
                 </a>
             </div>
             <div class="sidebar-nav-section">
@@ -102,7 +108,7 @@
         <main class="page-content">
 
             <!-- TOP ACTIONS BAR -->
-            <div class="courses-filter-bar mb-6">
+            <div class="courses-filter-bar mb-6 superadmin-only">
                 <button class="btn btn-primary btn-sm" id="addQuestionBtn">
                     + Add Question
                 </button>
@@ -112,7 +118,7 @@
             </div>
 
             <!-- BULK UPLOAD SECTION -->
-            <div class="card mb-6">
+            <div class="card mb-6 superadmin-only">
                 <div class="flex-between mb-4">
                     <h3 class="profile-section-title" style="margin:0;">
                         Bulk Upload Questions
@@ -159,7 +165,7 @@
             </div>
 
             <!-- AI QUESTION GENERATION -->
-            <div class="card mb-6" id="aiSection">
+            <div class="card mb-6 superadmin-only" id="aiSection">
                 <div style="display: flex; align-items: center;
                     gap: var(--space-3); margin-bottom: var(--space-2);">
                     <span style="font-size: 1.5rem;">🤖</span>

@@ -44,6 +44,11 @@ const init = async () => {
 
     updateThemeIcon();
 
+    // ── SUPERADMIN-ONLY SIDEBAR ITEMS ──
+    document.querySelectorAll(".superadmin-only").forEach(el => {
+        if (!Auth.isSuperAdmin()) el.style.display = "none";
+    });
+
     // ── DEFAULT AVATAR ──
     const defaultAvatar = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="60%" height="60%">
@@ -106,6 +111,7 @@ const init = async () => {
                         </span>
                     </td>
                     <td>
+                        ${Auth.isSuperAdmin() ? `
                         <div class="table-actions">
                             <button
                                 class="btn-icon btn-icon-edit"
@@ -117,7 +123,7 @@ const init = async () => {
                                 onclick="confirmDelete('${cat._id}', '${cat.name}', 'category')"
                                 title="Delete"
                             >🗑️</button>
-                        </div>
+                        </div>` : `<span class="text-muted" style="font-size: var(--text-sm);">—</span>`}
                     </td>
                 </tr>
             `).join("");
@@ -156,6 +162,7 @@ const init = async () => {
                         </span>
                     </td>
                     <td>
+                        ${Auth.isSuperAdmin() ? `
                         <div class="table-actions">
                             <button
                                 class="btn-icon btn-icon-edit"
@@ -172,7 +179,7 @@ const init = async () => {
                                 onclick="confirmDelete('${course._id}', '${course.title}', 'course')"
                                 title="Delete"
                             >🗑️</button>
-                        </div>
+                        </div>` : `<span class="text-muted" style="font-size: var(--text-sm);">—</span>`}
                     </td>
                 </tr>
             `).join("");
@@ -224,6 +231,10 @@ const init = async () => {
 
     // ── EDIT CATEGORY (GLOBAL) ──
     window.editCategory = (id, name) => {
+        if (!Auth.isSuperAdmin()) {
+            Utils.toast("You don't have permission to edit categories.", "error");
+            return;
+        }
         document.getElementById("categoryModalTitle").textContent = "Edit Category";
         document.getElementById("categoryName").value = name;
         document.getElementById("categoryId").value = id;
@@ -233,6 +244,10 @@ const init = async () => {
 
     // ── TOGGLE COURSE (GLOBAL) ──
     window.toggleCourse = async (id) => {
+        if (!Auth.isSuperAdmin()) {
+            Utils.toast("You don't have permission to change course status.", "error");
+            return;
+        }
         try {
             const response = await api.request(`/admin/courses/${id}/toggle`, { method: "PATCH" });
             Utils.toast(response.message, "success");
@@ -244,6 +259,10 @@ const init = async () => {
 
     // ── CONFIRM DELETE (GLOBAL) ──
     window.confirmDelete = (id, name, type) => {
+        if (!Auth.isSuperAdmin()) {
+            Utils.toast("You don't have permission to delete this item.", "error");
+            return;
+        }
         document.getElementById("deleteItemName").textContent = name;
         document.getElementById("deleteItemId").value = id;
         document.getElementById("deleteItemType").value = type;

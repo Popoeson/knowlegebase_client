@@ -23,7 +23,12 @@ const Auth = {
 
     isAdmin: () => {
         const user = Auth.getUser();
-        return user && user.role === "admin";
+        return user && ["admin", "superadmin"].includes(user.role);
+    },
+
+    isSuperAdmin: () => {
+        const user = Auth.getUser();
+        return user && user.role === "superadmin";
     },
 
     restoreSession: async () => {
@@ -70,8 +75,16 @@ const Auth = {
     }
 },
 
-    requireAuth: () => {
-        if (!Auth.isLoggedIn()) {
+    requireAdmin: () => {
+        if (!Auth.isLoggedIn() || !Auth.isAdmin()) {
+            window.location.href = "/pages/login.html";
+            return false;
+        }
+        return true;
+    },
+
+    requireSuperAdmin: () => {
+        if (!Auth.isLoggedIn() || !Auth.isSuperAdmin()) {
             window.location.href = "/pages/login.html";
             return false;
         }

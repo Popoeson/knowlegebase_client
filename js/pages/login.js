@@ -70,8 +70,8 @@ loginForm.addEventListener("submit", async (e) => {
             password: passwordInput.value
         });
 
-        // Admins always get a full session
-        if (response.user.role === "admin") {
+        // Admins and superadmins always get a full session
+        if (["admin", "superadmin"].includes(response.user.role)) {
             Auth.setSession(response.token, response.user);
             Utils.toast(response.message, "success");
             setTimeout(() => {

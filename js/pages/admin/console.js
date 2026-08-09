@@ -7,6 +7,11 @@ const init = async () => {
         return;
     }
 
+    if (!Auth.isSuperAdmin()) {
+        window.location.href = "./dashboard.html";
+        return;
+    }
+
     // ── ELEMENT REFERENCES ──
     const sidebar = document.getElementById("sidebar");
     const hamburger = document.getElementById("hamburger");
@@ -39,6 +44,11 @@ const init = async () => {
         updateThemeIcon();
     });
     updateThemeIcon();
+
+   // ── SUPERADMIN-ONLY SIDEBAR ITEMS ──
+    document.querySelectorAll(".superadmin-only").forEach(el => {
+        if (!Auth.isSuperAdmin()) el.style.display = "none";
+    });
 
     const defaultAvatar = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="60%" height="60%">
