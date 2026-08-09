@@ -46,6 +46,11 @@ const init = async () => {
 
     updateThemeIcon();
 
+    // ── SUPERADMIN-ONLY SIDEBAR ITEMS ──
+    document.querySelectorAll(".superadmin-only").forEach(el => {
+        if (!Auth.isSuperAdmin()) el.style.display = "none";
+    });
+
     // ── DEFAULT AVATAR ──
     const defaultAvatar = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="60%" height="60%">
