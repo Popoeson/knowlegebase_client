@@ -1154,6 +1154,10 @@ const init = async () => {
 
     if (generateBtn) {
         generateBtn.addEventListener("click", async () => {
+            if (!Auth.isSuperAdmin()) {
+                Utils.toast("You don't have permission to generate questions.", "error");
+                return;
+            }
             const courseId = document.getElementById("aiCourse").value;
             const topicName = document.getElementById("aiTopic").value.trim();
             const difficulty = document.getElementById("aiDifficulty").value;
@@ -1206,6 +1210,10 @@ const init = async () => {
 
     if (approveBtn) {
         approveBtn.addEventListener("click", async () => {
+            if (!Auth.isSuperAdmin()) {
+                Utils.toast("You don't have permission to save questions.", "error");
+                return;
+            }
             const courseId = document.getElementById("aiCourse").value;
             const difficulty = document.getElementById("aiDifficulty").value;
             const type = document.getElementById("aiType").value;
