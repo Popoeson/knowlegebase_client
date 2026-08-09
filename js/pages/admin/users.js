@@ -151,11 +151,12 @@ const init = async () => {
                             onclick="viewUser('${user._id}')"
                             title="View Details"
                         >👁</button>
+                        ${Auth.isSuperAdmin() ? `
                         <button
                             class="btn-icon btn-icon-delete"
                             onclick="confirmDelete('${user._id}')"
                             title="Delete"
-                        >🗑️</button>
+                        >🗑️</button>` : ""}
                     </div>
                 </td>
             </tr>
@@ -225,6 +226,10 @@ const init = async () => {
 
     // ── CONFIRM DELETE (GLOBAL) ──
     window.confirmDelete = (id) => {
+        if (!Auth.isSuperAdmin()) {
+            Utils.toast("You don't have permission to delete users.", "error");
+            return;
+        }
         const user = allUsers.find(u => u._id === id);
         document.getElementById("deleteUserName").textContent = user ? user.fullName : "";
         document.getElementById("deleteUserId").value = id;
