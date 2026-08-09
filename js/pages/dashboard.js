@@ -43,11 +43,6 @@ const init = async () => {
     });
 
     updateThemeIcon();
- 
-// ── SUPERADMIN-ONLY SIDEBAR ITEMS ──
-    document.querySelectorAll(".superadmin-only").forEach(el => {
-        if (!Auth.isSuperAdmin()) el.style.display = "none";
-    });
 
     // ── DEFAULT AVATAR ──
     const defaultAvatar = `
