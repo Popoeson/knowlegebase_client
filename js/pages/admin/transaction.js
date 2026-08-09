@@ -138,12 +138,13 @@ const init = async () => {
         transactionsTable.innerHTML = payments.map((payment, index) => `
             <tr>
                 <td>
+                    ${Auth.isSuperAdmin() ? `
                     <input
                         type="checkbox"
                         class="q-checkbox transaction-row-checkbox"
                         data-id="${payment._id}"
                         onchange="updateSelectedCount()"
-                    >
+                    >` : ""}
                 </td>
                 <td>${index + 1}</td>
                 <td>
@@ -187,13 +188,14 @@ const init = async () => {
                 </td>
                 <td>${Utils.formatDate(payment.createdAt)}</td>
                 <td>
+                    ${Auth.isSuperAdmin() ? `
                     <div class="table-actions">
                         <button
                             class="btn-icon btn-icon-delete"
                             onclick="confirmDeleteOne('${payment._id}')"
                             title="Delete"
                         >🗑️</button>
-                    </div>
+                    </div>` : `<span class="text-muted" style="font-size: var(--text-sm);">—</span>`}
                 </td>
             </tr>
         `).join("");
@@ -252,6 +254,10 @@ const init = async () => {
 
     // ── DELETE SINGLE ──
     window.confirmDeleteOne = (id) => {
+        if (!Auth.isSuperAdmin()) {
+            Utils.toast("You don't have permission to delete transactions.", "error");
+            return;
+        }
         document.getElementById("deleteTransactionId").value = id;
         openModal(deleteModal);
     };
@@ -283,6 +289,10 @@ const init = async () => {
 
     // ── DELETE SELECTED (BULK) ──
     deleteSelectedBtn.addEventListener("click", () => {
+        if (!Auth.isSuperAdmin()) {
+            Utils.toast("You don't have permission to delete transactions.", "error");
+            return;
+        }
         const checkboxes = document.querySelectorAll(".transaction-row-checkbox:checked");
         const ids = Array.from(checkboxes).map(cb => cb.dataset.id);
 
@@ -335,6 +345,10 @@ const init = async () => {
 
     // ── DOWNLOAD (CURRENTLY FILTERED VIEW) ──
     downloadBtn.addEventListener("click", () => {
+        if (!Auth.isSuperAdmin()) {
+            Utils.toast("You don't have permission to download transactions.", "error");
+            return;
+        }
         if (!currentlyDisplayed || currentlyDisplayed.length === 0) {
             Utils.toast("No transactions to download", "info");
             return;
