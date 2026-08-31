@@ -21,7 +21,25 @@ const init = async () => {
     const loadingState = document.getElementById("loadingState");
     const signupState = document.getElementById("signupState");
     const partnerState = document.getElementById("partnerState");
+    const consentCheckbox = document.getElementById("consentCheckbox");
     const signupBtn = document.getElementById("signupBtn");
+
+    const optedOutBanner = document.getElementById("optedOutBanner");
+    const optBackInBtn = document.getElementById("optBackInBtn");
+    const optOutCard = document.getElementById("optOutCard");
+    const optOutBtn = document.getElementById("optOutBtn");
+    const optOutModal = document.getElementById("optOutModal");
+
+    const payoutAccountSummary = document.getElementById("payoutAccountSummary");
+    const payoutFormWrapper = document.getElementById("payoutFormWrapper");
+    const bankSelect = document.getElementById("bankSelect");
+    const accountNumberInput = document.getElementById("accountNumberInput");
+    const verifiedNamePreview = document.getElementById("verifiedNamePreview");
+    const verifiedNameText = document.getElementById("verifiedNameText");
+    const verifyAccountBtn = document.getElementById("verifyAccountBtn");
+    const savePayoutBtn = document.getElementById("savePayoutBtn");
+    const cancelEditBtn = document.getElementById("cancelEditBtn");
+    const editPayoutBtn = document.getElementById("editPayoutBtn");
 
     // ── SIDEBAR TOGGLE ──
     hamburger.addEventListener("click", () => {
@@ -66,12 +84,22 @@ const init = async () => {
         }
     }
 
+    // ── CONSENT CHECKBOX GATES SIGNUP BUTTON ──
+    consentCheckbox.addEventListener("change", () => {
+        signupBtn.disabled = !consentCheckbox.checked;
+    });
+
     // ── SIGN UP FOR AFFILIATION ──
     signupBtn.addEventListener("click", async () => {
+        if (!consentCheckbox.checked) {
+            Utils.toast("Please accept the Referral Program Terms to continue.", "error");
+            return;
+        }
+
         signupBtn.disabled = true;
         signupBtn.textContent = "Signing up...";
         try {
-            const response = await api.post("/referral/signup", {});
+            const response = await api.post("/referral/signup", { consent: true });
             Utils.toast(response.message, "success");
             await loadPartnerInfo();
         } catch (error) {
@@ -87,57 +115,169 @@ const init = async () => {
         const copyLinkBtn = document.getElementById("copyLinkBtn");
         const referralLink = `${window.location.origin}/pages/register.html?ref=${partner.referralCode}`;
 
-        copyCodeBtn.addEventListener("click", () => {
+        copyCodeBtn.onclick = () => {
             navigator.clipboard.writeText(partner.referralCode);
             Utils.toast("Referral code copied", "success");
-        });
+        };
 
-        copyLinkBtn.addEventListener("click", () => {
+        copyLinkBtn.onclick = () => {
             navigator.clipboard.writeText(referralLink);
             Utils.toast("Referral link copied", "success");
-        });
+        };
     };
 
-    // ── LOAD BANK LIST + PAYOUT SETUP ──
-    const setupPayoutForm = async () => {
-        const bankSelect = document.getElementById("bankSelect");
-        const accountNumberInput = document.getElementById("accountNumberInput");
-        const setupPayoutBtn = document.getElementById("setupPayoutBtn");
-
+    // ── LOAD BANK LIST ──
+    let banksLoaded = false;
+    const loadBankList = async () => {
+        if (banksLoaded) return;
         try {
             const response = await api.get("/referral/banks");
             bankSelect.innerHTML = `<option value="">Select your bank...</option>` +
                 response.banks.map(b => `<option value="${b.code}">${Utils.escapeHTML(b.name)}</option>`).join("");
+            banksLoaded = true;
         } catch (error) {
             Utils.toast("Failed to load bank list", "error");
         }
+    };
 
-        setupPayoutBtn.addEventListener("click", async () => {
-            const bankCode = bankSelect.value;
-            const accountNumber = accountNumberInput.value.trim();
+    // ── VERIFY ACCOUNT (preview only) ──
+    let verifiedAccountName = null;
 
-            if (!bankCode || !accountNumber) {
-                Utils.toast("Please select a bank and enter your account number", "error");
-                return;
-            }
+    verifyAccountBtn.addEventListener("click", async () => {
+        const bankCode = bankSelect.value;
+        const accountNumber = accountNumberInput.value.trim();
 
-            setupPayoutBtn.disabled = true;
-            setupPayoutBtn.textContent = "Verifying...";
+        if (!bankCode || !accountNumber) {
+            Utils.toast("Please select a bank and enter your account number", "error");
+            return;
+        }
+        if (accountNumber.length !== 10) {
+            Utils.toast("Account number must be 10 digits", "error");
+            return;
+        }
 
-            try {
-                const response = await api.put("/referral/payout-account", { bankCode, accountNumber });
-                Utils.toast(response.message, "success");
-                document.getElementById("payoutSetupCard").classList.add("hidden");
-                document.getElementById("payoutAccountConfirmed").classList.remove("hidden");
-                document.getElementById("confirmedAccountName").textContent = response.accountName;
-            } catch (error) {
-                Utils.toast(error.message, "error");
-            } finally {
-                setupPayoutBtn.disabled = false;
-                setupPayoutBtn.textContent = "Save Payout Account";
+        verifyAccountBtn.disabled = true;
+        verifyAccountBtn.textContent = "Verifying...";
+        verifiedNamePreview.classList.add("hidden");
+        savePayoutBtn.classList.add("hidden");
+        verifiedAccountName = null;
+
+        try {
+            const response = await api.post("/referral/payout-account/verify", { bankCode, accountNumber });
+            verifiedAccountName = response.accountName;
+            verifiedNameText.textContent = verifiedAccountName;
+            verifiedNamePreview.classList.remove("hidden");
+            savePayoutBtn.classList.remove("hidden");
+        } catch (error) {
+            Utils.toast(error.message, "error");
+        } finally {
+            verifyAccountBtn.disabled = false;
+            verifyAccountBtn.textContent = "Verify Account";
+        }
+    });
+
+    // Re-verification required if the person changes bank or number after
+    // a successful verify — prevents saving a stale/mismatched preview.
+    [bankSelect, accountNumberInput].forEach(el => {
+        el.addEventListener("input", () => {
+            if (verifiedAccountName) {
+                verifiedAccountName = null;
+                verifiedNamePreview.classList.add("hidden");
+                savePayoutBtn.classList.add("hidden");
             }
         });
-    };
+    });
+
+    // ── SAVE PAYOUT ACCOUNT ──
+    savePayoutBtn.addEventListener("click", async () => {
+        const bankCode = bankSelect.value;
+        const accountNumber = accountNumberInput.value.trim();
+
+        if (!verifiedAccountName) {
+            Utils.toast("Please verify the account first.", "error");
+            return;
+        }
+
+        savePayoutBtn.disabled = true;
+        savePayoutBtn.textContent = "Saving...";
+
+        try {
+            const response = await api.put("/referral/payout-account", { bankCode, accountNumber });
+            Utils.toast(response.message, "success");
+            await loadPartnerInfo();
+        } catch (error) {
+            if (error.code === "PAYOUT_CHANGE_COOLDOWN") {
+                Utils.toast(error.message, "error");
+            } else {
+                Utils.toast(error.message, "error");
+            }
+        } finally {
+            savePayoutBtn.disabled = false;
+            savePayoutBtn.textContent = "Save Payout Account";
+        }
+    });
+
+    // ── EDIT / CANCEL TOGGLE ──
+    editPayoutBtn.addEventListener("click", async () => {
+        payoutAccountSummary.classList.add("hidden");
+        payoutFormWrapper.classList.remove("hidden");
+        cancelEditBtn.classList.remove("hidden");
+        await loadBankList();
+    });
+
+    cancelEditBtn.addEventListener("click", () => {
+        payoutFormWrapper.classList.add("hidden");
+        payoutAccountSummary.classList.remove("hidden");
+        cancelEditBtn.classList.add("hidden");
+        verifiedAccountName = null;
+        verifiedNamePreview.classList.add("hidden");
+        savePayoutBtn.classList.add("hidden");
+    });
+
+    // ── OPT OUT ──
+    optOutBtn.addEventListener("click", () => {
+        optOutModal.classList.remove("hidden");
+    });
+
+    document.getElementById("closeOptOutModal").addEventListener("click", () => {
+        optOutModal.classList.add("hidden");
+    });
+    document.getElementById("cancelOptOutBtn").addEventListener("click", () => {
+        optOutModal.classList.add("hidden");
+    });
+
+    document.getElementById("confirmOptOutBtn").addEventListener("click", async () => {
+        const btn = document.getElementById("confirmOptOutBtn");
+        btn.disabled = true;
+        btn.textContent = "Processing...";
+        try {
+            const response = await api.post("/referral/opt-out", {});
+            Utils.toast(response.message, "success");
+            optOutModal.classList.add("hidden");
+            await loadPartnerInfo();
+        } catch (error) {
+            Utils.toast(error.message, "error");
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Yes, Opt Out";
+        }
+    });
+
+    // ── OPT BACK IN ──
+    optBackInBtn.addEventListener("click", async () => {
+        optBackInBtn.disabled = true;
+        optBackInBtn.textContent = "Processing...";
+        try {
+            const response = await api.post("/referral/opt-in", {});
+            Utils.toast(response.message, "success");
+            await loadPartnerInfo();
+        } catch (error) {
+            Utils.toast(error.message, "error");
+        } finally {
+            optBackInBtn.disabled = false;
+            optBackInBtn.textContent = "Opt Back In";
+        }
+    });
 
     // ── RENDER REFERRED STUDENTS ──
     const renderReferredStudents = (students) => {
@@ -191,11 +331,34 @@ const init = async () => {
             setupCopyButtons(partner);
             renderReferredStudents(referredStudents);
 
-            if (!partner.hasSubaccount) {
-                document.getElementById("payoutSetupCard").classList.remove("hidden");
-                await setupPayoutForm();
+            // ── OPTED-OUT STATE ──
+            if (partner.status === "inactive") {
+                optedOutBanner.classList.remove("hidden");
+                optOutCard.classList.add("hidden");
             } else {
-                document.getElementById("payoutAccountConfirmed").classList.remove("hidden");
+                optedOutBanner.classList.add("hidden");
+                optOutCard.classList.remove("hidden");
+            }
+
+            // ── PAYOUT ACCOUNT VIEW ──
+            verifiedAccountName = null;
+            verifiedNamePreview.classList.add("hidden");
+            savePayoutBtn.classList.add("hidden");
+            bankSelect.value = "";
+            accountNumberInput.value = "";
+
+            if (partner.hasSubaccount) {
+                payoutFormWrapper.classList.add("hidden");
+                payoutAccountSummary.classList.remove("hidden");
+                cancelEditBtn.classList.add("hidden");
+                document.getElementById("confirmedAccountName").textContent = "Payout account set up";
+                document.getElementById("cooldownNote").textContent =
+                    "Account details can be changed once every 14 days. Contact an admin if you need an earlier change.";
+            } else {
+                payoutAccountSummary.classList.add("hidden");
+                payoutFormWrapper.classList.remove("hidden");
+                cancelEditBtn.classList.add("hidden");
+                await loadBankList();
             }
 
         } catch (error) {
