@@ -14,6 +14,16 @@ const otherNameInput = document.getElementById("otherName");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const confirmPasswordInput = document.getElementById("confirmPassword");
+const referralCodeInput = document.getElementById("referralCode");
+
+// Pre-fill from ?ref=CODE if present in the URL, still editable —
+// matches the existing pattern of reading URL/localStorage state for
+// payment recovery elsewhere in the app.
+const urlParams = new URLSearchParams(window.location.search);
+const refFromUrl = urlParams.get("ref");
+if (refFromUrl) {
+    referralCodeInput.value = refFromUrl;
+}
 
 // ── PASSWORD TOGGLES ──
 document.getElementById("togglePassword").addEventListener("click", () => {
@@ -106,7 +116,8 @@ registerForm.addEventListener("submit", async (e) => {
             surname: surnameInput.value.trim(),
             email: emailInput.value.trim(),
             password: passwordInput.value,
-            confirmPassword: confirmPasswordInput.value
+            confirmPassword: confirmPasswordInput.value,
+            referralCode: referralCodeInput.value.trim() || undefined
         });
 
         Utils.toast(response.message, "success");
