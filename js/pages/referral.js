@@ -346,12 +346,12 @@ const init = async () => {
             savePayoutBtn.classList.add("hidden");
             bankSelect.value = "";
             accountNumberInput.value = "";
-
+    
             if (partner.hasSubaccount) {
                 payoutFormWrapper.classList.add("hidden");
                 payoutAccountSummary.classList.remove("hidden");
                 cancelEditBtn.classList.add("hidden");
-                document.getElementById("confirmedAccountName").textContent = "Payout account set up";
+                document.getElementById("confirmedAccountName").textContent = partner.payoutAccountName || "Payout account set up";
                 document.getElementById("cooldownNote").textContent =
                     "Account details can be changed once every 14 days. Contact an admin if you need an earlier change.";
             } else {
