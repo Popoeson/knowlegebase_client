@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral Partners - ASODEM Admin</title>
+
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/reset.css">
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="../../css/pages/dashboard.css">
+    <link rel="stylesheet" href="../../css/pages/courses.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span class="navbar-brand">
+    <img src="../../asset/images/logo3.png" alt="ASODEM Logo" class="navbar-logo">
+</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Admin Panel</p>
+                <a href="./dashboard.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="./users.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">👥</span>
+                    Users
+                </a>
+                <a href="./courses.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📚</span>
+                    Courses
+                </a>
+                <a href="./questions.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🧠</span>
+                    Questions
+                </a>
+                <a href="./certificates.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🏆</span>
+                    Certificates
+                </a>
+                <a href="./transaction.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">💳</span>
+                    Transactions
+                </a>
+                <a href="./referral-partners.html" class="sidebar-nav-item active">
+                    <span class="sidebar-nav-icon">🔗</span>
+                    Referral Partners
+                </a>
+                <a href="./referral-settings.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">⚙️</span>
+                    Referral Settings
+                </a>
+                <a href="./console.html" class="sidebar-nav-item superadmin-only">
+                    <span class="sidebar-nav-icon">🩺</span>
+                    Error Monitor
+                </a>
+                <a href="./analytics.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📈</span>
+                    Analytics
+                </a>
+                <a href="./admin-management.html" class="sidebar-nav-item superadmin-only">
+                    <span class="sidebar-nav-icon">🛡️</span>
+                    Admin Management
+                </a>
+            </div>
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Account</p>
+                <a href="./profile.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">👤</span>
+                    Profile
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar" id="sidebarAvatar"></div>
+                <div class="sidebar-user-info">
+                    <p class="sidebar-user-name" id="sidebarName"></p>
+                    <p class="sidebar-user-role">Administrator</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- OVERLAY -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <h1 class="topbar-title">Referral Partners</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle">🌙</button>
+                <div class="topbar-avatar" id="topbarAvatar"></div>
+            </div>
+        </header>
+
+        <main class="page-content">
+
+            <!-- STATS -->
+            <div class="stats-grid mb-8">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-blue">🔗</div>
+                    <div class="stat-info">
+                        <p class="stat-value" id="statTotal">—</p>
+                        <p class="stat-label">Total Partners</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-green">✅</div>
+                    <div class="stat-info">
+                        <p class="stat-value" id="statActive">—</p>
+                        <p class="stat-label">Active</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-amber">🏫</div>
+                    <div class="stat-info">
+                        <p class="stat-value" id="statLifetime">—</p>
+                        <p class="stat-label">Lifetime Tier</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-purple">👤</div>
+                    <div class="stat-info">
+                        <p class="stat-value" id="statOneTime">—</p>
+                        <p class="stat-label">One-Time Tier</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FILTERS + ONBOARD BUTTON -->
+            <div class="courses-filter-bar mb-6">
+                <div class="filter-search">
+                    <span class="filter-search-icon">🔍</span>
+                    <input
+                        type="text"
+                        class="form-input"
+                        id="searchInput"
+                        placeholder="Search by name or code..."
+                    >
+                </div>
+                <select class="filter-select" id="tierFilter">
+                    <option value="">All Tiers</option>
+                    <option value="lifetime">Lifetime</option>
+                    <option value="one-time">One-Time</option>
+                </select>
+                <select class="filter-select" id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+                <button class="btn btn-primary" id="onboardBtn">+ Onboard Partner</button>
+            </div>
+
+            <!-- TABLE -->
+            <div class="section-header mb-4">
+                <h2 class="section-title">
+                    All Partners
+                    <span id="partnersCount" class="text-muted" style="font-size: var(--text-sm); font-weight: 400;"></span>
+                </h2>
+            </div>
+
+            <div class="card">
+                <div class="admin-table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Code</th>
+                                <th>Tier</th>
+                                <th>Tag</th>
+                                <th>Status</th>
+                                <th>Onboarded</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="partnersTable">
+                            <tr>
+                                <td colspan="8" class="text-center text-muted">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- ONBOARD PARTNER MODAL -->
+<div class="modal-overlay hidden" id="onboardModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Onboard Referral Partner</h3>
+            <button class="modal-close" id="closeOnboardModal">✕</button>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="userSearchInput">Find User by Email</label>
+            <input type="text" class="form-input" id="userSearchInput" placeholder="Type at least 2 characters...">
+            <div id="userSearchResults" style="margin-top: var(--space-2);"></div>
+        </div>
+
+        <div id="selectedUserCard" class="hidden" style="padding: var(--space-3); background-color: var(--color-surface-2); border-radius: var(--radius-md); margin-bottom: var(--space-4);">
+            <p style="font-weight: var(--font-semibold);" id="selectedUserName"></p>
+            <p style="font-size: var(--text-sm); color: var(--color-text-muted);" id="selectedUserEmail"></p>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="partnerNameInput">Partner / Institution Name</label>
+            <input type="text" class="form-input" id="partnerNameInput" placeholder="e.g. Federal Polytechnic Nekede">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="referralCodeInput">Referral Code <span style="color: var(--color-text-muted); font-weight: 400;">(auto-suggested, editable)</span></label>
+            <input type="text" class="form-input" id="referralCodeInput" placeholder="Auto-generated on entering a name">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="tierSelect">Tier</label>
+            <select class="form-input" id="tierSelect">
+                <option value="one-time">One-Time (individual affiliate)</option>
+                <option value="lifetime">Lifetime (institution / negotiated partner)</option>
+            </select>
+        </div>
+
+        <div id="lifetimeFields" class="hidden">
+            <div class="form-group">
+                <label class="form-label" for="tagSelect">Tag</label>
+                <select class="form-input" id="tagSelect">
+                    <option value="institution_as_institution">Institution as Institution</option>
+                    <option value="individual_as_institution">Individual as Institution</option>
+                </select>
+            </div>
+            <div class="auth-form-row">
+                <div class="form-group">
+                    <label class="form-label" for="registrationFlatInput">Registration Payout (₦)</label>
+                    <input type="number" class="form-input" id="registrationFlatInput" placeholder="0" min="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="examFlatInput">Exam Payout (₦)</label>
+                    <input type="number" class="form-input" id="examFlatInput" placeholder="0" min="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-ghost" id="cancelOnboardBtn">Cancel</button>
+            <button class="btn btn-primary" id="confirmOnboardBtn">Onboard Partner</button>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT PARTNER MODAL -->
+<div class="modal-overlay hidden" id="editModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Edit Partner</h3>
+            <button class="modal-close" id="closeEditModal">✕</button>
+        </div>
+
+        <input type="hidden" id="editPartnerId">
+
+        <div class="form-group">
+            <label class="form-label" for="editNameInput">Name</label>
+            <input type="text" class="form-input" id="editNameInput">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="editCodeInput">Referral Code</label>
+            <input type="text" class="form-input" id="editCodeInput">
+        </div>
+
+        <div id="editLifetimeFields" class="hidden">
+            <div class="form-group">
+                <label class="form-label" for="editTagSelect">Tag</label>
+                <select class="form-input" id="editTagSelect">
+                    <option value="institution_as_institution">Institution as Institution</option>
+                    <option value="individual_as_institution">Individual as Institution</option>
+                </select>
+            </div>
+            <div class="auth-form-row">
+                <div class="form-group">
+                    <label class="form-label" for="editRegistrationFlatInput">Registration Payout (₦)</label>
+                    <input type="number" class="form-input" id="editRegistrationFlatInput" min="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editExamFlatInput">Exam Payout (₦)</label>
+                    <input type="number" class="form-input" id="editExamFlatInput" min="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-ghost" id="cancelEditModalBtn">Cancel</button>
+            <button class="btn btn-primary" id="confirmEditBtn">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- SETTLEMENT MODAL -->
+<div class="modal-overlay hidden" id="settlementModal">
+    <div class="modal" style="max-width: 700px;">
+        <div class="modal-header">
+            <h3 class="modal-title" id="settlementModalTitle">Settlement Report</h3>
+            <button class="modal-close" id="closeSettlementModal">✕</button>
+        </div>
+
+        <input type="hidden" id="settlementPartnerId">
+
+        <div class="auth-form-row" style="margin-bottom: var(--space-4);">
+            <div class="form-group">
+                <label class="form-label" for="settlementStart">From</label>
+                <input type="date" class="form-input" id="settlementStart">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="settlementEnd">To</label>
+                <input type="date" class="form-input" id="settlementEnd">
+            </div>
+        </div>
+        <button class="btn btn-outline btn-sm" id="runSettlementBtn" style="margin-bottom: var(--space-4);">Run Report</button>
+
+        <div id="settlementResults" class="hidden">
+            <div class="stats-grid" style="margin-bottom: var(--space-4);">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <p class="stat-value" id="settlementStudents">—</p>
+                        <p class="stat-label">Referred Students</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <p class="stat-value" id="settlementVolume">—</p>
+                        <p class="stat-label">Transaction Volume</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <p class="stat-value" id="settlementOwed">—</p>
+                        <p class="stat-label">Total Owed</p>
+                    </div>
+                </div>
+            </div>
+            <p style="font-size: var(--text-sm); color: var(--color-text-muted);" id="settlementRedirectedNote"></p>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-ghost" id="closeSettlementBtn">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- REASSIGN STUDENT MODAL -->
+<div class="modal-overlay hidden" id="reassignModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Reassign Student</h3>
+            <button class="modal-close" id="closeReassignModal">✕</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="reassignUserSearch">Find Student by Email</label>
+            <input type="text" class="form-input" id="reassignUserSearch" placeholder="Type at least 2 characters...">
+            <div id="reassignUserResults" style="margin-top: var(--space-2);"></div>
+        </div>
+        <div id="reassignSelectedUser" class="hidden" style="padding: var(--space-3); background-color: var(--color-surface-2); border-radius: var(--radius-md); margin-bottom: var(--space-4);">
+            <p style="font-weight: var(--font-semibold);" id="reassignSelectedUserName"></p>
+            <p style="font-size: var(--text-sm); color: var(--color-text-muted);" id="reassignSelectedUserEmail"></p>
+        </div>
+        <input type="hidden" id="reassignPartnerId">
+        <input type="hidden" id="reassignUserId">
+        <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-4);">
+            This ties the selected student's future payments to this partner. Use with care — this overrides normal first-touch attribution.
+        </p>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" id="cancelReassignBtn">Cancel</button>
+            <button class="btn btn-primary" id="confirmReassignBtn">Reassign</button>
+        </div>
+    </div>
+</div>
+
+<script src="../../js/config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/store.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/utils.js"></script>
+<script src="../../js/pages/admin/referral-partners.js"></script>
+
+</body>
+</html>
