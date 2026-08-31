@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral Program — ASODEM</title>
+
+<link rel="icon" href="https://www.asodem.com/asset/images/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="https://www.asodem.com/asset/images/app_icon.png">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/pages/dashboard.css">
+    <link rel="stylesheet" href="../css/pages/courses.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span class="navbar-brand">
+    <img src="../asset/images/logo3.png" alt="ASODEM Logo" class="navbar-logo">
+</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Main</p>
+                <a href="./dashboard.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🏠</span>
+                    Dashboard
+                </a>
+                <a href="./courses.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📚</span>
+                    Courses
+                </a>
+            </div>
+
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">My Activity</p>
+                <a href="./exam-history.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">📝</span>
+                    Exam History
+                </a>
+                <a href="./certificates.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">🏆</span>
+                    My Certificates
+                </a>
+                <a href="./transaction.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">💳</span>
+                    Transactions
+                </a>
+                <a href="./referral.html" class="sidebar-nav-item active">
+                    <span class="sidebar-nav-icon">🔗</span>
+                    Referral Program
+                </a>
+            </div>
+
+            <div class="sidebar-nav-section">
+                <p class="sidebar-nav-label">Account</p>
+                <a href="./profile.html" class="sidebar-nav-item">
+                    <span class="sidebar-nav-icon">👤</span>
+                    Profile
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar" id="sidebarAvatar"></div>
+                <div class="sidebar-user-info">
+                    <p class="sidebar-user-name" id="sidebarName"></p>
+                    <p class="sidebar-user-role">Student</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- OVERLAY -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <h1 class="topbar-title">Referral Program</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle">🌙</button>
+                <a href="./profile.html">
+                    <div class="topbar-avatar" id="topbarAvatar"></div>
+                </a>
+            </div>
+        </header>
+
+        <main class="page-content">
+
+            <!-- LOADING -->
+            <div id="loadingState" class="empty-state">
+                <p class="empty-state-text">Loading...</p>
+            </div>
+
+            <!-- NOT A PARTNER YET — SIGNUP CTA -->
+            <div id="signupState" class="hidden">
+                <div class="welcome-banner">
+                    <div>
+                        <h2 class="welcome-title">Earn by referring students</h2>
+                        <p class="welcome-subtitle">Sign up for the referral program and get a reward every time someone registers using your link.</p>
+                    </div>
+                    <div class="welcome-emoji">🔗</div>
+                </div>
+
+                <div class="card" style="padding: var(--space-8); text-align: center;">
+                    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-6);">
+                        Once you sign up, you'll get a unique referral code and link to share.
+                        Anyone who registers using it will be tied to your account for their
+                        first registration payment.
+                    </p>
+                    <button class="btn btn-primary btn-lg" id="signupBtn">Sign Up for Referral Program</button>
+                </div>
+            </div>
+
+            <!-- PARTNER VIEW -->
+            <div id="partnerState" class="hidden">
+
+                <!-- CODE + LINK CARD -->
+                <div class="welcome-banner">
+                    <div>
+                        <h2 class="welcome-title" id="partnerWelcome">Your Referral Program</h2>
+                        <p class="welcome-subtitle" id="partnerTierLabel"></p>
+                    </div>
+                    <div class="welcome-emoji">🔗</div>
+                </div>
+
+                <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-8);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-4);">
+                        <div>
+                            <p class="stat-label" style="margin-bottom: var(--space-2);">Your Referral Code</p>
+                            <p style="font-family: monospace; font-size: var(--text-xl); font-weight: var(--font-bold); color: var(--color-primary);" id="referralCodeDisplay">—</p>
+                        </div>
+                        <div style="display: flex; gap: var(--space-3);">
+                            <button class="btn btn-outline btn-sm" id="copyCodeBtn">Copy Code</button>
+                            <button class="btn btn-outline btn-sm" id="copyLinkBtn">Copy Link</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STATS -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-blue">👥</div>
+                        <div class="stat-info">
+                            <p class="stat-value" id="statReferred">—</p>
+                            <p class="stat-label">Referred Students</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-green">✅</div>
+                        <div class="stat-info">
+                            <p class="stat-value" id="statPaidOut">—</p>
+                            <p class="stat-label">Paid Out</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-amber">⏳</div>
+                        <div class="stat-info">
+                            <p class="stat-value" id="statPending">—</p>
+                            <p class="stat-label">Pending Payout</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PAYOUT ACCOUNT SETUP (shown only if not yet set up) -->
+                <div id="payoutSetupCard" class="card hidden" style="padding: var(--space-6); margin-bottom: var(--space-8);">
+                    <div class="section-header">
+                        <h2 class="section-title">Set Up Your Payout Account</h2>
+                    </div>
+                    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-4);">
+                        You have earnings waiting to be paid out. Add your bank details to receive them.
+                    </p>
+                    <div class="form-group">
+                        <label class="form-label" for="bankSelect">Bank</label>
+                        <select class="form-input" id="bankSelect">
+                            <option value="">Select your bank...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="accountNumberInput">Account Number</label>
+                        <input type="text" class="form-input" id="accountNumberInput" placeholder="10-digit account number" maxlength="10">
+                    </div>
+                    <button class="btn btn-primary" id="setupPayoutBtn">Save Payout Account</button>
+                </div>
+
+                <div id="payoutAccountConfirmed" class="card hidden" style="padding: var(--space-6); margin-bottom: var(--space-8);">
+                    <p style="color: var(--color-success); font-weight: var(--font-semibold);">
+                        ✅ Payout account set up — <span id="confirmedAccountName"></span>
+                    </p>
+                </div>
+
+                <!-- REFERRED STUDENTS TABLE -->
+                <div class="section-header">
+                    <h2 class="section-title">Referred Students</h2>
+                </div>
+
+                <div class="card">
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Joined</th>
+                                    <th>Generated</th>
+                                </tr>
+                            </thead>
+                            <tbody id="referredStudentsTable">
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/store.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/pages/referral.js"></script>
+
+</body>
+</html>
