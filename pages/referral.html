@@ -124,12 +124,29 @@
                         Anyone who registers using it will be tied to your account for their
                         first registration payment.
                     </p>
-                    <button class="btn btn-primary btn-lg" id="signupBtn">Sign Up for Referral Program</button>
+
+                    <div style="display: flex; align-items: flex-start; gap: var(--space-3); text-align: left; max-width: 480px; margin: 0 auto var(--space-6);">
+                        <input type="checkbox" id="consentCheckbox" style="margin-top: 4px; width: 18px; height: 18px; flex-shrink: 0;">
+                        <label for="consentCheckbox" style="font-size: var(--text-sm); color: var(--color-text-secondary);">
+                            I have read and agree to the
+                            <a href="./terms-of-use.html#referral-program" target="_blank" style="color: var(--color-primary);">Referral Program Terms &amp; Conditions</a>.
+                        </label>
+                    </div>
+
+                    <button class="btn btn-primary btn-lg" id="signupBtn" disabled>Sign Up for Referral Program</button>
                 </div>
             </div>
 
             <!-- PARTNER VIEW -->
             <div id="partnerState" class="hidden">
+
+                <!-- OPTED-OUT BANNER -->
+                <div id="optedOutBanner" class="card hidden" style="padding: var(--space-4) var(--space-6); margin-bottom: var(--space-6); background-color: rgba(239, 68, 68, 0.08); border-color: var(--color-error);">
+                    <p style="color: var(--color-error); font-weight: var(--font-semibold); margin: 0;">
+                        ⚠️ You have opted out of the referral program. No new payouts will be processed for your referrals until you opt back in.
+                    </p>
+                    <button class="btn btn-outline btn-sm" id="optBackInBtn" style="margin-top: var(--space-3);">Opt Back In</button>
+                </div>
 
                 <!-- CODE + LINK CARD -->
                 <div class="welcome-banner">
@@ -178,31 +195,45 @@
                     </div>
                 </div>
 
-                <!-- PAYOUT ACCOUNT SETUP (shown only if not yet set up) -->
-                <div id="payoutSetupCard" class="card hidden" style="padding: var(--space-6); margin-bottom: var(--space-8);">
-                    <div class="section-header">
-                        <h2 class="section-title">Set Up Your Payout Account</h2>
+                <!-- PAYOUT ACCOUNT CARD (adapts: setup / view+edit) -->
+                <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-8);">
+                    <div class="section-header" style="margin-bottom: var(--space-4);">
+                        <h2 class="section-title">Payout Account</h2>
                     </div>
-                    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-4);">
-                        You have earnings waiting to be paid out. Add your bank details to receive them.
-                    </p>
-                    <div class="form-group">
-                        <label class="form-label" for="bankSelect">Bank</label>
-                        <select class="form-input" id="bankSelect">
-                            <option value="">Select your bank...</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="accountNumberInput">Account Number</label>
-                        <input type="text" class="form-input" id="accountNumberInput" placeholder="10-digit account number" maxlength="10">
-                    </div>
-                    <button class="btn btn-primary" id="setupPayoutBtn">Save Payout Account</button>
-                </div>
 
-                <div id="payoutAccountConfirmed" class="card hidden" style="padding: var(--space-6); margin-bottom: var(--space-8);">
-                    <p style="color: var(--color-success); font-weight: var(--font-semibold);">
-                        ✅ Payout account set up — <span id="confirmedAccountName"></span>
-                    </p>
+                    <!-- Confirmed account summary (shown when a recipient exists) -->
+                    <div id="payoutAccountSummary" class="hidden" style="margin-bottom: var(--space-4);">
+                        <p style="color: var(--color-success); font-weight: var(--font-semibold); margin-bottom: var(--space-1);">
+                            ✅ <span id="confirmedAccountName"></span>
+                        </p>
+                        <p style="color: var(--color-text-muted); font-size: var(--text-sm); margin-bottom: var(--space-3);" id="cooldownNote"></p>
+                        <button class="btn btn-outline btn-sm" id="editPayoutBtn">Change Payout Account</button>
+                    </div>
+
+                    <!-- Bank form (setup or edit) -->
+                    <div id="payoutFormWrapper">
+                        <div class="form-group">
+                            <label class="form-label" for="bankSelect">Bank</label>
+                            <select class="form-input" id="bankSelect">
+                                <option value="">Select your bank...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="accountNumberInput">Account Number</label>
+                            <input type="text" class="form-input" id="accountNumberInput" placeholder="10-digit account number" maxlength="10">
+                        </div>
+
+                        <div id="verifiedNamePreview" class="hidden" style="margin-bottom: var(--space-4); padding: var(--space-3) var(--space-4); background-color: var(--color-surface-2); border-radius: var(--radius-md);">
+                            <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-1);">Account Name</p>
+                            <p style="font-weight: var(--font-semibold);" id="verifiedNameText">—</p>
+                        </div>
+
+                        <div style="display: flex; gap: var(--space-3);">
+                            <button class="btn btn-outline" id="verifyAccountBtn">Verify Account</button>
+                            <button class="btn btn-primary hidden" id="savePayoutBtn">Save Payout Account</button>
+                            <button class="btn btn-ghost hidden" id="cancelEditBtn">Cancel</button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- REFERRED STUDENTS TABLE -->
@@ -210,7 +241,7 @@
                     <h2 class="section-title">Referred Students</h2>
                 </div>
 
-                <div class="card">
+                <div class="card" style="margin-bottom: var(--space-8);">
                     <div class="admin-table-wrapper">
                         <table class="admin-table">
                             <thead>
@@ -231,9 +262,38 @@
                     </div>
                 </div>
 
+                <!-- OPT OUT -->
+                <div class="card" id="optOutCard" style="padding: var(--space-6); border-color: var(--color-error);">
+                    <h3 style="color: var(--color-error); margin-bottom: var(--space-2);">Leave the Referral Program</h3>
+                    <p style="color: var(--color-text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-4);">
+                        Opting out means no new payouts will be processed for your referred students —
+                        your referral code will stop earning immediately. This does not remove your
+                        referred students or delete your history. You can opt back in at any time.
+                    </p>
+                    <button class="btn btn-outline" id="optOutBtn" style="border-color: var(--color-error); color: var(--color-error);">Opt Out of Referral Program</button>
+                </div>
+
             </div>
 
         </main>
+    </div>
+</div>
+
+<!-- OPT-OUT CONFIRM MODAL -->
+<div class="modal-overlay hidden" id="optOutModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Opt Out of Referral Program?</h3>
+            <button class="modal-close" id="closeOptOutModal">✕</button>
+        </div>
+        <p style="color: var(--color-text-secondary); margin-bottom: var(--space-4);">
+            Are you sure? Once you opt out, <strong>no further payouts will be paid</strong> for your
+            referred students until you opt back in. This takes effect immediately.
+        </p>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" id="cancelOptOutBtn">Cancel</button>
+            <button class="btn btn-accent" id="confirmOptOutBtn" style="background-color: var(--color-error);">Yes, Opt Out</button>
+        </div>
     </div>
 </div>
 
