@@ -752,6 +752,13 @@
     display: inline-block;
 }
 
+.legal-subsection-title {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-primary);
+    margin: var(--space-6) 0 var(--space-3);
+}
+
 .legal-text {
     font-size: var(--text-base);
     color: var(--color-text-secondary);
