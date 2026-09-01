@@ -196,4 +196,6 @@ const init = async () => {
     }
     await loadSubaccounts();
 
+};
+
 init();
