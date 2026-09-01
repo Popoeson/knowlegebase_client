@@ -114,22 +114,24 @@
 
         <main class="page-content">
 
-            <!-- GLOBAL SETTINGS -->
-            <div class="section-header mb-4">
-                <h2 class="section-title">Global Individual Payout</h2>
-            </div>
-
-            <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-8); max-width: 480px;">
-                <p style="color: var(--color-text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-4);">
-                    Applies to every one-time-tier (self-serve individual affiliate) partner.
-                    Lifetime-tier partners have their own negotiated amounts, set per partner
-                    on the Referral Partners page.
-                </p>
-                <div class="form-group">
-                    <label class="form-label" for="individualFlatInput">Flat Reward per Registration (₦)</label>
-                    <input type="number" class="form-input" id="individualFlatInput" min="0" placeholder="0">
+<!-- GLOBAL SETTINGS — superadmin only, hidden entirely from regular admins -->
+            <div class="superadmin-only">
+                <div class="section-header mb-4">
+                    <h2 class="section-title">Global Individual Payout</h2>
                 </div>
-                <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+
+                <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-8); max-width: 480px;">
+                    <p style="color: var(--color-text-secondary); font-size: var(--text-sm); margin-bottom: var(--space-4);">
+                        Applies to every one-time-tier (self-serve individual affiliate) partner.
+                        Lifetime-tier partners have their own negotiated amounts, set per partner
+                        on the Referral Partners page.
+                    </p>
+                    <div class="form-group">
+                        <label class="form-label" for="individualFlatInput">Flat Reward per Registration (₦)</label>
+                        <input type="number" class="form-input" id="individualFlatInput" min="0" placeholder="0">
+                    </div>
+                    <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+                </div>
             </div>
 
             <!-- SUBACCOUNTS -->
