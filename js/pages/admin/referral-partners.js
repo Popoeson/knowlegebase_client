@@ -120,11 +120,11 @@ const init = async () => {
                 <td>${Utils.formatDate(p.createdAt)}</td>
                 <td>
                     <div class="table-actions">
-                        <button class="btn-icon btn-icon-edit" title="Edit" onclick="openEditModal('${p._id}')">✏️</button>
-                        <button class="btn-icon ${p.status === "active" ? "btn-icon-delete" : "btn-icon-toggle"}" title="${p.status === "active" ? "Deactivate" : "Activate"}" onclick="toggleStatus('${p._id}')">${p.status === "active" ? "🚫" : "✅"}</button>
+                        ${Auth.isSuperAdmin() ? `<button class="btn-icon btn-icon-edit" title="Edit" onclick="openEditModal('${p._id}')">✏️</button>` : ""}
+                        ${Auth.isSuperAdmin() ? `<button class="btn-icon ${p.status === "active" ? "btn-icon-delete" : "btn-icon-toggle"}" title="${p.status === "active" ? "Deactivate" : "Activate"}" onclick="toggleStatus('${p._id}')">${p.status === "active" ? "🚫" : "✅"}</button>` : ""}
                         <button class="btn-icon btn-icon-edit" title="Settlement Report" onclick="openSettlementModal('${p._id}', '${Utils.escapeHTML(p.name)}')">📊</button>
-                        <button class="btn-icon btn-icon-edit" title="Reassign a Student" onclick="openReassignModal('${p._id}')">🔀</button>
-                        <button class="btn-icon btn-icon-edit" title="Grant Early Payout-Change Override" onclick="grantOverride('${p._id}')">🔓</button>
+                        ${Auth.isSuperAdmin() ? `<button class="btn-icon btn-icon-edit" title="Reassign a Student" onclick="openReassignModal('${p._id}')">🔀</button>` : ""}
+                        ${Auth.isSuperAdmin() ? `<button class="btn-icon btn-icon-edit" title="Grant Early Payout-Change Override" onclick="grantOverride('${p._id}')">🔓</button>` : ""}
                     </div>
                 </td>
             </tr>
@@ -303,6 +303,7 @@ const init = async () => {
         document.getElementById("editPartnerId").value = partner._id;
         document.getElementById("editNameInput").value = partner.name;
         document.getElementById("editCodeInput").value = partner.referralCode;
+        document.getElementById("editTierSelect").value = partner.tier;
 
         const editLifetimeFields = document.getElementById("editLifetimeFields");
         if (partner.tier === "lifetime") {
@@ -312,24 +313,41 @@ const init = async () => {
             document.getElementById("editExamFlatInput").value = (partner.examFlatAmount || 0) / 100;
         } else {
             editLifetimeFields.classList.add("hidden");
+            document.getElementById("editTagSelect").value = "institution_as_institution";
+            document.getElementById("editRegistrationFlatInput").value = "";
+            document.getElementById("editExamFlatInput").value = "";
         }
 
         openModal(editModal);
     };
 
+    // Toggle the lifetime-only fields live as the admin changes tier
+    // mid-edit, before saving.
+    document.getElementById("editTierSelect").addEventListener("change", () => {
+        const editLifetimeFields = document.getElementById("editLifetimeFields");
+        editLifetimeFields.classList.toggle("hidden", document.getElementById("editTierSelect").value !== "lifetime");
+    });
+
+    // Toggle the lifetime-only fields live as the admin changes tier
+    // mid-edit, before saving.
+    document.getElementById("editTierSelect").addEventListener("change", () => {
+        const editLifetimeFields = document.getElementById("editLifetimeFields");
+        editLifetimeFields.classList.toggle("hidden", document.getElementById("editTierSelect").value !== "lifetime");
+    });
     document.getElementById("closeEditModal").addEventListener("click", () => closeModal(editModal));
     document.getElementById("cancelEditModalBtn").addEventListener("click", () => closeModal(editModal));
 
     document.getElementById("confirmEditBtn").addEventListener("click", async () => {
         const id = document.getElementById("editPartnerId").value;
-        const partner = allPartners.find(p => p._id === id);
+        const selectedTier = document.getElementById("editTierSelect").value;
 
         const payload = {
             name: document.getElementById("editNameInput").value.trim(),
-            referralCode: document.getElementById("editCodeInput").value.trim()
+            referralCode: document.getElementById("editCodeInput").value.trim(),
+            tier: selectedTier
         };
 
-        if (partner && partner.tier === "lifetime") {
+        if (selectedTier === "lifetime") {
             payload.tag = document.getElementById("editTagSelect").value;
             payload.registrationFlatAmount = Math.round(Number(document.getElementById("editRegistrationFlatInput").value || 0) * 100);
             payload.examFlatAmount = Math.round(Number(document.getElementById("editExamFlatInput").value || 0) * 100);
