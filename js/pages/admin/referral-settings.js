@@ -146,11 +146,14 @@ const init = async () => {
                 </td>
                 <td>
                     <div class="table-actions">
-                        ${!p.subaccountDeletedAt
-                            ? `<button class="btn-icon btn-icon-delete" title="Remove Subaccount" onclick="openDeleteModal('${p._id}')">🗑️</button>`
-                            : `<span style="font-size: var(--text-xs); color: var(--color-text-muted);">Clears automatically</span>`}
+                        ${p.subaccountDeletedAt
+                            ? `<span style="font-size: var(--text-xs); color: var(--color-text-muted);">Clears automatically</span>`
+                            : Auth.isSuperAdmin()
+                                ? `<button class="btn-icon btn-icon-delete" title="Remove Subaccount" onclick="openDeleteModal('${p._id}')">🗑️</button>`
+                                : `<span style="font-size: var(--text-xs); color: var(--color-text-muted);">View only</span>`}
                     </div>
                 </td>
+                  
             </tr>
         `).join("");
     };
@@ -185,10 +188,12 @@ const init = async () => {
         }
     });
 
-    // ── INIT ──
-    await loadSettings();
+// ── INIT ──
+    // GET /admin/referral-settings is now superadmin-only on the backend —
+    // don't even attempt the call for a regular admin, avoids a needless 403.
+    if (Auth.isSuperAdmin()) {
+        await loadSettings();
+    }
     await loadSubaccounts();
-
-};
 
 init();
