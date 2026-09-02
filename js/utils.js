@@ -55,17 +55,21 @@ escapeHTML: (str) => {
     },
 
     // Format currency
-    formatCurrency: (amount) => {
-        return new Intl.NumberFormat("en-NG", {
-            style: "currency",
-            currency: "NGN"
-        }).format(amount);
-    },
 
-    // Truncate text
+// Truncate text
     truncate: (text, length = 100) => {
         return text.length > length ? text.substring(0, length) + "..." : text;
     },
+
+    // Mask an account number, showing only the last 4 digits —
+    // used on user-facing payout account displays.
+    maskAccountNumber: (accountNumber) => {
+        if (!accountNumber) return "";
+        const str = String(accountNumber);
+        if (str.length <= 4) return str;
+        return "*".repeat(str.length - 4) + str.slice(-4);
+    },
+
 
     // Show/hide page loader
     showLoader: () => {
