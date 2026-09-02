@@ -219,6 +219,10 @@ const init = async () => {
                 </td>
                 <td><span class="badge ${p.tier === "lifetime" ? "badge-warning" : "badge-info"}">${p.tier}</span></td>
                 <td>
+                    <p style="font-size: var(--text-sm); font-weight: var(--font-medium);">${Utils.escapeHTML(p.bankDetails?.bankName || "—")}</p>
+                    <p style="font-size: var(--text-sm);">${Utils.escapeHTML(p.bankDetails?.accountName || "")}</p>
+                    <p style="font-size: var(--text-xs); color: var(--color-text-muted); font-family: monospace;">${Utils.escapeHTML(p.bankDetails?.accountNumber || "")}</p>
+                </td>
                     <p style="font-size: var(--text-sm);">${Utils.escapeHTML(p.bankDetails?.accountName || "—")}</p>
                     <p style="font-size: var(--text-xs); color: var(--color-text-muted);">${Utils.escapeHTML(p.bankDetails?.accountNumber || "")}</p>
                 </td>
