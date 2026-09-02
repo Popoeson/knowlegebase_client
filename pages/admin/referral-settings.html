@@ -134,7 +134,7 @@
                 </div>
             </div>
 
-            <!-- SUBACCOUNTS -->
+     <!-- SUBACCOUNTS -->
             <div class="section-header mb-4">
                 <h2 class="section-title">
                     Payout Subaccounts
@@ -161,6 +161,50 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- PENDING PAYOUTS (60-day manual claim) — superadmin only -->
+            <div class="superadmin-only">
+                <div class="section-header mb-4">
+                    <h2 class="section-title">
+                        Pending Payouts
+                        <span id="pendingPayoutsCount" class="text-muted" style="font-size: var(--text-sm); font-weight: 400;"></span>
+                    </h2>
+                </div>
+
+                <div class="legal-highlight" style="margin-bottom: var(--space-4);">
+                    <p>
+                        These are referral payouts snapshotted while the partner had no
+                        payout account set up. They resolve automatically once the partner
+                        completes setup. A payout can only be manually claimed back to
+                        ASODEM after sitting pending for 60 days or more — this is a
+                        deliberate, auditable resolution, not the same as pausing for an
+                        inactive partner.
+                    </p>
+                </div>
+
+                <div class="card" style="margin-bottom: var(--space-8);">
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Partner</th>
+                                    <th>Student</th>
+                                    <th>Reference</th>
+                                    <th>Payout Amount</th>
+                                    <th>Days Pending</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pendingPayoutsTable">
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
