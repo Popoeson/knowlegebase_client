@@ -212,6 +212,22 @@
     </div>
 </div>
 
+   <!-- CLAIM PENDING PAYOUT CONFIRM MODAL -->
+<div class="modal-overlay hidden" id="claimPayoutModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Claim Pending Payout</h3>
+            <button class="modal-close" id="closeClaimPayoutModal">✕</button>
+        </div>
+        <p style="color: var(--color-text-secondary); margin-bottom: var(--space-4);" id="claimPayoutModalText"></p>
+        <input type="hidden" id="claimPaymentId">
+        <div class="modal-footer">
+            <button class="btn btn-ghost" id="cancelClaimPayoutBtn">Cancel</button>
+            <button class="btn btn-accent" id="confirmClaimPayoutBtn" style="background-color: var(--color-error);">Claim to ASODEM</button>
+        </div>
+    </div>
+</div>
+
 <!-- DELETE SUBACCOUNT CONFIRM MODAL -->
 <div class="modal-overlay hidden" id="deleteSubaccountModal">
     <div class="modal">
