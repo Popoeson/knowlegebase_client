@@ -203,9 +203,11 @@
 
                     <!-- Confirmed account summary (shown when a recipient exists) -->
                     <div id="payoutAccountSummary" class="hidden" style="margin-bottom: var(--space-4);">
-                        <p style="color: var(--color-success); font-weight: var(--font-semibold); margin-bottom: var(--space-1);">
+                        <p style="color: var(--color-success); font-weight: var(--font-semibold); margin-bottom: var(--space-2);">
                             ✅ <span id="confirmedAccountName"></span>
                         </p>
+                        <p style="font-size: var(--text-sm); color: var(--color-text-secondary); margin-bottom: var(--space-1);" id="confirmedBankName"></p>
+                        <p style="font-size: var(--text-sm); font-family: monospace; color: var(--color-text-muted); margin-bottom: var(--space-3);" id="confirmedAccountNumber"></p>
                         <p style="color: var(--color-text-muted); font-size: var(--text-sm); margin-bottom: var(--space-3);" id="cooldownNote"></p>
                         <button class="btn btn-outline btn-sm" id="editPayoutBtn">Change Payout Account</button>
                     </div>
