@@ -176,6 +176,11 @@ const init = async () => {
         }
     });
 
+    const getSelectedBankName = () => {
+        const option = bankSelect.options[bankSelect.selectedIndex];
+        return option ? option.textContent : "";
+    };
+
     // Re-verification required if the person changes bank or number after
     // a successful verify — prevents saving a stale/mismatched preview.
     [bankSelect, accountNumberInput].forEach(el => {
@@ -191,6 +196,7 @@ const init = async () => {
     // ── SAVE PAYOUT ACCOUNT ──
     savePayoutBtn.addEventListener("click", async () => {
         const bankCode = bankSelect.value;
+        const bankName = getSelectedBankName();
         const accountNumber = accountNumberInput.value.trim();
 
         if (!verifiedAccountName) {
@@ -202,7 +208,8 @@ const init = async () => {
         savePayoutBtn.textContent = "Saving...";
 
         try {
-            const response = await api.put("/referral/payout-account", { bankCode, accountNumber });
+            const response = await api.put("/referral/payout-account", { bankCode, bankName, accountNumber });
+
             Utils.toast(response.message, "success");
             await loadPartnerInfo();
         } catch (error) {
@@ -346,15 +353,18 @@ const init = async () => {
             savePayoutBtn.classList.add("hidden");
             bankSelect.value = "";
             accountNumberInput.value = "";
-    
-            if (partner.hasSubaccount) {
+
+           if (partner.hasSubaccount) {
                 payoutFormWrapper.classList.add("hidden");
                 payoutAccountSummary.classList.remove("hidden");
                 cancelEditBtn.classList.add("hidden");
                 document.getElementById("confirmedAccountName").textContent = partner.payoutAccountName || "Payout account set up";
+                document.getElementById("confirmedBankName").textContent = partner.payoutBankName || "";
+                document.getElementById("confirmedAccountNumber").textContent =
+                    partner.payoutAccountNumber ? Utils.maskAccountNumber(partner.payoutAccountNumber) : "";
                 document.getElementById("cooldownNote").textContent =
                     "Account details can be changed once every 14 days. Contact an admin if you need an earlier change.";
-            } else {
+            } else { 
                 payoutAccountSummary.classList.add("hidden");
                 payoutFormWrapper.classList.remove("hidden");
                 cancelEditBtn.classList.add("hidden");
