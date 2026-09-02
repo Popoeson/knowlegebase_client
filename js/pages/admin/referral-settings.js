@@ -107,6 +107,89 @@ const init = async () => {
     });
 
     // ══════════════════════════════════════════
+    // PENDING PAYOUTS (60-day manual claim)
+    // ══════════════════════════════════════════
+
+    const pendingPayoutsTable = document.getElementById("pendingPayoutsTable");
+    const pendingPayoutsCount = document.getElementById("pendingPayoutsCount");
+    const claimPayoutModal = document.getElementById("claimPayoutModal");
+
+    const loadPendingPayouts = async () => {
+        try {
+            const response = await api.get("/admin/referral-pending-payouts");
+            renderPendingPayouts(response.payouts);
+        } catch (error) {
+            pendingPayoutsTable.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Failed to load pending payouts</td></tr>`;
+        }
+    };
+
+    const renderPendingPayouts = (payouts) => {
+        pendingPayoutsCount.textContent = `(${payouts.length})`;
+
+        if (payouts.length === 0) {
+            pendingPayoutsTable.innerHTML = `<tr><td colspan="7" class="text-center text-muted">No pending payouts</td></tr>`;
+            return;
+        }
+
+        pendingPayoutsTable.innerHTML = payouts.map((p, index) => `
+            <tr>
+                <td>${index + 1}</td>
+                <td>
+                    <p style="font-weight: var(--font-semibold);">${Utils.escapeHTML(p.partner?.name || "—")}</p>
+                    <p style="font-size: var(--text-xs); color: var(--color-text-muted); font-family: monospace;">${Utils.escapeHTML(p.partner?.referralCode || "")}</p>
+                </td>
+                <td>
+                    <p style="font-size: var(--text-sm);">${Utils.escapeHTML(p.user?.fullName || (p.user ? p.user.firstName + " " + p.user.surname : "—"))}</p>
+                    <p style="font-size: var(--text-xs); color: var(--color-text-muted);">${Utils.escapeHTML(p.user?.email || "")}</p>
+                </td>
+                <td><span style="font-size: var(--text-xs); font-family: monospace;">${Utils.escapeHTML(p.reference)}</span></td>
+                <td>${Utils.formatCurrency((p.referralPayoutAmount || 0) / 100)}</td>
+                <td>
+                    <span class="badge ${p.claimEligible ? "badge-warning" : "badge-info"}">
+                        ${p.daysPending !== null ? p.daysPending : "—"} day${p.daysPending === 1 ? "" : "s"}
+                    </span>
+                </td>
+                <td>
+                    <div class="table-actions">
+                        ${p.claimEligible
+                            ? `<button class="btn-icon btn-icon-delete" title="Claim to ASODEM" onclick="openClaimModal('${p._id}', '${Utils.escapeHTML(p.partner?.name || "this partner")}', ${p.daysPending})">💰</button>`
+                            : `<span style="font-size: var(--text-xs); color: var(--color-text-muted);">Not yet eligible</span>`}
+                    </div>
+                </td>
+            </tr>
+        `).join("");
+    };
+
+    window.openClaimModal = (paymentId, partnerName, daysPending) => {
+        document.getElementById("claimPaymentId").value = paymentId;
+        document.getElementById("claimPayoutModalText").textContent =
+            `This payout for ${partnerName} has been pending for ${daysPending} days with no payout account set up. Claiming it moves this amount to ASODEM permanently — it will not be paid out even if the partner later completes their account setup. This action cannot be undone.`;
+        openModal(claimPayoutModal);
+    };
+
+    document.getElementById("closeClaimPayoutModal").addEventListener("click", () => closeModal(claimPayoutModal));
+    document.getElementById("cancelClaimPayoutBtn").addEventListener("click", () => closeModal(claimPayoutModal));
+
+    document.getElementById("confirmClaimPayoutBtn").addEventListener("click", async () => {
+        const paymentId = document.getElementById("claimPaymentId").value;
+        const btn = document.getElementById("confirmClaimPayoutBtn");
+        btn.disabled = true;
+        btn.textContent = "Claiming...";
+
+        try {
+            const response = await api.request(`/admin/referral-pending-payouts/${paymentId}/claim`, { method: "PATCH" });
+            Utils.toast(response.message, "success");
+            closeModal(claimPayoutModal);
+            await loadPendingPayouts();
+        } catch (error) {
+            Utils.toast(error.message, "error");
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Claim to ASODEM";
+        }
+    });
+
+    // ══════════════════════════════════════════
     // SUBACCOUNTS
     // ══════════════════════════════════════════
 
@@ -189,10 +272,12 @@ const init = async () => {
     });
 
 // ── INIT ──
-    // GET /admin/referral-settings is now superadmin-only on the backend —
-    // don't even attempt the call for a regular admin, avoids a needless 403.
+    // GET /admin/referral-settings and /admin/referral-pending-payouts are
+    // both superadmin-only on the backend — don't even attempt the calls
+    // for a regular admin, avoids needless 403s.
     if (Auth.isSuperAdmin()) {
         await loadSettings();
+        await loadPendingPayouts();
     }
     await loadSubaccounts();
 
